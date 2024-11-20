@@ -7,10 +7,15 @@ import ChartRevenues from './Chart/ChartRevenues';
 import MostProductOrder from './Chart/MostProductOrder';
 import { totalOrderToday } from '../../../api/Order';
 import { countEmployee } from '../../../api/EmployeeApi';
+import { getAllCustomer } from '../../../api/Customer';
 const Dashboard = ({ UserName }) => {
 
-
-
+    const [customer, setCustomer] = useState([]);
+    useEffect(() => {
+        getAllCustomer().then((response) => {
+            setCustomer(response.data);
+        })
+    }, [customer])
     const [totalOrder, setTotalOrder] = useState();
 
     const [employeeCount, setCountEmployee] = useState();
@@ -162,7 +167,7 @@ const Dashboard = ({ UserName }) => {
                                         <div className='btn-box center '>
                                             <button className="bg-white border-0 w-100 rounded start">
                                                 <div className="d-flex start" >
-                                                    <i class="fa-solid fa-trash border  p-3 rounded-circle"></i>
+                                                    <i class="fa-solid fa-trash border   text-primary p-3 rounded-circle"></i>
                                                     <div className="d-block text-title text-start px-2">
                                                         <span className=''>Trash</span> <br />
                                                         <span className='f-10 text-secondary'>new item 324 trash your file problem</span>
@@ -175,7 +180,7 @@ const Dashboard = ({ UserName }) => {
                                         <div className='btn-box center '>
                                             <button className="bg-white border-0 w-100 rounded start">
                                                 <div className="start" >
-                                                    <i class="fa-solid fa-envelope border p-3 rounded-circle"></i>
+                                                    <i class="fa-solid fa-envelope border  text-warning p-3 rounded-circle"></i>
                                                     <div className="d-block  text-start px-2">
                                                         <span className=''>Message</span> <br />
                                                         <span className='f-10 text-secondary text-title w-25'>New massage from saka da , raek smey , punlue</span>
@@ -189,10 +194,10 @@ const Dashboard = ({ UserName }) => {
                                         <div className='btn-box center '>
                                             <button className="bg-white border-0 w-100 rounded start">
                                                 <div className="start" >
-                                                    <i class="fa-solid fa-database border p-3 rounded-circle"></i>
+                                                    <i class="fa-solid fa-database border  text-info p-3 rounded-circle"></i>
                                                     <div className="d-block  text-start px-2">
                                                         <span className=''>Database Storage</span> <br />
-                                                        <span className='f-10 text-secondary text-title w-25'>200MB </span>
+                                                        <span className='f-10 text-secondary text-title  w-25'>200MB </span>
                                                     </div>
                                                 </div>
 
@@ -211,7 +216,7 @@ const Dashboard = ({ UserName }) => {
                 </div>
 
 
-                <div className='container-fluid w-100 p-0 center my-3 animation-2 bg-white rounded box-shadow'>
+                <div className='container-fluid w-100 p-0 center my-3  bg-white rounded box-shadow'>
                     <div className="row w-100 p-0">
                         <div className="col-xl-9 col-sm-12">
                             <div className="card border-0 bgso  center" style={{ height: '540px' }}>
@@ -230,10 +235,57 @@ const Dashboard = ({ UserName }) => {
 
                     </div>
                 </div>
-                <div className='container-fluid w-100 p-0 center animation-3'>
+                <div className='container-fluid w-100 p-0 center  bg-white '>
                     <div className="row w-100">
-                        <div className="col-xl-9 col-md-8 col-12">
-
+                        <div className="col-xl-9 col-md-8 col-12 box-shadow rounded">
+                            <h6 className='p-3 px-0'>Customer Membership</h6>
+                            <div className="row">
+                                <div className="col-xl-2 col-lg-3 col-md-3 col-6">
+                                    <div className="card p-0">
+                                        <div className="card-img-top p-1">
+                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
+                                        </div>
+                                        <div className="card-body p-1 px-3">
+                                            <div className="text-title text-start pb-1">Johny Cross</div>
+                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-xl-2 col-lg-3 col-md-3 col-6">
+                                    <div className="card p-0">
+                                        <div className="card-img-top p-1">
+                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
+                                        </div>
+                                        <div className="card-body p-1 px-3">
+                                            <div className="text-title text-start pb-1">Johny Cross</div>
+                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-xl-2 col-lg-3 col-md-3 col-6">
+                                    <div className="card p-0">
+                                        <div className="card-img-top p-1">
+                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
+                                        </div>
+                                        <div className="card-body p-1 px-3">
+                                            <div className="text-title text-start pb-1">Johny Cross</div>
+                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-xl-2 col-lg-3 col-md-3 col-6">
+                                    <div className="card p-0">
+                                        <div className="card-img-top p-1">
+                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
+                                        </div>
+                                        <div className="card-body p-1 px-3">
+                                            <div className="text-title text-start pb-1">Johny Cross</div>
+                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button className='btn btn-outline-secondary px-5 my-2'>View All</button>
                         </div>
                         <div className="col-xl-3 col-md-4 pb-2">
                             <div className="card py-4 border pointer text-dark" style={{ height: '250px' }}>
@@ -256,6 +308,7 @@ const Dashboard = ({ UserName }) => {
 
 
                     </div>
+
                 </div>
 
             </div>

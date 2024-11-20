@@ -7,7 +7,17 @@ import { createProduct, updateProduct } from '../../../api/Product'
 import { getProductById } from '../../../api/Product'
 import { getAllBranch } from '../../../api/Branch'
 import { useNavigate } from 'react-router-dom'
+import { getAllCategory } from '../../../api/Category'
 const InsertItem = () => {
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        getAllCategory().then((response) => {
+            setCategories(response.data);
+        }).catch(e => {
+            console.error(e);
+        })
+    }, [categories])
     const [productData, setProductData] = useState({
         createdBy: '',
         updatedBy: '',
@@ -272,7 +282,7 @@ const InsertItem = () => {
                                                 </button>
                                                 <ul className="dropdown-menu w-100 box-shadow">
                                                     {
-                                                        category.map(c =>
+                                                        categories.map(c =>
                                                             <li>
                                                                 <a className="dropdown-item pointer"
                                                                     onClick={() => {
