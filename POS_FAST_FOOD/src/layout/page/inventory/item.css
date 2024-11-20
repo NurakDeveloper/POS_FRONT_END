@@ -1,0 +1,21 @@
+.sticky {
+    position: sticky;
+    top: 0;
+}
+
+table {
+    font-size: 12px;
+}
+
+td {
+    vertical-align: middle;
+
+}
+
+.text-title {
+    width: 90%;
+    white-space: nowrap;
+    /* Prevent text from wrapping to the next line */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

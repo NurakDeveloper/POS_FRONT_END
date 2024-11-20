@@ -1,0 +1,47 @@
+.menu {
+    border-radius: 15px;
+    height: 10vh;
+    width: 250px;
+    position: sticky;
+    top: 0;
+}
+
+.menu-item {
+    padding: 10px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    color: rgb(115, 115, 115);
+    margin: 7px 0px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.1s;
+
+}
+
+.menu-item:hover {
+    border-left: 7px solid salmon;
+}
+
+.bg-orange {
+    background: rgb(235, 116, 52);
+    color: aliceblue;
+
+}
+
+.menu-title {
+    padding: 10px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    color: silver;
+    margin: 7px 0px;
+}
+
+.btn-box {
+    width: 100%;
+    height: 75px;
+    padding: 10px 7px;
+    background: white;
+    color: rgb(45, 45, 45);
+}

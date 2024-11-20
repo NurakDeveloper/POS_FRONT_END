@@ -1,0 +1,21 @@
+/* From Uiverse.io by SchawnnahJ */
+.loader {
+    cursor: wait;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 2px;
+    background: rgb(35, 82, 171);
+    animation: width 0.3s;
+}
+
+
+@keyframes width {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}

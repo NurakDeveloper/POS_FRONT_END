@@ -1,0 +1,70 @@
+.form-content {
+    width: 500px;
+    max-width: 600px;
+    display: block;
+    padding: 16px;
+    font-size: 16px;
+}
+
+.c-cyan {
+    color: rgb(38, 202, 123);
+}
+
+.input-box {
+    border: none;
+    background: none;
+    border-bottom: 1px solid rgb(220, 220, 220);
+    padding: 7px 10px;
+}
+
+.input-box:hover {
+    border-bottom: 1px solid rgb(170, 170, 170);
+}
+
+.input-box:focus {
+    border-bottom: 1px solid rgb(42, 41, 41);
+}
+
+textarea:focus {
+    outline-width: 0;
+}
+
+
+
+.form-login {
+    max-width: 500px;
+    padding: 15px;
+    width: 100%;
+    border: 1px solid white;
+    /* border: 10px; */
+    border-radius: 10px;
+    background: rgba(189, 189, 189, 0.1);
+}
+
+.form-back {
+    /* backdrop-filter: blur(10px); */
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.txt-bottom {
+    border: none;
+    border-bottom: 1px solid rgb(150, 150, 150);
+    background: none;
+}
+
+.txt-bottom:hover {
+    border-bottom: 1px solid rgb(181, 181, 181);
+}
+
+.txt-bottom:focus {
+    border-bottom: 1px solid rgb(238, 238, 238);
+}
+
+.txt-bottom::placeholder {
+    color: rgb(214, 214, 214);
+}
+
+.login {
+    background-image: url('https://malis.thalias.com.kh/wp-content/uploads/2024/07/old-cement-wall-texture-scaled.jpg');
+}

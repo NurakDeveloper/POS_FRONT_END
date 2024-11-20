@@ -1,0 +1,296 @@
+.pos-view-order {
+    width: 600px;
+    height: 100vh;
+    padding: 10px;
+    background: white;
+
+}
+
+.btn-category {
+    padding: 10px;
+    width: 110px;
+    height: 110px;
+    border: 1px solid silver;
+    border-radius: 10px;
+}
+
+.pos {
+
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+}
+
+.order {
+    background-color: rgba(41, 40, 40, 0.4);
+    backdrop-filter: blur(2px);
+}
+
+.pos-info {
+    width: 480px;
+    height: 100vh;
+    overflow: scroll;
+}
+
+
+.img-btn {
+    max-height: 50px;
+}
+
+.img-btn:hover {
+    transform: scale(1.1);
+}
+
+.card-img {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+
+
+.card-product {
+    transition-duration: 0.3s;
+    cursor: pointer;
+    border: 1px solid rgb(76, 76, 76);
+    background: rgba(18, 18, 18, 0.7);
+    padding: 10px;
+    backdrop-filter: blur(0.4px);
+}
+
+.text-product {
+    color: rgb(245, 164, 44);
+}
+
+.text-des {
+    color: rgb(183, 183, 183);
+}
+
+.text-green {
+    color: rgb(24, 185, 24);
+}
+
+.card-product-light {
+    background: white;
+    cursor: pointer;
+}
+
+.card-product:hover {
+    border: 1px solid rgb(113, 113, 113);
+    box-shadow: rgba(185, 185, 185, 0.2) 0px 2px 8px 0px;
+}
+
+.card-product-light:hover {
+    box-shadow: rgba(185, 185, 185, 0.2) 0px 2px 8px 0px;
+}
+
+.bg {
+    z-index: -1;
+    background-color: rgb(12, 12, 12);
+    /* background-image: url('https://img.freepik.com/free-photo/brown-wooden-textured-flooring-background_53876-101851.jpg?t=st=1729937952~exp=1729941552~hmac=79844a72cc7841deb1a99a4209b10d28d022acfc8ee28f1a0c597352a3bc3544&w=2000'); */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.btn-shop {
+    background: white;
+    color: rgb(42, 102, 220);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    font-size: 10px;
+    transition-duration: 0.3s;
+    /* border: 1px solid rgb(42, 102, 220); */
+}
+
+.btn-shop:hover {
+    background: rgb(42, 102, 220);
+    color: white;
+}
+
+input:focus {
+    outline-width: 0;
+}
+
+.fadeIn {
+    -webkit-animation-name: fadeIn;
+    animation-name: fadeIn;
+    -webkit-animation-duration: 0, 7s;
+    animation-duration: 0.7s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.img-pos-order {
+    max-width: 120px;
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+}
+
+.small-i {
+    font-size: 13px;
+    background: rgb(248, 118, 26);
+    color: white;
+    padding: 8px;
+    padding: 6px 10px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.bg-sliver {
+    background-color: aliceblue;
+}
+
+.bg-orange {
+    background: rgb(248, 118, 26);
+    color: rgb(225, 225, 225);
+}
+
+.color-orange {
+    background: rgb(248, 118, 26);
+}
+
+.btn-orange {
+    background: rgb(248, 118, 26);
+    color: rgb(255, 255, 255);
+    transition-duration: 0.2s;
+}
+
+.btn-orange:hover {
+    background: rgb(211, 96, 15);
+    color: white;
+}
+
+.bg-none {
+    background: none;
+}
+
+.hover-zoom {
+    transition-duration: 0.3s;
+}
+
+.hover-zoom:hover {
+    transform: scale(1.2);
+}
+
+.btn-yellow {
+    border: 1px solid coral;
+    color: rgb(245, 103, 51);
+}
+
+.btn-yellow:hover {
+    border: 1px solid rgb(237, 97, 46);
+    color: rgb(237, 97, 46);
+}
+
+@keyframes move {
+    100% {
+        transform: translate3d(0, 0, 1px) rotate(360deg);
+    }
+}
+
+
+
+
+.slideInLeft {
+    -webkit-animation-name: slideInLeft;
+    animation-name: slideInLeft;
+    -webkit-animation-duration: 0.3s;
+    animation-duration: 0.3s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+@-webkit-keyframes slideInLeft {
+    0% {
+        -webkit-transform: translateX(-100%);
+        transform: translateX(-100%);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translateX(0);
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    0% {
+        -webkit-transform: translateX(-100%);
+        transform: translateX(-100%);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translateX(0);
+        transform: translateX(0);
+    }
+}
+
+.slideInRight {
+    -webkit-animation-name: slideInRight;
+    animation-name: slideInRight;
+    -webkit-animation-duration: 0.3s;
+    animation-duration: 0.3s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+@-webkit-keyframes slideInRight {
+    0% {
+        -webkit-transform: translateX(100%);
+        transform: translateX(100%);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translateX(0);
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    0% {
+        -webkit-transform: translateX(100%);
+        transform: translateX(100%);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translateX(0);
+        transform: translateX(0);
+    }
+}
+
+
+.bg-blur-dark {
+    background: rgb(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+
+.bg-blur-light {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(30px);
+}
