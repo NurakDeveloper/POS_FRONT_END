@@ -8,6 +8,7 @@ import { getProductById } from '../../../api/Product'
 import { getAllBranch } from '../../../api/Branch'
 import { useNavigate } from 'react-router-dom'
 import { getAllCategory } from '../../../api/Category'
+import './itemform.css'
 const InsertItem = () => {
     const [categories, setCategories] = useState([]);
 
@@ -17,7 +18,7 @@ const InsertItem = () => {
         }).catch(e => {
             console.error(e);
         })
-    }, [categories])
+    }, [])
     const [productData, setProductData] = useState({
         createdBy: '',
         updatedBy: '',
@@ -125,6 +126,12 @@ const InsertItem = () => {
         })
 
     }
+    function preview(e) {
+        e.preventDefault();
+        const jsonString = JSON.stringify(productData, null, 2); // 'null, 2' formats the JSON for readability
+
+        alert(jsonString)
+    }
     useEffect(() => {
         if (id) {
             getProductById(id).then((reponse) => {
@@ -158,11 +165,7 @@ const InsertItem = () => {
             <form action=''>
                 <div className="container-fluid p-0 center">
                     <div className="row w-100">
-                        <div className="col-xl-9" style={{ height: '900px' }}>
-                            <div class="btn-group my-2" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-outline-secondary px-4" onClick={submitProduct}><i class="fa-solid fa-cloud-arrow-down"></i></button>
-                                <button type="button" class="btn btn-outline-secondary"><i class="fa-solid fa-circle-xmark"></i></button>
-                            </div>
+                        <div className="col-xl-12" style={{ height: '900px' }}>
                             <div className="border bg-white w-100 rounded">
                                 <div className="d-flex h-100" >
                                     <div className='start w-50 p-2'>
@@ -179,7 +182,7 @@ const InsertItem = () => {
                                     </div>
 
                                     <div className='end p-2 w-50 d-flex'>
-                                        <div className='d-flex' style={{ height: '120px', width: '170px', overflow: 'hidden' }}>
+                                        <div className='d-flex' style={{ height: '140px', width: '170px', overflow: 'hidden' }}>
                                             <div className='d-block text-center fs-6' style={{ width: '40px' }}>
                                                 <input type="file" name="" className='d-none' id="fileImage"
                                                     onChange={(e) => {
@@ -189,18 +192,13 @@ const InsertItem = () => {
                                                         }));
                                                     }}
                                                 />
-                                                <div className=' mt-2'>
-                                                    <label htmlFor="fileImage" className='pointer'><i class="fa-solid fa-pen font-12 c-cyan f-16"></i></label>
-                                                </div>
-                                                <div className=' py-3'>
-                                                    <i class="fa-solid fa-trash font-12 text-danger f-16 pointer"></i>
-                                                </div>
+
 
 
                                             </div>
-                                            <div className='center box-shadow rounded' style={{ height: '120px', width: '130px', overflow: 'hidden' }}>
-                                                <img src={`/src/assets/image/${productData.image}`} alt="" className="h-100" />
-                                            </div>
+                                            <label htmlFor="fileImage" className='center rounded-circle py-2 border pointer' style={{ height: '120px', width: '120px', overflow: 'hidden' }}>
+                                                <img src={`/src/assets/image/${productData.image}`} alt="" className="h-100 " />
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -355,7 +353,7 @@ const InsertItem = () => {
                                         </li>
 
                                     </ul>
-                                    <div class="tab-content border-0" id="myTabContent">
+                                    <div class="tab-content border-0 py-4" id="myTabContent">
                                         <div class="border-0 tab-pane show active " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                                             <div className="d-flex">
                                                 <div className='d-block text-start fs-6 bg-white px-4 py-2 w-75'>
@@ -403,29 +401,24 @@ const InsertItem = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="col-md-3" style={{ height: '900px' }}>
-                            <div className="card border-0 rounded bg-white h-100 w-100 p-2">
-                                <div className='d-flex p-2 border rounded start pointer' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
+                            <div className="between">
+                                <div className='w-50 d-flex mt-2'>
+                                    <div class="pb-2 px-2" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-outline-dark px-4 w-100 box-shadow rounded-pill" onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
                                     </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>Dara Chhun</div>
-                                        <div className='text-secondary'>Seller / pos</div>
-                                        <div className='f-16 hover-line pointer'>mobile : +885990340943</div>
-                                    </div>
+
+
                                 </div>
-                                <div className='d-flex p-2 border rounded start pointer mt-2' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
+                                <div className='w-50 d-flex end mt-2'>
+                                    <div class="pb-2  px-2" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn-red px-4 w-100 box-shadow rounded-pill"><i class="fa-solid fa-xmark px-2"></i>Cancel </button>
                                     </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>General</div>
-                                        <div className='text-secondary'>membership : no</div>
-                                        <div className='f-16 hover-line pointer'>Contact : +885990340943</div>
+                                    <div class="pb-2 " role="group" aria-label="Basic example">
+                                        <button type="button" class="btn-green px-4 w-100 box-shadow rounded-pill" onClick={submitProduct}><i class="fa-solid fa-check px-2"></i>Save </button>
                                     </div>
+
                                 </div>
+
                             </div>
                         </div>
                     </div>

@@ -9,38 +9,68 @@ const Menu = () => {
                     <img src="src/assets/image/logo.png" alt="" className='h-100' /> <br />
                     <div className='px-4 fw-bold fs-6'>FAST FOOD KH.</div>
                 </div>
+                <hr />
                 <div className="menu-item" onClick={() => goto('/')}>
                     <span className='w-25'><i class="fa-solid fa-globe"></i></span>
                     <span className='w-75 text-start'>Dashboard</span>
                 </div>
-                <div className="menu-item" onClick={() => goto('/inventory')}>
+                <div className="menu-title">
+                    Inventory
+                </div>
+                <div className="menu-item" onClick={() => goto('/list-item')}>
+                    <span className='w-25'><i class="fa-solid fa-bowl-food"></i></span>
+                    <span className='w-75 text-start'>Product</span>
+                </div>
+                <div className="menu-item" onClick={() => goto('/list-category')}>
+                    <span className='w-25'><i class="fa-solid fa-bolt"></i></span>
+                    <span className='w-75 text-start'>Category</span>
+                </div>
+                <div className="menu-item" onClick={() => goto('/list-category')}>
                     <span className='w-25'><i class="fa-solid fa-layer-group"></i></span>
-                    <span className='w-75 text-start'>inventory</span>
+                    <span className='w-75 text-start'>Purchase</span>
                 </div>
-                {/* <div className="menu-title fs-6">
-                    POS & ORDER
-                </div> */}
+                <div className="menu-title ">
+                    Order reporting
+                </div>
                 <div className="menu-item" onClick={() => goto('/pos-order')}>
-                    <span className='w-25'><i class="fa-solid fa-eye"></i></span>
-                    <span className='w-75 text-start'>Pos Order</span>
+                    <span className='w-25'><i class="fa-solid fa-file-lines"></i></span>
+                    <span className='w-75 text-start'>Pos order</span>
                 </div>
-                {/* <div className="menu-title fs-6">
-                    USER
-                </div> */}
+
+                <div className="menu-item" onClick={() => goto('/pos-order')}>
+                    <span className='w-25'><i class="fa-brands fa-wikipedia-w"></i></span>
+                    <span className='w-75 text-start'>Website order</span>
+                </div>
+                <div className="menu-item" onClick={() => goto('/pos-order')}>
+                    <span className='w-25'><i class="fa-solid fa-circle-info"></i></span>
+                    <span className='w-75 text-start'>Order details</span>
+                </div>
+                <div className="menu-title">
+                    User Management
+                </div>
                 <div className="menu-item" onClick={() => goto('/employees')}>
                     <span className='w-25'><i class="fa-solid fa-users"></i></span>
                     <span className='w-75 text-start'>Employees</span>
                 </div>
+
                 <div className="menu-item" onClick={() => goto('/list-customer')}>
                     <span className='w-25'><i class="fa-solid fa-circle-user"></i></span>
                     <span className='w-75 text-start'>Customer</span>
                 </div>
-                {/* <div className="menu-title fs-6">
-                    ACCOUNTANT
-                </div> */}
-                <div className="menu-item" onClick={() => goto('/accountant')}>
-                    <span className='w-25'><i class="fa-solid fa-business-time"></i></span>
-                    <span className='w-75 text-start'>Accountant</span>
+                <div className="menu-item" onClick={() => goto('/list-vendor')}>
+                    <span className='w-25'><i class="fa-solid fa-user-tie"></i></span>
+                    <span className='w-75 text-start'>Vendor</span>
+                </div>
+                <div className="menu-title">
+                    Accounting
+                </div>
+                <div className="menu-item" onClick={() => goto('/journal')}>
+                    <span className='w-25'><i class="fa-solid fa-book"></i></span>
+                    <span className='w-75 text-start'>Journal entries</span>
+                </div>
+                <div className="menu-item" onClick={() => goto('/chart-of-account')}>
+                    <span className='w-25'><i class="fa-solid fa-asterisk"></i></span>
+                    <span className='w-75 text-start'>Chart of accounts</span>
                 </div>
                 {/* <div className="menu-title fs-6">
                     ATTRIBUTE

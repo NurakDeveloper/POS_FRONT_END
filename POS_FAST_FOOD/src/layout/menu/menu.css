@@ -9,18 +9,21 @@
 .menu-item {
     padding: 10px;
     display: flex;
+    font-size: 14px;
     justify-content: start;
     align-items: center;
     color: rgb(115, 115, 115);
     margin: 7px 0px;
     cursor: pointer;
     text-align: center;
-    transition: 0.1s;
+    transition: 0.2s;
+    border-bottom: 1px solid white;
 
 }
 
 .menu-item:hover {
-    border-left: 7px solid salmon;
+    border-bottom: 1px solid salmon;
+    color: salmon;
 }
 
 .bg-orange {
@@ -32,6 +35,7 @@
 .menu-title {
     padding: 10px;
     display: flex;
+    font-size: 12px;
     justify-content: start;
     align-items: center;
     color: silver;

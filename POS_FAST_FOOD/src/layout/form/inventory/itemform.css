@@ -14,3 +14,27 @@
 .f-input:focus {
     border-bottom: 1px solid #696969;
 }
+
+.btn-green {
+    background: rgb(76, 156, 39);
+    color: white;
+    transition-duration: 0.3s;
+    border: none;
+    padding: 10px 15px;
+}
+
+.btn-green:hover {
+    background: rgb(56, 117, 28);
+}
+
+.btn-red {
+    background: rgb(178, 61, 57);
+    color: white;
+    transition-duration: 0.3s;
+    border: none;
+    padding: 10px 15px;
+}
+
+.btn-red:hover {
+    background: rgb(134, 43, 40);
+}

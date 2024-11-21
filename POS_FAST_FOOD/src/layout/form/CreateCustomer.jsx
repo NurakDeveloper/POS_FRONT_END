@@ -5,8 +5,8 @@ const CreateCustomer = () => {
 
             <div>
                 <div className="row">
-                    <div className="col-xl-9 col-md-7 col-12">
-                        <div className="form-heder w-100 bg-white" style={{ maxHeight: '130px' }}>
+                    <div className="col-12">
+                        <div className="form-heder w-100 bg-white border" style={{ maxHeight: '130px' }}>
                             <form className="d-flex h-100" >
                                 <div className='start w-50 p-2'>
                                     <div className='w-100 px-4'>
@@ -108,20 +108,7 @@ const CreateCustomer = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xl-3 col-md-5 col-12">
-                        <div className="d-block m-auto px-2 py-3 bg-white sticky rounded">
-                            <div className="menu-item border-bottom">
-                                <span className='menu-icon fs-6'><i class="fa-solid fa-floppy-disk"></i></span>
-                                <span className='btn-menu-link'>Save</span>
-                            </div>
 
-                            <div className="menu-item border-bottom">
-                                <span className='menu-icon fs-6'><i class="fa-solid fa-xmark"></i></span>
-                                <span className='btn-menu-link '>Cancel</span>
-                            </div>
-
-                        </div>
-                    </div>
                 </div>
             </div>
 

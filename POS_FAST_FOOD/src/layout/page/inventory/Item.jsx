@@ -51,13 +51,13 @@ const Item = () => {
                                         <div className=" p-0 start" style={{ height: '200px', overflow: 'hidden', width: '55%' }}>
                                             <img src={`src/assets/image/${o.image}`} alt="" className='h-100' />
                                         </div>
-                                        <div className='font-14 ps-4 py-3' style={{ overflow: 'hidden', width: '45%' }}>
-                                            <div className='f-20 text-title' >
+                                        <div className='p-2' style={{ overflow: 'hidden', width: '45%' }}>
+                                            <div className='f-16 text-title' >
                                                 {o.productName}
                                             </div>
-                                            <div className='f-14' style={{ color: '#38A6CB' }}> <span className='text-secondary'>prepare : </span>{o.prepareTime} min</div>
-                                            <div className='f-14' style={{ maxHeight: '70px', overflow: 'hidden' }}>Sugar : {o.sugar} G</div>
-                                            <div className=' f-14'><span className=''>Price : </span> <span className=''>${o.price}</span></div>
+                                            <div className='f-16' style={{ color: '#38A6CB' }}> <span className='text-secondary'>prepare : </span>{o.prepareTime} min</div>
+                                            <div className='f-16' style={{ maxHeight: '70px', overflow: 'hidden' }}>Sugar : {o.sugar} G</div>
+                                            <div className=' f-16'><span className=''>Price : </span> <span className=''>${o.price}</span></div>
 
                                         </div>
 

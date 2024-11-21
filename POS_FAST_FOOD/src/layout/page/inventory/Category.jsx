@@ -13,7 +13,7 @@ const Category = () => {
         }).catch(e => {
             console.error(e);
         })
-    }, [categories])
+    }, [])
 
     const goto = useNavigate();
     function listCard() {
