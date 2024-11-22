@@ -74,20 +74,9 @@ const ItemDetail = () => {
                                         </div>
                                     </div>
 
-                                    <div className='end p-2 w-50 d-flex'>
-                                        <div className='d-flex' style={{ height: '120px', width: '170px', overflow: 'hidden' }}>
-                                            <div className='d-block text-center fs-6' style={{ width: '40px' }}>
-
-                                                <div className=' mt-2'>
-                                                    <label htmlFor="fileImage" className='pointer'><i class="fa-solid fa-pen font-12 c-cyan f-16"></i></label>
-                                                </div>
-                                                <div className=' py-3'>
-                                                    <i class="fa-solid fa-trash font-12 text-danger f-16 pointer"></i>
-                                                </div>
-
-
-                                            </div>
-                                            <div className='center box-shadow rounded' style={{ height: '120px', width: '130px', overflow: 'hidden' }}>
+                                    <div className='end p-2 w-50'>
+                                        <div className='d-flex end' style={{ height: '120px', width: '100%', overflow: 'hidden' }}>
+                                            <div className='center border border-3 rounded' style={{ height: '120px', overflow: 'hidden' }}>
                                                 <img src={`/src/assets/image/${productData.image}`} alt="" className="h-100" />
                                             </div>
                                         </div>

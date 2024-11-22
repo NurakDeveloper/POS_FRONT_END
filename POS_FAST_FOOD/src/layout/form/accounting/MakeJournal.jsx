@@ -98,7 +98,7 @@ const MakeJournal = () => {
             <div>
                 <div className="container-fluid p-0 center">
                     <div className="row w-100">
-                        <div className="col-xl-9" style={{ height: '900px' }}>
+                        <div className="col-12" style={{ height: '900px' }}>
                             <div class="btn-group my-2" role="group" aria-label="Basic example">
 
                                 <button type="button" class="btn btn-outline-secondary px-4" onClick={saveJournal}><i class="fa-solid fa-floppy-disk"></i></button>
@@ -178,19 +178,26 @@ const MakeJournal = () => {
                                                         {rows.map((row, index) => (
                                                             <tr key={index}>
                                                                 <td className="py-3" style={{ width: '400px' }}>
-                                                                    <div className="dropdown">
-                                                                        <button
-                                                                            className="btn p-1 w-100 d-flex text-secondary input-box rounded-0"
+                                                                    <div className="dropdown cursor-i p-0">
+                                                                        {/* <button
+                                                                            className="btn p-0 w-100 d-flex text-secondary input-box rounded-0"
                                                                             type="button"
                                                                             data-bs-toggle="dropdown"
                                                                             aria-expanded="false"
                                                                         >
                                                                             <p className="w-75 text-start text-title">
-                                                                                {acName[index] ? acName[index].name : "Select Account"}
+
                                                                             </p>
                                                                             <i className="w-25 text-end">&#10141;</i>
-                                                                        </button>
-                                                                        <ul className="dropdown-menu w-100 box-shadow">
+                                                                        </button> */}
+                                                                        <input type="text"
+                                                                            className="p-0 w-100 d-flex text-secondary input-box rounded-0 cursor-i"
+                                                                            data-bs-toggle="dropdown"
+                                                                            // style={{ height: '25px' }}
+                                                                            aria-expanded="false"
+                                                                            value={acName[index] ? acName[index].name : "Select Account"}
+                                                                        />
+                                                                        <ul className="dropdown-menu w-100 box-shadow" style={{ maxHeight: '200px', overflow: 'scroll' }}>
                                                                             {account.map(a => (
                                                                                 <li key={a.id}>
                                                                                     <a
@@ -221,6 +228,7 @@ const MakeJournal = () => {
                                                                         value={row.label || ""}
                                                                         onChange={(e) => handleChange(index, e)}
                                                                         className="input-box w-100"
+                                                                        placeholder="type yout label"
                                                                     />
                                                                 </td>
                                                                 <td>
@@ -266,30 +274,7 @@ const MakeJournal = () => {
                             </div>
                             <h6 className="bg-white text-end p-3">Total : {total}</h6>
                         </div>
-                        <div className="col-md-3" style={{ height: '900px' }}>
-                            <div className="card border-0 rounded bg-white h-100 w-100 p-2">
-                                <div className='d-flex p-2 border rounded start pointer' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
-                                    </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>Dara Chhun</div>
-                                        <div className='text-secondary'>Seller / pos</div>
-                                        <div className='f-16 hover-line pointer'>mobile : +885990340943</div>
-                                    </div>
-                                </div>
-                                <div className='d-flex p-2 border rounded start pointer mt-2' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
-                                    </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>General</div>
-                                        <div className='text-secondary'>membership : no</div>
-                                        <div className='f-16 hover-line pointer'>Contact : +885990340943</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
 
                 </div>

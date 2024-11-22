@@ -6,6 +6,10 @@
     font-size: 16px;
 }
 
+.group-input {
+    padding: 10px 0px;
+}
+
 .c-cyan {
     color: rgb(38, 202, 123);
 }
@@ -13,8 +17,8 @@
 .input-box {
     border: none;
     background: none;
-    border-bottom: 1px solid rgb(220, 220, 220);
-    padding: 7px 10px;
+    border-bottom: 1px solid rgb(240, 240, 240);
+    padding: 0px;
 }
 
 .input-box:hover {
@@ -22,12 +26,6 @@
 }
 
 .input-box:focus {
-    border-bottom: 1px solid rgb(42, 41, 41);
-}
-
-.input-box:focus::-webkit-input-placeholder {
-    /* Safari-specific styles (if needed) */
-    outline-width: 0;
     border-bottom: 1px solid rgb(42, 41, 41);
 }
 

@@ -44,20 +44,21 @@ const Item = () => {
                         <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12">
                             <div className="card bg-white p-0 pointer mb-3"
                                 onClick={() => goto(`/item-detail/${o.id}`)}
-                                style={{ height: '200px', overflow: 'hidden' }}
+                                style={{ height: '180px', overflow: 'hidden' }}
                             >
                                 <div className="card-body p-0 border-1 h-100">
                                     <div className="d-flex text-start h-100">
-                                        <div className=" p-0 start" style={{ height: '200px', overflow: 'hidden', width: '55%' }}>
+                                        <div className=" p-0 start" style={{ height: '180px', overflow: 'hidden', width: '45%' }}>
                                             <img src={`src/assets/image/${o.image}`} alt="" className='h-100' />
                                         </div>
-                                        <div className='p-2' style={{ overflow: 'hidden', width: '45%' }}>
+                                        <div className='f-14 p-2' style={{ overflow: 'hidden', width: '65%' }}>
                                             <div className='f-16 text-title' >
                                                 {o.productName}
                                             </div>
-                                            <div className='f-16' style={{ color: '#38A6CB' }}> <span className='text-secondary'>prepare : </span>{o.prepareTime} min</div>
-                                            <div className='f-16' style={{ maxHeight: '70px', overflow: 'hidden' }}>Sugar : {o.sugar} G</div>
-                                            <div className=' f-16'><span className=''>Price : </span> <span className=''>${o.price}</span></div>
+                                            <div className=''> <span className=''>prepare : </span>{o.prepareTime} min</div>
+                                            <div className='' style={{ maxHeight: '70px', overflow: 'hidden' }}>Sugar : {o.sugar} G</div>
+                                            <div className=''><span className=''>Price : </span> <span className=''>${o.price}</span></div>
+                                            <textarea name="" className='border-0 text-secondary w-100 py-2 h-100 f-10' id="" value={o.description} readOnly></textarea>
 
                                         </div>
 

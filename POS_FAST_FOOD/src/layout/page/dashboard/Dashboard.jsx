@@ -15,7 +15,7 @@ const Dashboard = ({ UserName }) => {
         getAllCustomer().then((response) => {
             setCustomer(response.data);
         })
-    }, [customer])
+    }, [])
     const [totalOrder, setTotalOrder] = useState();
 
     const [employeeCount, setCountEmployee] = useState();
@@ -101,57 +101,61 @@ const Dashboard = ({ UserName }) => {
 
                 <div className="container-fluid p-0">
                     <div className="row">
-                        <div className="col-xl-9 col-lg-6 col-md-6 col-sm-12 col-12">
-                            <div className='container-fluid w-100 p-2 pt-3 center animation bg-purple rounded'>
+                        <div className="col-xl-9 col-lg-6 col-md-6 col-sm-12 col-12 p-0">
+                            <div className='container-fluid w-100 center animation rounded p-0'>
                                 <div className="row w-100">
                                     <div className="col-xl-4 col-12  pb-2">
-                                        <div className="card py-4 border-0 pointer big-shadow text-white w-100 h-100 bgO" style={{ height: '200px' }}>
+                                        <div className="card py-4 border-0 pointer big-shadow text-white w-100 h-100 bg-purple" style={{ height: '200px' }}>
                                             <div className="card-header border-0 fs-5 d-block bg-none border-0">
-                                                <div className='d-flex'>
-                                                    <div className="w-100 center">
+                                                <div className='d-flex h-75'>
+                                                    <div className="w-100 center h-100">
                                                         <div>
                                                             <div className="fs-6 text-center">Sale Revenues</div>
                                                             <div className='fs-1'>$20,000.00</div>
                                                         </div>
                                                     </div>
-                                                    {/* <div className="w-25 end">
-                                            <div className="fs-6 center border rounded-circle text-white box-shadow" style={{ width: 60, height: 60 }}>
-                                                <i class="fa-solid fa-gauge"></i>
-                                            </div>
-                                        </div> */}
                                                 </div>
+                                                <div className="h-25 center">
+                                                    <button className="btn border-0 text-white">View Reporting <i class="fa-solid fa-arrow-right"></i></button>
+                                                </div>
+
                                             </div>
 
                                         </div>
                                     </div>
                                     <div className="col-xl-4 col-12 pb-2">
-                                        <div className="card py-4 border-0 pointer big-shadow text-white bgO" style={{ height: '200px' }}>
+                                        <div className="card py-4 border-0 pointer big-shadow text-white  bg-purple" style={{ height: '200px' }}>
                                             <div className="card-header border-0 fs-5 d-block bg-none border-0">
-                                                <div className='d-flex'>
-                                                    <div className="w-100 center">
+                                                <div className='d-flex h-75'>
+                                                    <div className="w-100 center h-100">
                                                         <div>
                                                             <div className="fs-6 text-center">Total Expense</div>
-                                                            <div className='fs-1'>$3,070.00</div>
+                                                            <div className='fs-1'>$20,000.00</div>
                                                         </div>
                                                     </div>
-
+                                                </div>
+                                                <div className="h-25 center">
+                                                    <button className="btn border-0 text-white">View Reporting <i class="fa-solid fa-arrow-right"></i></button>
                                                 </div>
                                             </div>
 
                                         </div>
                                     </div>
                                     <div className="col-xl-4 col-12 pb-2">
-                                        <div className="card py-4 border-0 pointer big-shadow text-white bgO" style={{ height: '200px' }}>
+                                        <div className="card py-4 border-0 pointer big-shadow text-white  bg-purple" style={{ height: '200px' }}>
                                             <div className="card-header border-0 fs-5 d-block bg-none border-0">
-                                                <div className='d-flex'>
-                                                    <div className="w-100 center">
+                                                <div className='d-flex h-75'>
+                                                    <div className="w-100 center h-100">
                                                         <div>
-                                                            <div className="fs-6 text-center">Sale Totday</div>
+                                                            <div className="fs-6 text-center">Total Daily Order</div>
                                                             <div className='fs-1'>{formatCurrency.format(totalOrder)}</div>
                                                         </div>
                                                     </div>
-
                                                 </div>
+                                                <div className="h-25 center">
+                                                    <button className="btn border-0 text-white">View Reporting <i class="fa-solid fa-arrow-right"></i></button>
+                                                </div>
+
                                             </div>
 
                                         </div>
@@ -160,9 +164,9 @@ const Dashboard = ({ UserName }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12 center ">
-                            <div className="card border-0 pointer bg-none p-0" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-                                <div className="h-100 d-flex" style={{ overflow: 'hidden' }}>
+                        <div className="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12 p-0">
+                            <div className="card border-0 pointer bg-none center" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+                                <div className="d-flex w-100" style={{ overflow: 'hidden' }}>
                                     <div className="card-body p-0">
                                         <div className='btn-box center '>
                                             <button className="bg-white border-0 w-100 rounded start">
@@ -216,17 +220,17 @@ const Dashboard = ({ UserName }) => {
                 </div>
 
 
-                <div className='container-fluid w-100 p-0 center my-3  bg-white rounded box-shadow'>
+                <div className='container-fluid w-100 p-0 center my-3  rounded '>
                     <div className="row w-100 p-0">
-                        <div className="col-xl-9 col-sm-12">
-                            <div className="card border-0 bgso  center" style={{ height: '540px' }}>
+                        <div className="col-xl-9 col-sm-12 p-0">
+                            <div className="card border-0 bgso  center box-shadow" style={{ height: '540px' }}>
                                 <div className="card-body w-100 p-3 bg-white rounded "  >
                                     <ChartRevenues />
                                 </div>
                             </div>
                         </div>
-                        <div className="col-xl-3 col-sm-12">
-                            <div className="card border-0 bgso  center rounded" style={{ height: '540px' }}>
+                        <div className="col-xl-3 col-sm-12 ">
+                            <div className="card border-0 bgso  center rounded box-shadow" style={{ height: '540px' }}>
                                 <div className="card-body w-100 bg-white p-1 rounded"  >
                                     <MostProductOrder />
                                 </div>
@@ -241,55 +245,57 @@ const Dashboard = ({ UserName }) => {
                             <h6 className='p-3 px-0'>Customer Membership</h6>
                             <div className="row">
                                 <div className="col-xl-2 col-lg-3 col-md-3 col-6">
-                                    <div className="card p-0">
-                                        <div className="card-img-top p-1">
-                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
+                                    <div className="card w-100" style={{ overflow: 'hidden' }}>
+                                        <div className="card-img-top p-2">
+                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid rounded-circle" />
                                         </div>
-                                        <div className="card-body p-1 px-3">
-                                            <div className="text-title text-start pb-1">Johny Cross</div>
-                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-xl-2 col-lg-3 col-md-3 col-6">
-                                    <div className="card p-0">
-                                        <div className="card-img-top p-1">
-                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
-                                        </div>
-                                        <div className="card-body p-1 px-3">
-                                            <div className="text-title text-start pb-1">Johny Cross</div>
-                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
+                                        <div className="card-body p-0">
+                                            <div className="text-title text-center">Johny Cross</div>
+                                            <div className="between px-1">
+                                                <div className="f-10 text-end text-secondary hover-line pointer py-2">Vew Detail<i class="fa-solid fa-arrow-right px-2"></i></div>
+                                                <div className="f-10 text-end text-secondary hover-line pointer py-2">Message<i class="fa-solid fa-envelope px-2"></i></div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-xl-2 col-lg-3 col-md-3 col-6">
-                                    <div className="card p-0">
-                                        <div className="card-img-top p-1">
-                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
+                                    <div className="card w-100" style={{ overflow: 'hidden' }}>
+                                        <div className="card-img-top p-2">
+                                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWpKTY2xHZszDP68onp9b9zlrov7fqTgBMguwwTpOHRFdpd4nH2d7ERIc6mSnWjfUGUjw&usqp=CAU" alt="" className="img-fluid rounded-circle" />
                                         </div>
-                                        <div className="card-body p-1 px-3">
-                                            <div className="text-title text-start pb-1">Johny Cross</div>
-                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
+                                        <div className="card-body p-0">
+                                            <div className="text-title text-center">Tony Jaa</div>
+                                            <div className="between px-1">
+                                                <div className="f-10 text-end text-secondary hover-line pointer py-2">Vew Detail<i class="fa-solid fa-arrow-right px-2"></i></div>
+                                                <div className="f-10 text-end text-secondary hover-line pointer py-2">Message<i class="fa-solid fa-envelope px-2"></i></div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-xl-2 col-lg-3 col-md-3 col-6">
-                                    <div className="card p-0">
-                                        <div className="card-img-top p-1">
-                                            <img src="https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_face,z_0.7,q_auto:eco,dpr_1/crvedxplgovlwey1eovk" alt="" className="img-fluid  " />
+                                    <div className="card w-100" style={{ overflow: 'hidden' }}>
+                                        <div className="card-img-top p-2 ">
+                                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfNLqN8I9I4WPzNkJ1DaeLuTENBL2M0WZItJ-n1elICBhGCJsoN1gEh81QZ0HGbL548HQ&usqp=CAU" alt="" className="img-fluid rounded-circle" />
                                         </div>
-                                        <div className="card-body p-1 px-3">
-                                            <div className="text-title text-start pb-1">Johny Cross</div>
-                                            <div className="f-10 w-100 text-start hover-line pointer pb-2">Vew Detail</div>
+                                        <div className="card-body p-0  ">
+                                            <div className="text-title text-center">Deo Freddy</div>
+                                            <div className="between px-1">
+                                                <div className="f-10 text-end text-secondary hover-line pointer py-2">Vew Detail<i class="fa-solid fa-arrow-right px-2"></i></div>
+                                                <div className="f-10 text-end text-secondary hover-line pointer py-2">Message<i class="fa-solid fa-envelope px-2"></i></div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                             <button className='btn btn-outline-secondary px-5 my-2'>View All</button>
                         </div>
-                        <div className="col-xl-3 col-md-4 pb-2">
-                            <div className="card py-4 border pointer text-dark" style={{ height: '250px' }}>
-                                <div className="card-header border-0 fs-5 d-block bg-none border-0">
+                        <div className="col-xl-3 col-md-4">
+                            <div className="card p-0 pointer text-dark box-shadow  border-0">
+                                {/* <div className="card-header border-0 fs-5 d-block bg-none border-0">
                                     <div className='d-flex'>
                                         <div className="w-100 start">
                                             <div>
@@ -299,19 +305,27 @@ const Dashboard = ({ UserName }) => {
                                         </div>
 
                                     </div>
+                                </div> */}
+                                <div className="card-img-top h-100 p-3">
+                                    <img src="/src/assets/image/profile.jpg" alt="" className="img-fluid rounded box-shadow" />
+                                </div>
+                                <div className="card-body">
+                                    {/* <p className='fs-2'>Bussines Owner</p> */}
+                                    <p className="f-12 text-secondary">Name</p>
+                                    <p>Oeurn Nurak</p>
+                                    <p className="f-12 text-secondary">Cash In Bank</p>
+                                    <p>$19k</p>
+                                    <p className="f-12 text-secondary">Contact</p>
+                                    <p>09782398923892</p>
                                 </div>
 
                             </div>
                         </div>
-
-
-
-
                     </div>
 
                 </div>
 
-            </div>
+            </div >
 
 
 

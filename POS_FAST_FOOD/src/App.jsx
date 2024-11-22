@@ -36,6 +36,8 @@ import MakeChartOfAccount from './layout/form/accounting/MakeChartOfAccount'
 import JouranlReport from './layout/page/report/accounting/JouranlReport'
 import MakeBill from './layout/form/accounting/MakeBill'
 import CustomTable from './layout/page/pos/Custom/CustomTable'
+import MobileMenu from './layout/menu/MobileMenu'
+import PosMenu from './layout/page/pos/PosMenu'
 function App() {
   const [userName, setUserName] = useState();
   const [role, setRole] = useState();
@@ -73,10 +75,29 @@ function App() {
       } else {
         return (
           <>
-            <Routes>
-              <Route path='/' element={<PosLight />} />
-              <Route path='/custome-table' element={<CustomTable />} />
-            </Routes>
+            <div className="app">
+              <div className="d-flex">
+                <div className="">
+                  <PosMenu />
+                </div>
+                <div className="content d-block">
+                  <div className="app-page">
+                    <Routes>
+                      <Route path='/' element={<PosLight />} />
+                      <Route path='*' element={<PosLight />} />
+
+                    </Routes>
+
+                  </div>
+
+
+
+
+                </div>
+              </div>
+
+            </div>
+
 
           </>
         )
@@ -115,8 +136,10 @@ function App() {
               if (admin_viewer) {
                 if (admin_viewer == 1) {
                   setPageViewer(() => administrator());
-                } else {
+                } else if (admin_viewer == 2) {
                   setPageViewer(() => posApplication());
+                } else {
+                  setPageViewer(() => administrator());
                 }
               } else {
                 setPageViewer(() => administrator());
@@ -145,7 +168,7 @@ function App() {
       <>
         <div className='between w-100 py-2 rounded bg-none d-none d-md-none d-lg-flex px-3'>
           <div className="fs-5 text-secondary border-start text-start w-25 ps-3">
-            <i class="fa-solid fa-bars pointer"></i>
+            <i class="fa-solid fa-bars pointer" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
           </div>
           <div className='d-flex w-75 end '>
             <div className=''>
@@ -216,7 +239,7 @@ function App() {
       <>
         <div className="app">
           <div className="d-flex">
-            <div className=" p-0 app-menu  d-none d-xxl-flex">
+            <div className=" px-1 app-menu  d-none d-xxl-flex">
               <Menu />
             </div>
             <div className="content d-block">
@@ -275,6 +298,28 @@ function App() {
       {mobileMenu()}
       {/* <CustomTable /> */}
 
+
+
+
+
+
+      <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-xl">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div className="modal-body">
+              <MobileMenu />
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" className="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </>
   )

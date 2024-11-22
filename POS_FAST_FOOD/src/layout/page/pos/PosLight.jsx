@@ -9,17 +9,33 @@ import { createOrderLine } from '../../../api/Order';
 import { getAllProduct } from '../../../api/Product';
 import { format } from 'date-fns';
 import { createJournal, createTransaction } from '../../../api/JournalE';
+import { getAllCategory } from '../../../api/Category';
 const PosLight = () => {
 
     const [product, setProduct] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(null);
+    const [categoryId, setCategoryId] = useState();
+
     useEffect(() => {
         getAllProduct().then((respnse) => {
             setProduct(respnse.data);
+            console.log(respnse.data);
+        }).catch(error => {
+            console.error(error);
+        })
+
+    }, [])
+    useEffect(() => {
+        getAllCategory().then((respones) => {
+            setCategories(respones.data);
         }).catch(error => {
             console.error(error);
         })
     }, [])
-
+    function setCId(id) {
+        setCategoryId(id);
+    }
     function addToCart(id, qty, price, image) {
         try {
             // Try to parse existing cookie or create an empty array if it doesn't exist
@@ -50,9 +66,7 @@ const PosLight = () => {
             console.log(obj);
 
             // Refresh item if function is defined
-            if (typeof refreshItem === 'function') {
-                refreshItem();
-            }
+
         }
     }
     function order() {
@@ -216,7 +230,7 @@ const PosLight = () => {
         return (
             <div className="card border-0 bg-none">
                 <div className="card-body p-0 border-0 bg-none ps-2">
-                    <table className="text-dark w-100" style={{ fontSize: '16px' }}>
+                    <table className="text-dark w-100" style={{ fontSize: '12px' }}>
                         <thead valign='middle '>
                             <tr className='border-secondary border-bottom'>
 
@@ -261,103 +275,6 @@ const PosLight = () => {
                 </div>
             </div>
         )
-    }
-
-    function btnActionUserView() {
-        return (
-            <>
-                <div className="pos-header">
-                    <div className='d-flex'>
-                        <div className="d-flex w-50">
-                            <div className='w-25 pe-3'>
-                                <button className="btn btn-danger box-shadow h-100 w-100"
-                                    onClick={() => {
-                                        Cookies.remove("user-data");
-                                        location.reload();
-                                    }}>Exit</button>
-                            </div>
-                            <div className="w-75 ">
-                                <input type="text" name="" className='border rounded h-100 w-100 px-3' id="" placeholder='search product' />
-                            </div>
-                        </div>
-                        <div className="d-flex w-50">
-                            <div className='w-auto d-flex'>
-                                <div className='px-3'>
-                                    <button className="btn-silver h-100 px-3">Search</button>
-                                </div>
-                                <div className=''>
-                                    <button className="btn-silver h-100 px-3">Notifiacation</button>
-                                </div>
-                            </div>
-                            <div className="w-75 px-4">
-                                <div className="d-flex w-100">
-                                    <div className="user-pos center border-start ps-1" style={{ width: '25%', height: '50px', overflow: 'hidden' }}>
-                                        <img src="https://photosbulk.com/wp-content/uploads/aesthetic-instagram-profile-picture-for-boys_7.webp" alt="" className="h-100 rounded" />
-                                    </div>
-                                    <div className="w-50">
-                                        <div className='f-16'>Nurak Oerun</div>
-                                        <div className='f-10 text-seondary'>User/Administrator</div>
-                                    </div>
-                                    <div className="w-25">
-                                        <button className='btn-silver h-100 w-100' data-bs-toggle="modal" data-bs-target="#exampleModal">Setting</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </>
-        )
-
-    }
-    function btnActionAdminView() {
-        return (
-            <>
-                <div className="pos-header">
-                    <div className='d-flex'>
-                        <div className="d-flex w-50">
-                            <div className='w-25 pe-3'>
-                                <button className="btn btn-danger box-shadow h-100 w-100"
-                                    onClick={() => {
-                                        Cookies.set("admin_viewer", 1);
-                                        location.reload();
-                                    }}>Exit</button>
-                            </div>
-                            <div className="w-75 ">
-                                <input type="text" name="" className='border rounded h-100 w-100 px-3' id="" placeholder='search product' />
-                            </div>
-                        </div>
-                        <div className="d-flex w-50">
-                            <div className='w-auto d-flex'>
-                                <div className='px-3'>
-                                    <button className="btn-silver h-100 px-3">Search</button>
-                                </div>
-                                <div className=''>
-                                    <button className="btn-silver h-100 px-3">Notifiacation</button>
-                                </div>
-                            </div>
-                            <div className="w-75 px-4">
-                                <div className="d-flex w-100">
-                                    <div className="user-pos center border-start ps-1" style={{ width: '25%', height: '50px', overflow: 'hidden' }}>
-                                        <img src="https://photosbulk.com/wp-content/uploads/aesthetic-instagram-profile-picture-for-boys_7.webp" alt="" className="h-100 rounded" />
-                                    </div>
-                                    <div className="w-50">
-                                        <div className='f-16'>Nurak Oerun</div>
-                                        <div className='f-10 text-seondary'>User/Administrator</div>
-                                    </div>
-                                    <div className="w-25">
-                                        <button className='btn-silver h-100 w-100' data-bs-toggle="modal" data-bs-target="#exampleModal">Setting</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </>
-        )
-
     }
     const secretkey = "kans983(*93849Jnjsbd@*^@knskldn&^@($*LLjbHHSDuBKJ_)93849uIHUSHD&#%#&^$(@80928()*&*#$&(*"
     function headerViewer() {
@@ -434,67 +351,99 @@ const PosLight = () => {
             </div>
         );
     }
+
     return (
         <>
             <div className="d-flex pos">
+                <div className="pos-info w-100 d-flex">
+                    <div className='w-100'>
+                        <div className="w-100 mt-1 d-flex px-2 py-1 pt-0" style={{
+                            overflowX: 'scroll',
+                            scrollbarWidth: 'none', // For Firefox
+                            msOverflowStyle: 'none',
+                        }}>
+                            {
+                                categories.map((c, index) =>
+                                    <div className="center">
+                                        <button
+                                            key={c.id}
+                                            className={`btn-category d-block me-3 ${activeIndex === index ? "active-category" : ""
+                                                }`}
+                                            onClick={() => {
+                                                setActiveIndex(index)
+                                                setCId(c.id)
+                                            }} // Update active index on click
+                                        >
+                                            <i className="fa-solid fa-bowl-food fs-2 h-25"></i>
+                                            <div className="f-12 py-2 w-100 h-75">{c.name}</div>
+                                        </button>
+                                    </div>
+                                )
+                            }
 
-                <div className="pos-info w-100">
-                    <div className='p-0 ps-0'>
-                        <div className="ps-3 pe-3  py-2 my-2">
-                            {headerViewer()}
+
                         </div>
-                        <div className="pos-cateogry mt-3 d-flex ps-3 pe-3">
-                            <button className='btn-category d-block me-3'>
-                                <img src="https://demo.foodscan.xyz/images/default/all-category.png" alt="" className='img-btn' />
-                                <div className='font-12 fw-bold mt-2'>All Category</div>
-                            </button>
-                            <button className='btn-category d-block me-3'>
-                                <img src="https://demo.foodscan.xyz/storage/27/conversions/appetizers-thumb.png" alt="" className='img-btn' />
-                                <div className='font-12 fw-bold mt-2'>All Category</div>
-                            </button>
-                            <button className='btn-category d-block me-3'>
-                                <img src="https://demo.foodscan.xyz/storage/30/conversions/sandwich_from_the_grill-thumb.png" alt="" className='img-btn' />
-                                <div className='font-12 fw-bold mt-2'>All Category</div>
-                            </button>
-                        </div>
-                        <div className="pos-product mt-3 p-0 center">
+                        <div className="pos-product p-0 center">
                             <div className="row p-0 w-100">
                                 {
-                                    product.map((i, index) =>
-                                        <div className="col-xxl-3 col-xl-4 col-lg-4 col-md-6 col-sm-6" key={i.id}>
-                                            <div className='p-2 pe-3'>
-                                                <div className="card border-1 rounded card-product-light mb-3" style={{ height: '100%', overflow: 'hidden' }} onClick={() => { addToCart(i.id, 1, i.price, i.image, index) }}>
-                                                    <div className="card-body p-1">
-                                                        <div className="center box-shadow" style={{ width: '100%', height: '200px', overflow: 'hidden' }}>
-                                                            <img src={`src/assets/image/${i.image}`} alt='img' className="h-100" />
-                                                        </div>
-                                                        <div className="card-header bg-none border-0 rounded px-2 pe-1" style={{ width: '100%', height: '90px', overflow: 'hidden' }}>
-                                                            <div className="f-20 text-dark hover-line text-title">{i.productName}</div>
-                                                            {/* <hr /> */}
-                                                            <div className="between">
-                                                                <textarea name="" className='border-0 w-100 f-14 text-secondary' readOnly id="" value={i.description}></textarea>
+                                    product.map((i, index) => {
+
+                                        if ((i.categoryId) == (categoryId)) {
+                                            return (
+                                                <div className="col-xxl-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 p-0" key={i.id}>
+                                                    <div className='p-1'>
+                                                        <div className="card border-1 rounded card-product-light mb-3" style={{ height: '100%', overflow: 'hidden' }} onClick={() => { addToCart(i.id, 1, i.price, i.image, index) }}>
+                                                            <div className="card-body p-0">
+                                                                <div className="center box-shadow " style={{ width: '100%', height: '200px', overflow: 'hidden' }}>
+                                                                    <img src={`src/assets/image/${i.image}`} alt='img' className="h-100 " />
+                                                                </div>
+                                                                <div className="card-header bg-none border-0 rounded px-2 pe-1" style={{ width: '100%', height: '50px', overflow: 'hidden' }}>
+                                                                    <div className="f-20 text-dark hover-line text-title">{i.productName}</div>
+                                                                </div>
+                                                                <div className="card-header bg-none border-0 rounded px-2 pe-1 start" style={{ width: '100%', height: '50px', overflow: 'hidden' }}>
+                                                                    <i class="fa-solid fa-basket-shopping px-2"></i><span className='fs-5'>{formatCurrency.format(i.price)}</span>
+                                                                </div>
                                                             </div>
 
 
-
-
                                                         </div>
                                                     </div>
-                                                    <div className="card-footer p-0" style={{ height: '70px' }}>
-                                                        <div className='center w-100 btn-orange h-100'>
-                                                            <button className='btn text-light center rounded-pill'><i class="fa-solid fa-basket-shopping px-2"></i><span className='fs-5'>{formatCurrency.format(i.price)}</span></button>
-                                                        </div>
-                                                    </div>
-
                                                 </div>
-                                            </div>
-                                        </div>
+                                            )
+                                        }
+                                        if ((categoryId) == null) {
+                                            return (
+                                                <div className="col-xxl-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 p-0" key={i.id}>
+                                                    <div className='p-1'>
+                                                        <div className="card border-1 rounded card-product-light mb-3" style={{ height: '100%', overflow: 'hidden' }} onClick={() => { addToCart(i.id, 1, i.price, i.image, index) }}>
+                                                            <div className="card-body p-0">
+                                                                <div className="center box-shadow " style={{ width: '100%', height: '200px', overflow: 'hidden' }}>
+                                                                    <img src={`src/assets/image/${i.image}`} alt='img' className="h-100 " />
+                                                                </div>
+                                                                <div className="card-header bg-none border-0 rounded px-2 pe-1" style={{ width: '100%', height: '50px', overflow: 'hidden' }}>
+                                                                    <div className="f-20 text-dark hover-line text-title">{i.productName}</div>
+                                                                </div>
+                                                                <div className="card-header bg-none border-0 rounded px-2 pe-1 start" style={{ width: '100%', height: '50px', overflow: 'hidden' }}>
+                                                                    <i class="fa-solid fa-basket-shopping px-2"></i><span className='fs-5'>{formatCurrency.format(i.price)}</span>
+                                                                </div>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+
+                                    }
                                     )
                                 }
 
                             </div>
                         </div>
                     </div>
+
+
                 </div>
                 <div className='pos-view-order p-2 ps-0 bg-none  d-none d-xl-block'>
                     <div className="border-0 order bg-white rounded box-shadow h-100 rounded p-2" style={{ overflow: 'scroll' }}>
@@ -606,75 +555,62 @@ const PosLight = () => {
                 </div>
             </div>
 
-            <div class="modal slideInRight " id="processOrder" tabindex="-1" aria-labelledby="processOrderModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen bg-none">
+            <div class="modal animation " id="processOrder" tabindex="-1" aria-labelledby="processOrderModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl bg-none modal-fullscreen-sm-down">
                     <div class="modal-content bg-blur-light">
 
-                        <div class="modal-body d-flex justify-content-center p-0">
-                            <div className="d-block text-light w-75">
-                                {listTable()}
-                            </div>
-                            <div className="w-25">
-                                <div className='p-2 ps-0 bg-none  d-none d-xl-block'>
-                                    <div className="bg-none border border-secondary rounded h-100 rounded p-2" style={{ overflow: 'scroll' }}>
-                                        <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
+                        <div class="modal-body d-flex justify-content-center p-2">
+                            <div className="row w-100">
+                                <div className="col-xl-7 col-lg-6 col-12col-md-6 col-12">
+                                    {listTable()}
+                                </div>
+                                <div className="col-xl-5 col-lg-6 col-12">
+                                    <div className='p-2 ps-0 bg-none'>
+                                        <div className="bg-none border border-secondary rounded h-100 rounded p-2" style={{ overflow: 'scroll' }}>
+                                            <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
 
-                                            <div className="between text-dark fs-5">
-                                                <div className='w-100 start fs-6'>Customer :</div>
-                                                <div className='text-dark'>
-                                                    <input type="comobox" className='bg-none border-secondary border-0 border-bottom text-dark text-end' />
+                                                <div className="between text-dark fs-5">
+                                                    {/* <div className='w-100 start fs-6'>Customer :</div> */}
+                                                    <div className='text-dark w-100'>
+                                                        <input type="comobox" className='bg-none border-secondary border-0 border-bottom text-dark  w-100' placeholder='Customer' />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
+                                            <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
+                                                <input type="comobox" className='bg-none border-secondary border-0 border-bottom text-dark w-100' placeholder='Discount' />
+                                            </div>
+                                            <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
+                                                <input type="comobox" className='bg-none border-secondary border-0 border-bottom text-dark w-100' placeholder='Cash' value={input} />
+                                            </div>
 
-                                            <div className="between text-dark fs-5">
-                                                <div className='w-100 start fs-6'>Discount :</div>
-                                                <div className='text-dark'>
-                                                    <input type="comobox" className='bg-none border-secondary border-0 border-bottom text-dark text-end' />
+                                            <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
+
+                                                <input type="" className='bg-none border-secondary border-0 border-bottom text-dark w-100' value={input - totalPay} />
+                                            </div>
+                                            <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
+
+                                                <div className="between text-dark fs-5">
+                                                    <div className='w-100 start fs-6'>Total Payment :</div>
+                                                    <div className='text-ligth'>{formatCurrency.format(totalPay)}</div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
-
-                                            <div className="between text-dark fs-5">
-                                                <div className='w-100 start fs-6'>Cash :</div>
-                                                <div className='text-dark'>
-                                                    <input type="" className='bg-none border-secondary border-0 border-bottom text-dark text-end' value={input} />
-                                                </div>
+                                            {calculator()}
+                                            <div className='mt-3 d-flex'>
+                                                <button className="btn bg-red text-white rounded py-3 box-shadow w-25 me-1" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                                                <button className="btn bg-green text-white rounded py-3 box-shadow w-75"
+                                                    onClick={() => {
+                                                        order();
+                                                        Cookies.remove("order")
+                                                    }
+                                                    }
+                                                >Order</button>
                                             </div>
-                                        </div>
-                                        <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
 
-                                            <div className="between text-dark fs-5">
-                                                <div className='w-100 start fs-6'>Exchange :</div>
-                                                <div className='text-ligth'>
-                                                    <input type="" className='bg-none border-secondary border-0 border-bottom text-dark text-end' />
-                                                </div>
-                                            </div>
                                         </div>
-                                        <div className="d-block px-3 border border-secondary py-3 rounded mt-1">
-
-                                            <div className="between text-dark fs-5">
-                                                <div className='w-100 start fs-6'>Total Payment :</div>
-                                                <div className='text-ligth'>{formatCurrency.format(totalPay)}</div>
-                                            </div>
-                                        </div>
-                                        {calculator()}
-                                        <div className='mt-3 d-flex'>
-                                            <button className="btn bg-red text-white rounded py-3 box-shadow w-25 me-1" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-                                            <button className="btn bg-green text-white rounded py-3 box-shadow w-75"
-                                                onClick={() => {
-                                                    order();
-                                                    Cookies.remove("order")
-                                                }
-                                                }
-                                            >Order</button>
-                                        </div>
-
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
                     </div>

@@ -164,8 +164,28 @@ const InsertItem = () => {
 
             <form action=''>
                 <div className="container-fluid p-0 center">
+
                     <div className="row w-100">
-                        <div className="col-xl-12" style={{ height: '900px' }}>
+                        <div className="col-xl-12">
+                            <div className="between">
+                                <div className='w-50 d-flex mt-2'>
+                                    <div class="pb-2 px-2" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-outline-dark px-4 w-100 box-shadow rounded" onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
+                                    </div>
+
+
+                                </div>
+                                <div className='w-50 d-flex end mt-2'>
+                                    <div class="pb-2  px-2" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn-red px-4 w-100 box-shadow rounded"><i class="fa-solid fa-xmark px-2"></i>Cancel </button>
+                                    </div>
+                                    <div class="pb-2 " role="group" aria-label="Basic example">
+                                        <button type="button" class="btn-green px-4 w-100 box-shadow rounded" onClick={submitProduct}><i class="fa-solid fa-floppy-disk px-2"></i>Save </button>
+                                    </div>
+
+                                </div>
+
+                            </div>
                             <div className="border bg-white w-100 rounded">
                                 <div className="d-flex h-100" >
                                     <div className='start w-50 p-2'>
@@ -204,7 +224,7 @@ const InsertItem = () => {
                                 </div>
                                 <div className="d-flex">
                                     <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='p-name' className='w-25 text-start'>Product name  </label>
                                             <input type="text" id='p-name' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='productName'
@@ -212,7 +232,7 @@ const InsertItem = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='p-code' className='w-25 text-start'>Product code  </label>
                                             <input type="text" id='p-code' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='productCode'
@@ -220,7 +240,7 @@ const InsertItem = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='price' className='w-25 text-start'>Selling price <span className='c-cyan'>{"($)"}</span> </label>
                                             <input type="number" id='p-price' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='price'
@@ -228,7 +248,7 @@ const InsertItem = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='maxOrderQty' className='w-25 text-start'>MaxOrderQty </label>
                                             <input type="number" id='maxOrderQty' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='maxOrderQty'
@@ -236,7 +256,7 @@ const InsertItem = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='minOrderQty' className='w-25 text-start'>MinOrderQty  </label>
                                             <input type="number" id='minOrderQty' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='minOrderQty'
@@ -244,7 +264,7 @@ const InsertItem = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='minOrderQty' className='w-25 text-start'>CategoryId  </label>
                                             <input type="number" id='minOrderQty' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='categoryId'
@@ -252,7 +272,7 @@ const InsertItem = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='branchId' className='w-25 text-start'>BranchId  </label>
                                             <input type="number" id='branchId' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='branchId'
@@ -260,7 +280,7 @@ const InsertItem = () => {
                                                 onChange={handleInputChange}
                                             />
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='image' className='w-25 text-start'>Image  </label>
                                             <input type="text" id='image' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='image'
@@ -271,14 +291,16 @@ const InsertItem = () => {
 
                                     </div>
                                     <div className='d-block text-start bg-white px-4 py-2 w-50 mt-1'>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Category : </p>
-                                            <div class="dropdown w-75">
-                                                <button className=" btn w-100 d-flex text-secondary input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <p className="w-75 text-start">{categoryName}</p>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
+                                            <p className='w-25 text-start'>Category  </p>
+                                            <div class=" cursor-i dropdown w-75">
+                                                <p className="w-100 d-flex text-secondary cursor-i input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <input type="text" className='border-0 w-100' value={categoryName} />
                                                     <i class="w-25 text-end">&#10141;</i>
-                                                </button>
-                                                <ul className="dropdown-menu w-100 box-shadow">
+                                                </p>
+
+
+                                                <ul className="cursor-i dropdown-menu w-100 box-shadow ">
                                                     {
                                                         categories.map(c =>
                                                             <li>
@@ -300,11 +322,11 @@ const InsertItem = () => {
                                                 </ul>
                                             </div>
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <p className='w-25 text-start'>Branch  </p>
                                             <div class="dropdown w-75">
                                                 <button className=" btn w-100 d-flex text-secondary input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <p className="w-75 text-start">{branchName}</p>
+                                                    <input type="text" className='border-0 w-100' value={branchName} />
                                                     <i class="w-25 text-end">&#10141;</i>
                                                 </button>
                                                 <ul className="dropdown-menu w-100 box-shadow">
@@ -329,7 +351,7 @@ const InsertItem = () => {
                                                 </ul>
                                             </div>
                                         </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='productOrigin' className='w-25 text-start'>Product origin </label>
                                             <input type="text" id='productOrigin' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                 name='productOrigin'
@@ -357,7 +379,7 @@ const InsertItem = () => {
                                         <div class="border-0 tab-pane show active " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                                             <div className="d-flex">
                                                 <div className='d-block text-start fs-6 bg-white px-4 py-2 w-75'>
-                                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                                    <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
                                                         <label htmlFor='prepareTime' className='w-25 text-start'> Prepare time <span className='c-cyan'>{"(Minute)"}</span> </label>
                                                         <input type="number" id='prepareTime' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                             name='prepareTime'
@@ -365,7 +387,7 @@ const InsertItem = () => {
                                                             onChange={handleInputChange}
                                                         />
                                                     </div>
-                                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                                    <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
                                                         <label htmlFor='calories' className='w-25 text-start'>Calories  </label>
                                                         <input type="number" id='calories' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                             name='calories'
@@ -373,7 +395,7 @@ const InsertItem = () => {
                                                             onChange={handleInputChange}
                                                         />
                                                     </div>
-                                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                                         <label htmlFor='sugar' className='w-25 text-start'>Sugar <span className='c-cyan'>{"(G)"}</span> </label>
                                                         <input type="number" id='sugar' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
                                                             name='sugar'
@@ -400,25 +422,6 @@ const InsertItem = () => {
 
                                     </div>
                                 </div>
-                            </div>
-                            <div className="between">
-                                <div className='w-50 d-flex mt-2'>
-                                    <div class="pb-2 px-2" role="group" aria-label="Basic example">
-                                        <button type="button" class="btn btn-outline-dark px-4 w-100 box-shadow rounded-pill" onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
-                                    </div>
-
-
-                                </div>
-                                <div className='w-50 d-flex end mt-2'>
-                                    <div class="pb-2  px-2" role="group" aria-label="Basic example">
-                                        <button type="button" class="btn-red px-4 w-100 box-shadow rounded-pill"><i class="fa-solid fa-xmark px-2"></i>Cancel </button>
-                                    </div>
-                                    <div class="pb-2 " role="group" aria-label="Basic example">
-                                        <button type="button" class="btn-green px-4 w-100 box-shadow rounded-pill" onClick={submitProduct}><i class="fa-solid fa-check px-2"></i>Save </button>
-                                    </div>
-
-                                </div>
-
                             </div>
                         </div>
                     </div>

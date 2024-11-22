@@ -120,10 +120,10 @@ const CreateEmployee = () => {
                             </div>
                             <div className="row">
                                 <div className='col-xl-6 col-12 d-block text-start fs-6 bg-white px-4 py-2'>
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start'>Branch  </p>
                                         <div class="dropdown w-75">
-                                            <button className=" btn w-100 d-flex text-secondary input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <p className="w-75 text-start">{branchName}</p>
                                                 <i class="w-25 text-end">&#10141;</i>
                                             </button>
@@ -149,8 +149,8 @@ const CreateEmployee = () => {
                                             </ul>
                                         </div>
                                     </div>
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start mt-3'>Position  </p>
+                                    <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
+                                        <p className='w-25 text-start '>Position  </p>
                                         <div class="dropdown w-75">
                                             <button className=" btn w-100 d-flex text-secondary input-box rounded-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <p className="w-75 text-start"></p>
@@ -178,8 +178,8 @@ const CreateEmployee = () => {
                                             </ul>
                                         </div>
                                     </div>
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start mt-3'>Manger  </p>
+                                    <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
+                                        <p className='w-25 text-start'>Manger  </p>
                                         <div class="dropdown w-75">
                                             <button className=" btn w-100 d-flex text-secondary input-box rounded-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <p className="w-75 text-start"></p>
@@ -207,8 +207,8 @@ const CreateEmployee = () => {
                                         </div>
                                     </div>
 
-                                    <div className='group-input center w-100 mt-0' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start mt-3'>Contact ? </p>
+                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
+                                        <p className='w-25 text-start'>Contact ? </p>
                                         <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
 
                                             name="contact"

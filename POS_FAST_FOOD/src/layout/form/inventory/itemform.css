@@ -15,6 +15,10 @@
     border-bottom: 1px solid #696969;
 }
 
+.cursor-i {
+    cursor: text;
+}
+
 .btn-green {
     background: rgb(76, 156, 39);
     color: white;
