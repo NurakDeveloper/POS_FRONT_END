@@ -55,21 +55,21 @@ const Employee = () => {
                 {
                     employee.map(o =>
                         <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-                            <div className="card border-0 bg-white p-0 border-3 pointer mb-2 box-shadow inv-card"
+                            <div className="card bg-white p-0 pointer mb-2 border"
                                 onClick={() => goto(`/employee-detail/${o.id}`)}
                             >
                                 <div className="card-body p-0 inv-card rounded">
                                     <div className="d-flex">
-                                        <div className="center " style={{ width: '40%' }}>
-                                            <div className="center rounded box-shadow" style={{ height: '200px', overflow: 'hidden' }}>
+                                        <div className="center p-1" style={{ width: '40%' }}>
+                                            <div className="center rounded" style={{ height: '200px', overflow: 'hidden' }}>
                                                 <img src={`/src/assets/image/${o.image}`} alt="" className='h-100 rounded' />
                                             </div>
                                         </div>
-                                        <div className='font-12 ps-4 py-3' style={{ width: '60%' }}>
-                                            <div className='fs-5'>{o.firstName} {o.lastName}</div>
+                                        <div className='f-12 ps-4 py-3' style={{ width: '60%' }}>
+                                            <div className='f-16'>{o.firstName} {o.lastName}</div>
                                             <div className='text-secondary f-14'>{findBranchName(o.companyID)}.</div>
-                                            <div><i class="fa-solid fa-envelope px-1"></i>{o.email}</div>
-                                            <div className='text-start'><i class="fa-solid fa-phone px-1"></i>{o.mobile}</div>
+                                            <div><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email}</div>
+                                            <div className='text-start'><i class="fa-solid fa-phone px-1 ps-0"></i>{o.mobile}</div>
 
 
                                         </div>

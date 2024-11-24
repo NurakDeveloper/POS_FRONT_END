@@ -1,15 +1,10 @@
-.pos-view-order {
-    width: 550px;
-    height: 100vh;
-    padding: 10px;
-    background: white;
-}
-
 .pos-info {
     width: 480px;
     height: 100vh;
     overflow-y: scroll;
 }
+
+
 
 .card-img {
     width: 100%;

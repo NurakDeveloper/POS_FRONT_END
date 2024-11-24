@@ -213,24 +213,21 @@ function App() {
           </div>
 
         </div>
-        {/* <div className='between w-100 box-shadow py-2 rounded mt-2 bg-white d-md-flex d-lg-none d-sm-flex'>
-          <div className="menu-btn fs-5 pointer">
+        <div className='between w-100 box-shadow py-2 rounded mt-2 bg-white d-md-flex d-lg-none d-sm-flex'>
+          <div className="menu-btn fs-5 pointer w-100 ms-3">
             <i class="fa-solid fa-bars pointer" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"></i>
           </div>
-          <button className="btn border border-success px-3"
+          <button className="btn"
             onClick={() => {
               Cookies.set('admin_viewer', 2);
               location.reload();
+              window.location.href = '/';
             }}
           >
-            <i class="fa-solid fa-desktop px-3"></i>
-            POS
+            <i class="fa-solid fa-desktop btn-silver p-3 rounded-circle"></i>
           </button>
-          <div className="app-defualt-user d-flex w-50 end">
-            <img src="https://i.pinimg.com/736x/55/33/5c/55335c708ac05d8f469894d08e2671fa.jpg" alt="" className="h-100 mx-2 rounded-circle box-shadow" />
-          </div>
 
-        </div> */}
+        </div>
       </>
     )
   }
@@ -312,10 +309,6 @@ function App() {
             </div>
             <div className="modal-body">
               <MobileMenu />
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-primary">Save changes</button>
             </div>
           </div>
         </div>

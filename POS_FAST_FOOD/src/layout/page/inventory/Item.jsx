@@ -49,7 +49,7 @@ const Item = () => {
                                 <div className="card-body p-0 border-1 h-100">
                                     <div className="d-flex text-start h-100">
                                         <div className=" p-0 start" style={{ height: '180px', overflow: 'hidden', width: '45%' }}>
-                                            <img src={`src/assets/image/${o.image}`} alt="" className='h-100' />
+                                            <img src={`src/assets/image/${o.image}`} alt="" className='w-100' />
                                         </div>
                                         <div className='f-14 p-2' style={{ overflow: 'hidden', width: '65%' }}>
                                             <div className='f-16 text-title' >

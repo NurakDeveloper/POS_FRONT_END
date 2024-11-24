@@ -52,7 +52,7 @@ const ChartRevenues = () => {
             },
             title: {
                 display: true,
-                text: 'Monthly Revenue',
+                text: 'Weekly Sale Revenue',
             },
         },
     };

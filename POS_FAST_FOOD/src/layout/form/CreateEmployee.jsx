@@ -210,7 +210,6 @@ const CreateEmployee = () => {
                                     <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start'>Contact ? </p>
                                         <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-
                                             name="contact"
                                             value={employeeData.contact}
                                             onChange={handleInputChange}
