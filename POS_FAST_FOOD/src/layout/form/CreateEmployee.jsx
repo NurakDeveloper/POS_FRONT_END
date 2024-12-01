@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { newEmployee } from "../../api/EmployeeApi";
+import { getEmployee, newEmployee, updateEmployee } from "../../api/EmployeeApi";
 import { getAllBranch } from "../../api/Branch";
 import { useEffect } from "react";
 import { getAllEmployee } from "../../api/EmployeeApi";
+import { json, useNavigate, useParams } from "react-router-dom";
+import { IoSaveSharp } from "react-icons/io5";
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 const CreateEmployee = () => {
     const [employeeData, setEmployeeData] = useState({
@@ -28,23 +31,7 @@ const CreateEmployee = () => {
         updatedDate: '',
         image: ''
     });
-    const [employee, setEmployee] = useState([]);
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setEmployeeData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
-    function submitProduct(e) {
-        e.preventDefault();
-        newEmployee(employeeData).then((response) => {
-            console.log(response.data);
-        }).catch(error => {
-            console.log(error);
-        })
-    }
-    const [branchName, setBranchName] = useState();
+    const [branchName, setBranchName] = useState('select branch');
     const [branch, setBranch] = useState([]);
     useEffect(() => {
         getAllBranch().then((response) => {
@@ -59,25 +46,118 @@ const CreateEmployee = () => {
             console.error(e);
         })
     }, [])
+    const { id } = useParams();
+    useEffect(() => {
+        if (id) {
+            getEmployee(id).then((reponse) => {
+                setEmployeeData((prevData) => ({
+                    ...prevData,
+                    ["lastName"]: reponse.data.lastName,
+                    ["firstName"]: reponse.data.firstName,
+                    ["schedule"]: reponse.data.schedule,
+                    ["workShiftID"]: reponse.data.workShiftID,
+                    ["managerID"]: reponse.data.managerID,
+                    ["cv"]: reponse.data.cv,
+                    ["positionID"]: reponse.data.positionID,
+                    ["companyID"]: reponse.data.companyID,
+                    ["resume"]: reponse.data.resume,
+                    ["dayOff"]: reponse.data.dayOff,
+                    ["email"]: reponse.data.email,
+                    ["mobile"]: reponse.data.mobile,
+                    ["gender"]: reponse.data.gender,
+                    ["salary"]: reponse.data.salary,
+                    ["address"]: reponse.data.address,
+                    ["bankAccount"]: reponse.data.bankAccount,
+                    ["contact"]: reponse.data.contact,
+                    ["startWorkingDate"]: reponse.data.startWorkingDate,
+                    ["createdDate"]: reponse.data.createdDate,
+                    ["updatedDate"]: reponse.data.updatedDate,
+                    ["image"]: reponse.data.image,
+                }));
+
+            }).catch(e => {
+                console.error(e);
+            })
+        }
+    }, [id])
+
+    function findBranchName(id) {
+        try {
+            return branch.find(b => b.id == id).branchName;
+        } catch (e) {
+            return "No Branch Selected"
+        }
+    }
+    function findManager(id) {
+        try {
+            return employee.find(e => e.id == id).firstName + ' ' + employee.find(e => e.id == id).lastName;
+        } catch (e) {
+            return "No Manager Selected"
+        }
+    }
+
+    const navigate = useNavigate();
+    const [employee, setEmployee] = useState([]);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEmployeeData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+    function saveEmployee(e) {
+        e.preventDefault();
+        if (id) {
+            updateEmployee(id, employeeData).then((response) => {
+                alert(json.stringify(response.data));
+            }).catch(e => {
+                console.warn(e);
+            })
+            return 0
+        }
+
+        newEmployee(employeeData).then((response) => {
+            console.log(response.data);
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
     function preview(e) {
         e.preventDefault();
         const jsonString = JSON.stringify(employeeData, null, 2); // 'null, 2' formats the JSON for readability
 
         alert(jsonString)
     }
+    function formHeader() {
+        return (
+            <div className='form-header-content pt-2'>
+                <button type="button" class="button cancel box-shadow " onClick={() => navigate('/employees')}><IoIosArrowRoundBack /><span className='px-2'>Cancel</span> </button>
+                <div className='d-flex'>
+                    <button type="button" class="button preview box-shadow " onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
+                    <div className='px-3 pe-0'>
+                        <button type="button" class="button add box-shadow px-4" onClick={saveEmployee}><IoSaveSharp /><span className='px-2'>Save</span> </button>
+                    </div>
+                </div>
+
+
+            </div>
+        );
+    }
     return (
         <>
 
             <form action="" className="">
-                <div className="container-fluid border">
+                {formHeader()}
+                <div className="container-fluid border rounded px-3">
                     <div className="row ">
                         <div className="col-12">
-                            <div className="form-heder w-100 bg-white" style={{ maxHeight: '150px' }}>
-                                <div className="d-flex h-100" >
-                                    <div className='start w-50 p-2'>
-                                        <div className='w-100 px-4'>
+                            <div className="form-heder w-100 bg-white p-3 ps-1">
+                                <div className="row" >
+                                    <div className='col-xl-6 col-md-6 col-12 '>
+                                        <div className='w-100 start h-100'>
                                             <div className="fs-2">
-                                                <input className='w-75 text-start text-secondary input-box' placeholder="eng. first name"
+                                                <input className='text-start text-secondary input-box' placeholder="eng. first name"
                                                     type="text"
                                                     name="firstName"
                                                     value={employeeData.firstName}
@@ -86,7 +166,7 @@ const CreateEmployee = () => {
                                                 />
                                             </div>
                                             <div className="fs-2">
-                                                <input type="text" className='w-75 text-start text-secondary input-box' placeholder="eng. lastname"
+                                                <input type="text" className='text-start text-secondary input-box' placeholder="eng. lastname"
                                                     name="lastName"
                                                     value={employeeData.lastName}
                                                     onChange={handleInputChange}
@@ -96,9 +176,9 @@ const CreateEmployee = () => {
                                         </div>
                                     </div>
 
-                                    <div className='end p-2 w-50 d-flex'>
-                                        <div className='d-flex' style={{ height: '150px', width: '170px', overflow: 'hidden' }}>
-                                            <div className='d-block text-center fs-6' style={{ width: '40px' }}>
+                                    <div className='col-xl-6 col-md-6 col-12 end'>
+                                        <div className='' style={{ height: '150px', width: '170px', overflow: 'hidden' }}>
+                                            <div className='d-none text-center fs-6' style={{ width: '40px' }}>
                                                 <input type="file" name="" className='d-none' id="fileImage"
                                                     onChange={(e) => {
                                                         setEmployeeData((prevData) => ({
@@ -119,12 +199,12 @@ const CreateEmployee = () => {
 
                             </div>
                             <div className="row">
-                                <div className='col-xl-6 col-12 d-block text-start fs-6 bg-white px-4 py-2'>
+                                <div className='col-xl-6 col-12 d-block text-start fs-6 bg-white'>
                                     <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start'>Branch  </p>
                                         <div class="dropdown w-75">
-                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <p className="w-75 text-start">{branchName}</p>
+                                            <button className="w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <p className="w-75 text-start">{findBranchName(employeeData.companyID)}</p>
                                                 <i class="w-25 text-end">&#10141;</i>
                                             </button>
                                             <ul className="dropdown-menu w-100 box-shadow">
@@ -152,7 +232,7 @@ const CreateEmployee = () => {
                                     <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start '>Position  </p>
                                         <div class="dropdown w-75">
-                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <p className="w-75 text-start"></p>
                                                 <i class=" w-25 text-end">&#10141;</i>
                                             </button>
@@ -181,8 +261,8 @@ const CreateEmployee = () => {
                                     <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start'>Manger  </p>
                                         <div class="dropdown w-75">
-                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <p className="w-75 text-start"></p>
+                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <p className="w-75 text-start">{findManager(employeeData.managerID)}</p>
                                                 <i class=" w-25 text-end">&#10141;</i>
                                             </button>
                                             <ul className="dropdown-menu w-100 box-shadow">
@@ -209,7 +289,7 @@ const CreateEmployee = () => {
 
                                     <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start'>Contact ? </p>
-                                        <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
+                                        <input type="text" className='w-75 text-start text-secondary input-box p-0' placeholder=""
                                             name="contact"
                                             value={employeeData.contact}
                                             onChange={handleInputChange}
@@ -217,8 +297,8 @@ const CreateEmployee = () => {
                                         />
                                     </div>
                                 </div>
-                                <div className='col-xl-6 col-12  d-block text-start fs-6 bg-white px-4 py-2'>
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                <div className='col-xl-6 col-12  d-block text-start bg-white'>
+                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start'>Stat Working ? </p>
                                         <input type="date" className='w-75 text-start text-secondary input-box' placeholder=""
                                             name="startWorkingDate"
@@ -226,7 +306,7 @@ const CreateEmployee = () => {
                                             onChange={handleInputChange}
                                             required />
                                     </div>
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                         <p className='w-25 text-start'>Work Email ? </p>
                                         <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" "
                                             name="email"
@@ -376,26 +456,6 @@ const CreateEmployee = () => {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div className="between">
-                    <div className='w-50 d-flex mt-2'>
-                        <div class="pb-2 px-2" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-outline-dark px-4 w-100 box-shadow rounded-pill" onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
-                        </div>
-
-
-                    </div>
-                    <div className='w-50 d-flex end mt-2'>
-                        <div class="pb-2  px-2" role="group" aria-label="Basic example">
-                            <button type="button" class="btn-red px-4 w-100 box-shadow rounded-pill"><i class="fa-solid fa-xmark px-2"></i>Cancel </button>
-                        </div>
-                        <div class="pb-2 " role="group" aria-label="Basic example">
-                            <button type="button" class="btn-green px-4 w-100 box-shadow rounded-pill" onClick={submitProduct}><i class="fa-solid fa-check px-2"></i>Save </button>
-                        </div>
-
-                    </div>
-
                 </div>
             </form>
 

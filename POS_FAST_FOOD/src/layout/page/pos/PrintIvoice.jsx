@@ -11,7 +11,7 @@ const Invoice = ({ data }) => {
                 background: 'white',
                 width: '85mm',
                 height: '100%',
-                padding: '10mm',
+                padding: '4mm',
                 fontFamily: 'Arial, sans-serif',
                 border: '1px solid #eee',
                 fontSize: '7px'
@@ -120,7 +120,8 @@ const PrinInvoice = () => {
     return (
         <div>
 
-            <button className='btn bg-green box-shadow border-0 text-white my-2' onClick={generatePdf}>Download Invoice PDF</button>          <div ref={invoiceRef}>
+            <button className='btn bg-green box-shadow border-0 text-white my-2 w-100' onClick={generatePdf}>Download Invoice PDF</button>
+            <div ref={invoiceRef}>
                 <Invoice data={invoiceData} />
             </div>
 

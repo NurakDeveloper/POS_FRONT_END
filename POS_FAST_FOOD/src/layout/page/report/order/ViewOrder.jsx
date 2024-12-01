@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { listOrder } from '../../../../api/Order';
 import { format } from 'date-fns';
 import * as XLSX from 'xlsx';
+import { FaFileExcel, FaFilter, FaPlus, FaPrint, FaSearch } from 'react-icons/fa';
+import { Th } from '../../../../components/table/DataGrid';
 const ViewOrder = () => {
     const goto = useNavigate();
     const [order, setOrder] = useState([]);
@@ -29,34 +31,53 @@ const ViewOrder = () => {
         style: 'currency',
         currency: 'USD'
     });
+
     function menu() {
         return (
-            <>
-                <div className="w-100 ">
-                    <div className="d-flex px-2 py-3 rounded">
-                        <div className='d-flex start w-50'>
-                            <Link className="btn btn-success box-shadow px-3" to='/create-item'>
-                                <span className='pe-2'><i class="fa-solid fa-circle-plus"></i></span>
-                                <span className=''>New</span>
-                            </Link>
-                            <div class="btn-group ms-3" role="group" aria-label="Basic mixed styles example">
-                                <button type="button" class="btn btn-outline-secondary"><span className='pe-2'><i class="fa-solid fa-print"></i></span>Print</button>
-                                <button type="button" class="btn btn-outline-secondary" onClick={() => ExportExcel(order, "order_data")}><span className='pe-2'><i class="fa-solid fa-file-export"></i></span>Export</button>
-                            </div>
+            <div className="list-header-container">
+                {/* Left Section */}
+                <div className="list-header-left">
+                    {/* Add New Button */}
+                    <button className="list-header-button add-new box-shadow" onClick={() => goto('/create-item')}>
+                        <FaPlus className="list-header-icon" />
+                        Add New
+                    </button>
+                    <button className="list-header-button print box-shadow">
+                        <FaPrint className="list-header-icon" />
+                        Print
+                    </button>
 
-                        </div>
-                        <div className='d-flex end w-50'>
-                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                <button type="button" class="btn btn-outline-secondary" ><span className='pe-2'><i class="fa-solid fa-list"></i></span> List</button>
-                                <button type="button" class="btn btn-outline-secondary" > <span className='pe-2'><i class="fa-brands fa-microsoft"></i></span>Card</button>
-                            </div>
-                        </div>
+                    {/* Export Button */}
+                    <button className="list-header-button export box-shadow" onClick={() => ExportExcel(order, "order_data")}>
+                        <FaFileExcel className="list-header-icon" />
+                        Export
+                    </button>
 
+                    {/* Search Input */}
 
+                </div>
+                <div className="list-header-right">
+                    <div className="list-header-search">
+                        <FaSearch className="list-header-icon search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="list-header-input"
+                        />
                     </div>
                 </div>
-            </>
-        )
+
+                {/* Right Section */}
+                <div className="list-header-right">
+
+                    {/* Filter Button */}
+                    <button className="list-header-button filter box-shadow">
+                        <FaFilter className="list-header-icon" />
+                        Filter
+                    </button>
+                </div>
+            </div>
+        );
     }
     const simpleFormatDate = (dateString) => {
         const date = new Date(dateString);
@@ -76,20 +97,21 @@ const ViewOrder = () => {
             {menu()}
             <div className="card border-0">
                 <div className="card-body p-0 border">
-                    <table className="table table-striped table-hover">
+                    <table className="">
                         <thead valign='middle'>
                             <tr>
-                                <td>
+
+                                <Th resizable>
                                     <input type="checkbox" name="" className='rounded-0 border pointer px-3' id="" />
-                                </td>
-                                <td className='py-3'>No</td>
-                                <td>Invoice</td>
-                                <td>OrderType</td>
-                                <td>TotalAmount</td>
-                                <td>Cash</td>
-                                <td>Exchange</td>
-                                <td>OrderTime</td>
-                                <td>Description</td>
+                                </Th>
+                                <Th resizable className='py-3'>No</Th>
+                                <Th resizable>Invoice</Th>
+                                <Th resizable>OrderType</Th>
+                                <Th resizable>TotalAmount</Th>
+                                <Th resizable>Cash</Th>
+                                <Th resizable>Exchange</Th>
+                                <Th resizable>OrderTime</Th>
+                                <Th resizable>Description</Th>
                             </tr>
                         </thead>
                         <tbody>

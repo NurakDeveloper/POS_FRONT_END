@@ -42,15 +42,7 @@ const Menu = () => {
                         <span className='w-25'><i class="fa-solid fa-bolt"></i></span>
                         <span className='w-75 text-start'>Category</span>
                     </NavLink>
-                    <NavLink
-                        to='/purchase'
-                        className={({ isActive }) =>
-                            isActive ? "  active-link" : "menu-item"
-                        }
-                    >
-                        <span className='w-25'><i class="fa-solid fa-layer-group"></i></span>
-                        <span className='w-75 text-start'>Purchase</span>
-                    </NavLink>
+
 
                     <div className="menu-title ">
                         Order reporting
@@ -146,6 +138,15 @@ const Menu = () => {
                     >
                         <span className='w-25'><i class="fa-solid fa-gear"></i></span>
                         <span className='w-75 text-start'>Setting</span>
+                    </NavLink>
+                    <NavLink
+                        to='/reporting'
+                        className={({ isActive }) =>
+                            isActive ? "  active-link" : "menu-item"
+                        }
+                    >
+                        <span className='w-25'><i class="fa-solid fa-registered"></i></span>
+                        <span className='w-75 text-start'>Report</span>
                     </NavLink>
 
                 </nav>

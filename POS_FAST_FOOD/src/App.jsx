@@ -38,6 +38,12 @@ import MakeBill from './layout/form/accounting/MakeBill'
 import CustomTable from './layout/page/pos/Custom/CustomTable'
 import MobileMenu from './layout/menu/MobileMenu'
 import PosMenu from './layout/page/pos/PosMenu'
+import OrderTable from './layout/page/pos/OrderTable'
+import RExpense from './layout/page/report/accounting/RExpense'
+import NetIncomeChart from './layout/page/report/netincome/NetIncomeChart'
+import PaymentMethod from './layout/page/report/paymentmethod/PaymentMethod'
+import MonthSaleReport from './layout/page/report/monthlysalereport/MonthSaleReport'
+import BestSellingMenuItemsChart from './layout/page/report/bestsellingproduct/BestSellingMenuItemsChart'
 function App() {
   const [userName, setUserName] = useState();
   const [role, setRole] = useState();
@@ -83,11 +89,11 @@ function App() {
                 <div className="content d-block">
                   <div className="app-page">
                     <Routes>
-                      <Route path='/' element={<PosLight />} />
+                      <Route path='' element={<PosLight />} />
+                      <Route path='/order-history/:id' element={<PosLight />} />
+                      <Route path='/order-history' element={<OrderTable />} />
                       <Route path='*' element={<PosLight />} />
-
                     </Routes>
-
                   </div>
 
 
@@ -166,7 +172,7 @@ function App() {
   const header = () => {
     return (
       <>
-        <div className='between w-100 py-2 rounded bg-none d-none d-md-none d-lg-flex px-3'>
+        <div className='between w-100 py-2 bg-none d-none d-md-none d-lg-flex border-bottom'>
           <div className="fs-5 text-secondary border-start text-start w-25 ps-3">
             <i class="fa-solid fa-bars pointer" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
           </div>
@@ -192,7 +198,7 @@ function App() {
                 <i class="fa-solid fa-desktop btn-silver p-3 rounded-circle"></i>
               </button>
             </div>
-            <div className="app-defualt-user d-flex start px-4 border-end  rounded py-1 border-start border-2">
+            <div className="app-defualt-user d-flex start px-4 py-1 border-start border-1">
               <img src={`/src/assets/image/${profile}`} alt="" className="user-img mx-2 rounded-circle " />
               <div className="center">
                 <div>
@@ -259,11 +265,19 @@ function App() {
                   <Route path='/employees' element={<Employee />} />
                   <Route path='/employee-detail/:id' element={<EmployeeDetail />} />
                   <Route path='/create-employee' element={<CreateEmployee />} />
+                  <Route path='/update-employee/:id' element={<CreateEmployee />} />
                   <Route path='/create-customer' element={<CreateCustomer />} />
                   <Route path='/list-category' element={<Category />} />
                   <Route path='/inventory' element={<Inventory />} />
                   <Route path='/accountant' element={<Accountant />} />
-                  <Route path='/reporting' element={<Report />} />
+                  <Route path='/reporting' element={<Report />}>
+
+                    <Route path='' element={<RExpense />} />
+                    <Route path='net-income' element={<NetIncomeChart />} />
+                    <Route path='payment-method' element={<PaymentMethod />} />
+                    <Route path='monthly-sale-report' element={<MonthSaleReport />} />
+                    <Route path='best-selling-product' element={<BestSellingMenuItemsChart />} />
+                  </Route>
                   <Route path='/setting' element={<Setting />} />
                   <Route path='/journal' element={<Journal />} />
                   <Route path='/journal-detail/:id' element={<JournalDetail />} />
@@ -271,6 +285,7 @@ function App() {
                   <Route path='/make-bill' element={<MakeBill />} />
                   <Route path='/make-account' element={<MakeChartOfAccount />} />
                   <Route path='/report-journal' element={<JouranlReport />} />
+
                 </Routes>
 
               </div>

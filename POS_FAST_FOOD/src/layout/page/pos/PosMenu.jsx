@@ -2,50 +2,88 @@ import './postest.css'
 import { useNavigate } from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { useEffect } from 'react';
 const PosMenu = () => {
+    function findTotalOrder() {
+        try {
+            const orderTables = JSON.parse(Cookies.get("table-order") || '[]'); // Default to empty array
+            console.log(orderTables);
+
+            if (Array.isArray(orderTables)) {
+                return orderTables.length;
+            } else {
+                return 0; // If `orderTables` is not an array
+            }
+        } catch (error) {
+            console.error("Error finding total order:", error);
+            return 0;
+        }
+    }
+
+    useEffect(() => {
+
+    }, [])
     const goto = useNavigate();
     return (
         <>
             <div className='pos-menu'>
 
-                <nav className='text-center'>
-                    <div className='pb-4'>
+                <nav className='pos-nav py-2 box-shadow'>
+                    <div className='navbar-item'>
                         <NavLink
                             to="/"
                             className={({ isActive }) =>
-                                isActive ? "pos-active" : "pos-item"
+                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
                             }
                         >
                             <i class="fa-solid fa-tablet-screen-button w-100"></i>
 
                         </NavLink>
                     </div>
-                    <div className='pb-4'>
+                    <div className='navbar-item'>
                         <NavLink
                             to="/notification"
                             className={({ isActive }) =>
-                                isActive ? "pos-active" : "pos-item"
+                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
                             }
                         >
                             <i class="fa-solid fa-bell w-100"></i>
 
                         </NavLink>
                     </div>
-                    <div className='pb-4'>
+                    <div className='navbar-item'>
                         <NavLink
                             to="/setting"
                             className={({ isActive }) =>
-                                isActive ? "pos-active" : "pos-item"
+                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
                             }
                         >
                             <i class="fa-solid fa-gear w-100"></i>
                         </NavLink>
                     </div>
-                    <div className='pb-4'>
+                    <div className='navbar-item'>
                         <NavLink
-
+                            to="/order-history"
                             className={({ isActive }) =>
-                                isActive ? "pos-active" : "pos-item"
+                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                            }
+                        >
+                            <div class="position-relative w-100">
+                                <i class="fa-solid fa-cart-shopping w-100"></i>
+                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger f-14" style={{ zIndex: '10' }}>
+                                    {findTotalOrder()}
+                                </span>
+                            </div>
+
+
+                        </NavLink>
+                    </div>
+                    <div className='navbar-item'>
+
+                        <NavLink
+                            to='/list-product'
+                            className={({ isActive }) =>
+                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
                             }
                             onClick={() => {
                                 Cookies.set("admin_viewer", 1);
@@ -53,9 +91,11 @@ const PosMenu = () => {
                                 location.reload();
                             }}
                         >
+
                             <i class="fa-solid fa-arrow-right-from-bracket w-100"></i>
                         </NavLink>
                     </div>
+
 
 
                 </nav>

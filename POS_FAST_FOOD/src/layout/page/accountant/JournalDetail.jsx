@@ -3,9 +3,14 @@ import { getJournalByID } from "../../../api/JournalE";
 import { useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { getAllAccount } from "../../../api/Account";
+import { Th } from "../../../components/table/DataGrid";
+import { getAllBranch } from "../../../api/Branch";
 const JournalDetail = () => {
 
+
     const { id } = useParams();
+    const [branch, setbranch] = useState([]);
+
     const [account, setAccount] = useState([]);
     const [journalData, setJournalData] = useState({
         "journal": '',
@@ -49,52 +54,69 @@ const JournalDetail = () => {
 
 
         }
+        getAllBranch().then((response) => {
+            setbranch(response.data);
+        })
     }, [])
+    const formatDate = (dateString) => {
+        try {
+            const date = new Date(dateString);
+            return new Intl.DateTimeFormat('en', {
+                weekday: 'long',   // Full day of the week (e.g., "Monday")
+                day: '2-digit',    // Two-digit day (e.g., "07")
+                month: 'numeric',     // Full month name (e.g., "November")
+                year: 'numeric'    // Full year (e.g., "2024")
+            }).format(date);
+        } catch (e) {
+            return "Error Date Time Create "
+        } // 'dd' for day, 'MMMM' for full month, 'yy' for year
+    };
 
     function getAccountName(id) {
         const findAccount = account.find(f => f.id == id);
         return findAccount.code + '  ' + findAccount.accountName;
     }
+    function findBranchName(id) {
+        try {
+            return branch.find(b => b.id == id).branchName;
+        } catch (e) {
+            return "No Branch Select"
+        }
+    }
 
     return (
         <>
 
-            <div>
+            <div className="container">
                 <div className="container-fluid p-0 center">
                     <div className="row w-100">
-                        <div className="col-xl-9" style={{ height: '900px' }}>
-                            <div class="btn-group my-2" role="group" aria-label="Basic example">
+                        <div className="col-12">
 
-                                <button type="button" class="btn btn-outline-secondary px-4" ><i class="fa-solid fa-floppy-disk"></i></button>
-                                <button type="button" class="btn btn-outline-secondary"><i class="fa-solid fa-circle-xmark"></i></button>
-                            </div>
                             <div className="border bg-white w-100 rounded">
-                                <div className="d-flex h-100" >
-                                    <div className='start w-50 p-2'>
-                                        <div className='w-100 px-4'>
-                                            <div className="fs-2">
-                                                <p></p>
-                                            </div>
 
-                                        </div>
-                                    </div>
-
-                                </div>
                                 <div className="d-flex">
                                     <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
                                             <label htmlFor='references' className='w-25 text-start'>Reference  </label>
                                             <p className="w-75">{journalData.reference}</p>
+                                        </div>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
+                                            <label htmlFor='references' className='w-25 text-start'>Branch  </label>
+                                            <p className="w-75">{findBranchName(journalData.branchId)}</p>
+                                        </div>
+                                        <div className='group-input center w-100' style={{ fontSize: 16 }}>
+                                            <label htmlFor='references' className='w-25 text-start'>Total  </label>
+                                            <p className="w-75">{formatCurrency.format(journalData.total)}</p>
                                         </div>
 
                                     </div>
                                     <div className='d-block text-start bg-white px-4 py-2 w-50 mt-1'>
                                         <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
                                             <label htmlFor='references' className='w-25 text-start'>Date  </label>
-                                            <p className="w-75">{journalData.date}</p>
+                                            <p className="w-75">{formatDate(journalData.date)}</p>
                                         </div>
                                         <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <label htmlFor='references' className='w-25 text-start'>Date  </label>
+                                            <label htmlFor='references' className='w-25 text-start'>Journal   </label>
                                             <p className="w-75">{journalData.journal}</p>
                                         </div>
                                     </div>
@@ -114,14 +136,14 @@ const JournalDetail = () => {
                                     <div class="tab-content border-0" id="myTabContent">
                                         <div class="border-0 tab-pane show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                                             <div className="p-0">
-                                                <table className="table table-striped table-hover w-100 p-0">
+                                                <table className="table-hover w-100 p-0">
                                                     <thead>
                                                         <tr>
-                                                            <th className="py-3">Account</th>
-                                                            <th className="py-3">Label</th>
-                                                            <th className="py-3">Debit</th>
-                                                            <th className="py-3">Credit</th>
-                                                            <th className="py-3">Action</th>
+                                                            <Th resizable className="py-3">Account</Th>
+                                                            <Th resizable className="py-3">Label</Th>
+                                                            <Th resizable className="py-3">Debit</Th>
+                                                            <Th resizable className="py-3">Credit</Th>
+                                                            <Th columnWidth={50} className="py-3">Action</Th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -132,7 +154,7 @@ const JournalDetail = () => {
                                                                     <td>{t.label}</td>
                                                                     <td>{formatCurrency.format(t.debit)}</td>
                                                                     <td>{formatCurrency.format(t.credit)}</td>
-                                                                    <td>Remove</td>
+                                                                    <td><i class="fa-solid fa-trash-can remove"></i></td>
                                                                 </tr>
                                                             )
                                                         }
@@ -153,30 +175,7 @@ const JournalDetail = () => {
                             </div>
 
                         </div>
-                        <div className="col-md-3" style={{ height: '900px' }}>
-                            <div className="card border-0 rounded bg-white h-100 w-100 p-2">
-                                <div className='d-flex p-2 border rounded start pointer' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
-                                    </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>Dara Chhun</div>
-                                        <div className='text-secondary'>Seller / pos</div>
-                                        <div className='f-16 hover-line pointer'>mobile : +885990340943</div>
-                                    </div>
-                                </div>
-                                <div className='d-flex p-2 border rounded start pointer mt-2' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
-                                    </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>General</div>
-                                        <div className='text-secondary'>membership : no</div>
-                                        <div className='f-16 hover-line pointer'>Contact : +885990340943</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
 
                 </div>

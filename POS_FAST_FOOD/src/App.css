@@ -210,3 +210,89 @@ p {
   background: #cecece;
 
 }
+
+
+
+/* From Uiverse.io by SmookyDev */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  font-family: "Arial", sans-serif;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  margin-left: -10px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+.tooltip .icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #4caf50;
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+}
+
+.text-box {
+  border: 1px solid rgb(153, 153, 153);
+  border-radius: 7px;
+  transition: 0.2s;
+}
+
+.text-box:hover {
+  border: 1px solid orange;
+}
+
+.text-box::placeholder {
+  color: #bebebe;
+}
+
+.txt-label {
+  color: rgb(93, 93, 93);
+}
+
+.text-box:focus {
+  border: 1px solid rgb(245, 187, 81);
+  box-shadow: 0 0 12px rgba(255, 165, 0, 0.6);
+}
+
+.remove {
+  color: hsl(1, 55%, 53%);
+  transition: 0.2s;
+}
+
+.remove:hover {
+  color: hsl(1, 57%, 48%);
+}

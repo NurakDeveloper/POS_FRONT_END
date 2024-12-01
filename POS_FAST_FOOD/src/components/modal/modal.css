@@ -1,0 +1,99 @@
+/* Modal Overlay (Dark background) */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* When the modal is open, we show it */
+.custom-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Content */
+.custom-modal-content {
+    position: relative;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    /* Set a max-width for larger screens */
+    max-height: 90vh;
+    /* Max height */
+    overflow-y: auto;
+    transition: transform 0.3s ease-in-out;
+    transform: scale(0.7);
+}
+
+/* Modal appears with smooth scaling effect */
+.custom-modal-overlay.open .custom-modal-content {
+    transform: scale(1);
+}
+
+/* Modal Header (Title and Close Button) */
+.custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.custom-modal-close {
+    font-size: 24px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: #888;
+    transition: color 0.3s ease;
+}
+
+.custom-modal-close:hover {
+    color: #d9534f;
+}
+
+/* Modal Body */
+.custom-modal-body {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+    max-height: 70vh;
+    /* For mobile screens, prevent overflow */
+    overflow-y: auto;
+}
+
+/* For smaller screens, make the modal more flexible */
+@media (max-width: 600px) {
+    .custom-modal-content {
+        width: 90%;
+        max-width: 100%;
+        max-height: 90vh;
+    }
+}
+
+/* Keyframe for Fade-in effect (for smoother appearance) */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

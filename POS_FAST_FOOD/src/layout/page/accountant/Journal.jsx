@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { getAllJournal } from '../../../api/JournalE';
 import { format } from 'date-fns';
 import * as XLSX from 'xlsx';
+import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
+import { Th } from '../../../components/table/DataGrid';
 const Journal = () => {
 
     const [journal, setJounal] = useState([])
@@ -33,19 +35,19 @@ const Journal = () => {
         return (
             <div className="card border-0">
                 <div className="card-body p-0 border">
-                    <table className="table table-striped table-hover">
+                    <table className="">
                         <thead valign='middle'>
                             <tr>
-                                <td>
+                                <Th columnWidth={50}>
                                     <input type="checkbox" name="" className='rounded-0 border pointer px-3' id="" />
-                                </td>
-                                <td className='py-3'>No</td>
-                                <td>Date</td>
-                                <td>Reference</td>
-                                <td>Journal</td>
-                                <td>Total</td>
-                                <td>Status</td>
-                                <td>Company</td>
+                                </Th>
+                                <Th columnWidth={50} className='py-3'>No</Th>
+                                <Th resizable>Date</Th>
+                                <Th resizable>Reference</Th>
+                                <Th resizable>Journal</Th>
+                                <Th resizable>Total</Th>
+                                <Th resizable>Status</Th>
+                                <Th resizable>Company</Th>
 
 
 
@@ -91,32 +93,52 @@ const Journal = () => {
 
     function menu() {
         return (
-            <>
-                <div className="w-100 ">
-                    <div className="d-flex px-2 py-3 rounded">
-                        <div className='d-flex start w-50'>
-                            <Link className="btn btn-success box-shadow px-3" to='/make-journal'>
-                                <span className='pe-2'><i class="fa-solid fa-circle-plus"></i></span>
-                                <span className=''>New</span>
-                            </Link>
-                            <div class="btn-group ms-3" role="group" aria-label="Basic mixed styles example">
-                                <button type="button" class="btn btn-outline-secondary"><span className='pe-2'><i class="fa-solid fa-print"></i></span>Print</button>
-                                <button type="button" class="btn btn-outline-secondary" onClick={() => ExportExcel(journal, "journal_data")}><span className='pe-2'><i class="fa-solid fa-file-export"></i></span>Export</button>
-                            </div>
+            <div className="list-header-container">
+                {/* Left Section */}
+                <div className="list-header-left">
+                    {/* Add New Button */}
+                    <button className="list-header-button add-new box-shadow" onClick={() => goto('/make-journal')}>
+                        <FaPlus className="list-header-icon" />
+                        Add New
+                    </button>
+                    <button className="list-header-button print box-shadow">
+                        <FaPrint className="list-header-icon" />
+                        Print
+                    </button>
 
-                        </div>
-                        <div className='d-flex end w-50'>
-                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                <button type="button" class="btn btn-outline-secondary" ><span className='pe-2'><i class="fa-solid fa-list"></i></span> List</button>
-                                <button type="button" class="btn btn-outline-secondary" > <span className='pe-2'><i class="fa-brands fa-microsoft"></i></span>Card</button>
-                            </div>
-                        </div>
+                    {/* Export Button */}
+                    <button className="list-header-button export box-shadow" onClick={() => ExportExcel(journal, "journal-data")}>
+                        <FaFileExport className="list-header-icon" />
+                        Export
+                    </button>
 
+                    {/* Search Input */}
 
+                </div>
+                <div className="list-header-right">
+                    <div className="list-header-search">
+                        <FaSearch className="list-header-icon search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="list-header-input"
+                        />
                     </div>
                 </div>
-            </>
-        )
+
+                {/* Right Section */}
+                <div className="list-header-right">
+                    {/* Print Button */}
+
+
+                    {/* Filter Button */}
+                    <button className="list-header-button filter box-shadow">
+                        <FaFilter className="list-header-icon" />
+                        Filter
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     return (

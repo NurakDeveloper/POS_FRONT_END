@@ -8,6 +8,12 @@ import MostProductOrder from './Chart/MostProductOrder';
 import { totalOrderToday } from '../../../api/Order';
 import { countEmployee } from '../../../api/EmployeeApi';
 import { getAllCustomer } from '../../../api/Customer';
+import MonthSaleReport from '../report/monthlysalereport/MonthSaleReport';
+import BestSellingMenuItemsChart from '../report/bestsellingproduct/BestSellingMenuItemsChart';
+import NetIncomeChart from '../report/netincome/NetIncomeChart';
+import { getNetIncomeReport } from '../../../api/Reporting';
+import { da } from 'date-fns/locale';
+import ChartComponent from '../report/netincome/ChartComponent';
 const Dashboard = ({ UserName }) => {
 
     const [customer, setCustomer] = useState([]);
@@ -16,6 +22,68 @@ const Dashboard = ({ UserName }) => {
             setCustomer(response.data);
         })
     }, [])
+    const [data, setData] = useState([]);
+    const [revenues, setRevenues] = useState();
+    const [expense, setExpense] = useState();
+    const [income, setIncome] = useState();
+
+    useEffect(() => {
+        getNetIncomeReport().then((response) => {
+            setData(response.data);
+        });
+    }, []);
+    useEffect(() => {
+
+        try {
+            let sum = 0;
+            for (let i = 0; i < data.length; i++) {
+                sum = sum + data[i].totalRevenues;
+            }
+            setRevenues(sum);
+            sum = 0;
+            for (let i = 0; i < data.length; i++) {
+                sum = sum + data[i].totalExpense;
+            }
+            setExpense(sum);
+            sum = 0;
+            for (let i = 0; i < data.length; i++) {
+                sum = sum + data[i].netIncome;
+            }
+            setIncome(sum);
+            console.log('hh')
+
+        } catch (e) {
+            return 0;
+
+        }
+    }, [data])
+    function findTotalRevenues() {
+
+    }
+    // function findTotalRevenues() {
+    //     let sum = 0;
+    //     try {
+    //         for (let i = 0; i < data.length; i++) {
+    //             sum = sum + data[i].findTotalRevenues;
+    //         }
+    //         return sum;
+    //     } catch (e) {
+    //         return 0;
+
+    //     }
+    // }
+    // function findTotalRevenues() {
+    //     let sum = 0;
+    //     try {
+    //         for (let i = 0; i < data.length; i++) {
+    //             sum = sum + data[i].findTotalRevenues;
+    //         }
+    //         return sum;
+    //     } catch (e) {
+    //         return 0;
+
+    //     }
+    // }
     const [totalOrder, setTotalOrder] = useState();
 
     const [employeeCount, setCountEmployee] = useState();
@@ -111,7 +179,7 @@ const Dashboard = ({ UserName }) => {
                                                     <div className="w-100 center h-100">
                                                         <div>
                                                             <div className="fs-6 text-center">Sale Revenues</div>
-                                                            <div className='fs-1'>$20,000.00</div>
+                                                            <div className='fs-1'>{formatCurrency.format(revenues)}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -130,7 +198,7 @@ const Dashboard = ({ UserName }) => {
                                                     <div className="w-100 center h-100">
                                                         <div>
                                                             <div className="fs-6 text-center">Total Expense</div>
-                                                            <div className='fs-1'>$20,000.00</div>
+                                                            <div className='fs-1'>{formatCurrency.format(expense)}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -147,8 +215,8 @@ const Dashboard = ({ UserName }) => {
                                                 <div className='d-flex h-75'>
                                                     <div className="w-100 center h-100">
                                                         <div>
-                                                            <div className="fs-6 text-center">Total Daily Order</div>
-                                                            <div className='fs-1'>{formatCurrency.format(totalOrder)}</div>
+                                                            <div className="fs-6 text-center">Net Income</div>
+                                                            <div className='fs-1'>{formatCurrency.format(income)}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -220,30 +288,33 @@ const Dashboard = ({ UserName }) => {
                 </div>
 
 
-                <div className='container-fluid w-100 p-0 center my-3  rounded '>
+                <div className='container-fluid w-100 p-0 center my-2  rounded '>
                     <div className="row w-100 p-0">
-                        <div className="col-xl-9 col-sm-12 p-0">
-                            <div className="card border-0 bgso  center box-shadow" style={{ height: '540px' }}>
+                        <div className="col-xl-6 p-1">
+                            <div className="card border-0 bgso  center box-shadow h-100">
                                 <div className="card-body w-100 p-3 bg-white rounded "  >
-                                    <ChartRevenues />
+                                    <h6 className='p-3 px-0'>Net Income Report</h6>
+                                    <ChartComponent />
                                 </div>
                             </div>
                         </div>
-                        <div className="col-xl-3 col-sm-12 ">
-                            <div className="card border-0 bgso  center rounded box-shadow" style={{ height: '540px' }}>
-                                <div className="card-body w-100 bg-white p-1 rounded"  >
-                                    <MostProductOrder />
+                        <div className="col-xl-6 p-1">
+                            <div className="card border-0 bgso  center box-shadow h-100">
+                                <div className="card-body w-100 p-3 bg-white rounded "  >
+                                    <h6 className='p-3 px-0'>Best Product Sale</h6>
+                                    <BestSellingMenuItemsChart />
                                 </div>
                             </div>
                         </div>
+
 
                     </div>
                 </div>
                 <div className='container-fluid w-100 p-0 center  bg-white '>
                     <div className="row w-100">
-                        <div className="col-xl-9 col-md-8 col-12 box-shadow rounded">
-                            <h6 className='p-3 px-0'>Customer Membership</h6>
-                            <div className="row">
+                        <div className="col-12 box-shadow rounded">
+                            <h6 className='p-3 px-0'>Monthly Sale Report</h6>
+                            {/* <div className="row">
                                 <div className="col-xl-2 col-lg-3 col-md-3 col-6">
                                     <div className="card w-100" style={{ overflow: 'hidden' }}>
                                         <div className="card-img-top p-2">
@@ -291,36 +362,10 @@ const Dashboard = ({ UserName }) => {
                                 </div>
 
                             </div>
-                            <button className='btn btn-outline-secondary px-5 my-2'>View All</button>
+                            <button className='btn btn-outline-secondary px-5 my-2'>View All</button> */}
+                            <MonthSaleReport />
                         </div>
-                        <div className="col-xl-3 col-md-4">
-                            <div className="card p-0 pointer text-dark box-shadow  border-0">
-                                {/* <div className="card-header border-0 fs-5 d-block bg-none border-0">
-                                    <div className='d-flex'>
-                                        <div className="w-100 start">
-                                            <div>
-                                                <div className="fs-6 text-secondary">Number of Employee All Branch</div>
-                                                <div className='fs-1'>{employeeCount}</div>
-                                            </div>
-                                        </div>
 
-                                    </div>
-                                </div> */}
-                                <div className="card-img-top h-100 p-3">
-                                    <img src="/src/assets/image/profile.jpg" alt="" className="img-fluid rounded box-shadow" />
-                                </div>
-                                <div className="card-body">
-                                    {/* <p className='fs-2'>Bussines Owner</p> */}
-                                    <p className="f-12 text-secondary">Name</p>
-                                    <p>Oeurn Nurak</p>
-                                    <p className="f-12 text-secondary">Cash In Bank</p>
-                                    <p>$19k</p>
-                                    <p className="f-12 text-secondary">Contact</p>
-                                    <p>09782398923892</p>
-                                </div>
-
-                            </div>
-                        </div>
                     </div>
 
                 </div>

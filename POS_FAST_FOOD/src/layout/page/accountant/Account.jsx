@@ -3,6 +3,7 @@ import { getAllAccount } from "../../../api/Account";
 import { getAllAccountType } from "../../../api/AccountType";
 import { Link } from "react-router-dom";
 import * as XLSX from 'xlsx';
+import { Th } from "../../../components/table/DataGrid";
 const Account = () => {
     const [account, setAccount] = useState([]);
     const [accountType, setAccountType] = useState([]);
@@ -15,8 +16,12 @@ const Account = () => {
         })
     }, [])
     function getAccountTypeName(id) {
-        const objAccountType = accountType.find(a => a.id == id);
-        return objAccountType.accountType;
+        try {
+            const objAccountType = accountType.find(a => a.id == id);
+            return objAccountType.accountType;
+        } catch (e) {
+            return "No Accountype Selected"
+        }
     }
     const ExportExcel = (data, fileName) => {
         // 1. Convert data to a worksheet
@@ -68,15 +73,15 @@ const Account = () => {
                         <div className="card border-0">
 
                             <div className="card-body p-0">
-                                <table className="table table-striped table-hover">
+                                <table className="">
                                     <thead>
                                         <tr >
-                                            <td className="py-3">No</td>
-                                            <td>Code</td>
-                                            <td>AccountName</td>
-                                            <td>Account Type</td>
-                                            <td>Currency</td>
-                                            <td>Branch</td>
+                                            <Th resizable className="py-3">No</Th>
+                                            <Th resizable>Code</Th>
+                                            <Th resizable>AccountName</Th>
+                                            <Th resizable>Account Type</Th>
+                                            <Th resizable>Currency</Th>
+                                            <Th resizable>Branch</Th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -87,7 +92,7 @@ const Account = () => {
                                                     <td>{a.code}</td>
                                                     <td>{a.accountName}</td>
                                                     <td>{getAccountTypeName(a.accountTypeId)}</td>
-                                                    <td>{a.currency}</td>
+                                                    <td>USD</td>
                                                     <td>Nurak Company's</td>
                                                 </tr>
                                             )

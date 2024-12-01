@@ -1,0 +1,72 @@
+.data-grid {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #dbdbdb;
+    padding: 30px 0px;
+    padding-top: 0px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+th {
+    width: 100%;
+    padding: 15px;
+    text-align: left;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+td {
+    width: 100%;
+    padding: 15px;
+    text-align: left;
+    border: none;
+    border-bottom: 0.4px solid #959595;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+th {
+    background-color: #f7f7f7;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+}
+
+th .header-cell {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+th .sort-icon {
+    margin-left: 5px;
+    font-size: 10px;
+}
+
+th .resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    cursor: col-resize;
+    background-color: transparent;
+}
+
+th:hover .resizer {
+    background-color: #ddd;
+}
+
+tr:hover {
+    background-color: #f9f9f9;
+}

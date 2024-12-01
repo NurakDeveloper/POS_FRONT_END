@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { createJournal, createTransaction } from "../../../api/JournalE";
 import { getAllAccount } from "../../../api/Account";
 import { set } from "date-fns";
-
+import { useNavigate } from "react-router-dom";
+import { IoSaveSharp } from 'react-icons/io5'
+import { IoIosArrowRoundBack } from 'react-icons/io'
+import { Th } from "../../../components/table/DataGrid";
+import { getBranchId } from "../../../api/Branch";
 const MakeJournal = () => {
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
     const [account, setAccount] = useState([]);
     const [acName, setAcName] = useState([])
-
+    const branchId = getBranchId();
     useEffect(() => {
         getAllAccount().then((reponse) => {
             setAccount(reponse.data);
@@ -25,7 +29,7 @@ const MakeJournal = () => {
     }
     const [journalData, setJournalData] = useState({
         "journal": '',
-        "branchId": '',
+        "branchId": branchId,
         "partnerId": '',
         "date": '',
         "total": 0,
@@ -65,6 +69,8 @@ const MakeJournal = () => {
         const { name, value } = e.target;
         setJournalData({ ...journalData, [name]: value });
 
+
+
     }
     const saveJournal = (e) => {
         e.preventDefault();
@@ -75,7 +81,8 @@ const MakeJournal = () => {
                 updatedRows[i]["journalEntriesId"] = response.data.id;
                 setRows(updatedRows);
                 createTransaction(rows[i]).then((responseT) => {
-                    console.log(responseT.data);
+                    alert(JSON.stringify(responseT.data));
+
                     setJournalData({
                         "journal": '',
                         "branchId": '',
@@ -85,37 +92,53 @@ const MakeJournal = () => {
                         "reference": '',
                         "status": "Posted"
                     });
+                    setRows([{
+                        "journalEntriesId": '',
+                        "accountId": '',
+                        "label": '',
+                        "debit": 0,
+                        "credit": 0
+                    }]);
                 })
 
             }
+        }).catch(e => {
+            console.error(e);
         })
 
+    }
+    function preview(e) {
+        e.preventDefault();
+        alert(JSON.stringify(rows));
+    }
+    const navigate = useNavigate();
+
+
+    function formHeader() {
+        return (
+            <div className='form-header-content px-0 pt-2'>
+                <button type="button" class="button cancel box-shadow " onClick={() => navigate('/journal')}><IoIosArrowRoundBack /><span className='px-2'>Cancel</span> </button>
+                <div className='d-flex'>
+                    <button type="button" class="button preview box-shadow " onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
+                    <div className='px-3 pe-0'>
+                        <button type="button" class="button add box-shadow px-4" onClick={saveJournal}><IoSaveSharp /><span className='px-2'>Save</span> </button>
+                    </div>
+                </div>
+
+
+            </div>
+        );
     }
 
     return (
         <>
 
-            <div>
+            <div className="container">
                 <div className="container-fluid p-0 center">
                     <div className="row w-100">
-                        <div className="col-12" style={{ height: '900px' }}>
-                            <div class="btn-group my-2" role="group" aria-label="Basic example">
-
-                                <button type="button" class="btn btn-outline-secondary px-4" onClick={saveJournal}><i class="fa-solid fa-floppy-disk"></i></button>
-                                <button type="button" class="btn btn-outline-secondary"><i class="fa-solid fa-circle-xmark"></i></button>
-                            </div>
+                        <div className="col-12">
+                            {formHeader()}
                             <div className="border bg-white w-100 rounded">
-                                <div className="d-flex h-100" >
-                                    <div className='start w-50 p-2'>
-                                        <div className='w-100 px-4'>
-                                            <div className="fs-2">
-                                                <p></p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
                                 <div className="d-flex">
                                     <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
                                         <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
@@ -164,32 +187,21 @@ const MakeJournal = () => {
                                     <div class="tab-content border-0" id="myTabContent">
                                         <div class="border-0 tab-pane show active " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                                             <div className="p-3">
-                                                <table className="table-striped table-hover w-100">
+                                                <table className="border-0 table w-100">
                                                     <thead>
-                                                        <tr className="border">
-                                                            <th className="py-3 ps-2">Account</th>
-                                                            <th className="py-3">Label</th>
-                                                            <th className="py-3">Debit</th>
-                                                            <th className="py-3">Credit</th>
-                                                            <th className="py-3">Action</th>
+                                                        <tr className="">
+                                                            <Th className="py-3" resizable columnWidth={300}>Account</Th>
+                                                            <Th className="py-3" resizable>Label</Th>
+                                                            <Th className="py-3">Debit</Th>
+                                                            <Th className="py-3">Credit</Th>
+                                                            <Th className="py-3">Action</Th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {rows.map((row, index) => (
                                                             <tr key={index}>
-                                                                <td className="py-3" style={{ width: '400px' }}>
+                                                                <td className="py-3" style={{ overflow: 'visible' }}>
                                                                     <div className="dropdown cursor-i p-0">
-                                                                        {/* <button
-                                                                            className="btn p-0 w-100 d-flex text-secondary input-box rounded-0"
-                                                                            type="button"
-                                                                            data-bs-toggle="dropdown"
-                                                                            aria-expanded="false"
-                                                                        >
-                                                                            <p className="w-75 text-start text-title">
-
-                                                                            </p>
-                                                                            <i className="w-25 text-end">&#10141;</i>
-                                                                        </button> */}
                                                                         <input type="text"
                                                                             className="p-0 w-100 d-flex text-secondary input-box rounded-0 cursor-i"
                                                                             data-bs-toggle="dropdown"
@@ -197,7 +209,7 @@ const MakeJournal = () => {
                                                                             aria-expanded="false"
                                                                             value={acName[index] ? acName[index].name : "Select Account"}
                                                                         />
-                                                                        <ul className="dropdown-menu w-100 box-shadow" style={{ maxHeight: '200px', overflow: 'scroll' }}>
+                                                                        <ul className="dropdown-menu w-100 box-shadow f-14" style={{ maxHeight: '200px', overflow: 'scroll' }}>
                                                                             {account.map(a => (
                                                                                 <li key={a.id}>
                                                                                     <a
@@ -209,7 +221,6 @@ const MakeJournal = () => {
                                                                                             // Set the selected account name for the specific row
                                                                                             const updatedAcName = [...acName];
                                                                                             updatedAcName[index] = { name: a.code + " " + a.accountName };
-
                                                                                             setRows(updatedRows);
                                                                                             setAcName(updatedAcName);
                                                                                         }}
@@ -251,7 +262,7 @@ const MakeJournal = () => {
                                                                 </td>
                                                                 <td>
                                                                     <span className="pointer" onClick={() => removeRow(index)}>
-                                                                        Remove
+                                                                        <i class="fa-solid fa-trash-can"></i>
                                                                     </span>
                                                                 </td>
                                                             </tr>
@@ -259,7 +270,7 @@ const MakeJournal = () => {
 
                                                     </tbody>
                                                 </table>
-                                                <button className="btn border-0 border-bottom w-100" onClick={addRow}>Add Row</button>
+                                                <button className="button add border-0 border-bottom" onClick={addRow}>Add Line</button>
                                             </div>
                                         </div>
                                         <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
