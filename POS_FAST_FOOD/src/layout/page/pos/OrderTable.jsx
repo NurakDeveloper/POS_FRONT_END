@@ -67,16 +67,13 @@ const OrderTable = () => {
                         key={o.id} // Unique key for each table order
                         className="col-xl-1 col-lg-2 col-md-3 col-sm-4 col-6 p-3"
                     >
-                        <div className="card border pointer rounded position-relative" style={{ height: '150px' }} onClick={() => navigate(`/order-history/${o.id}`)}>
-                            <div className="card-body p-0">
-                                <div className="center " style={{ width: '100%', height: '100px', overflow: 'hidden' }}>
-                                    <img src='https://cdn-icons-gif.flaticon.com/10607/10607785.gif' alt="img" className="h-100" />
-                                    {/* <img src="http://localhost:8085/api/images/BEEF-SKEWERS-3-1536x767.jpg" alt="" /> */}
+                        <div className="card border pointer rounded position-relative text-badges-green center" style={{ height: '105px' }} onClick={() => navigate(`/order-history/${o.id}`)}>
+                            <div className="card-body p-0 center">
+
+                                <div className="f-20 w-100 text-badges-warning">
+                                    {o.id}
                                 </div>
-                                <div className="f-16  hover-line w-100 text-start px-4 pe-1 text-secondary fs-5"
-                                    style={{ height: '50px' }}>{o.id}
-                                </div>
-                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-5">
+                                <span className="position-absolute top-0 start-100 translate-middle text-badges-danger text-light rounded-pill bg-danger px-3">
                                     {/* Dynamic count */}
 
                                     {countOrderLineByTable(o.data)}
@@ -86,7 +83,7 @@ const OrderTable = () => {
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     );
 };
 

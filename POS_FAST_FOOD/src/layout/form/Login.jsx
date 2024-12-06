@@ -4,7 +4,7 @@ import { loginAccount } from '../../api/UserApi';
 import { encryptData } from '../../cryptoJs/Crypto';
 import Cookies from 'js-cookie';
 const Login = () => {
-    const [userName, setUserName] = useState();
+    const [username, setUserName] = useState();
     const [password, setPassword] = useState();
 
     function getValueUserName(e) {
@@ -31,7 +31,7 @@ const Login = () => {
                                 className='txt-bottom w-100 text-white py-2'
                                 placeholder='username'
                                 onChange={getValueUserName}
-                                value={userName}
+                                value={username}
 
                             />
 
@@ -64,12 +64,15 @@ const Login = () => {
 
     function isLogin(e) {
         e.preventDefault();
-        const obj = { userName, password };
+        const obj = { username, password };
         loginAccount(obj).then((reponse) => {
             const encryptUser = encryptData(reponse.data, secretkey);
             Cookies.set("user-data", encryptUser, { expires: 1 });
             Cookies.set("user_id", reponse.data.userId, { expires: 1 });
-            Cookies.set("branchId", reponse.data.data.companyID);
+            // if (reponse.data.data.companyID) {
+            //     Cookies.set("branchId", reponse.data.data.companyID);
+            // }
+            alert("success");
             location.reload();
         }).catch(error => {
             alert(error);

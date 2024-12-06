@@ -2,6 +2,8 @@ import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import ChartComponent from "./ChartComponent"; // Ensure this is your chart component
 import RExpense from "../accounting/RExpense"; // Ensure this is your report component
+import Expense from "../expense/Expense";
+import Revenues from "../revenues/Revenues";
 
 const NetIncomeChart = () => {
   const printRef = useRef(); // Reference for the printable section
@@ -20,7 +22,9 @@ const NetIncomeChart = () => {
 
       {/* Section to print */}
       <div ref={printRef}>
-        <div className="fs-5 mb-3">Net Income Report</div>
+        <p className="f-16 ps-3 border-start">
+          Net Income Reporting
+        </p>
 
         {/* Chart component */}
         <ChartComponent />
@@ -28,12 +32,10 @@ const NetIncomeChart = () => {
         {/* Reports */}
         <div className="row mt-4">
           <div className="col-md-6 col-12">
-            <div className="fs-5 mb-2">Expense Report</div>
-            <RExpense />
+            <Expense />
           </div>
           <div className="col-md-6 col-12">
-            <div className="fs-5 mb-2">Revenues Report</div>
-            <RExpense />
+            <Revenues />
           </div>
         </div>
       </div>

@@ -7,28 +7,28 @@ const Report = () => {
         <>
             <div className='container-fluid px-1'>
                 <div className="row w-100">
-                    <div className="col-xl-9 col-md-9 col-12">
+                    <div className="col-xl-10 col-md-9 col-12">
                         <Outlet />
                     </div>
-                    <div className="col-xl-3 col-md-3 col-12 border px-2">
+                    <div className="col-xl-2 col-md-3 col-12 border px-2">
                         <div className="d-block px-2 py-3 bg-white sticky rounded f-12">
 
 
-                            <Link className="nav-link text-end py-2" to='net-income'>
+                            <Link className="nav-link text-start py-2" to='net-income'>
 
                                 <span className=''>Net Income Report</span>
                             </Link>
-                            <Link className="nav-link text-end py-2" to='best-selling-product'>
+                            <Link className="nav-link text-start  py-2" to='best-selling-product'>
                                 <span className=''>Best Selling Menu Items by Time Period</span>
                             </Link>
 
-                            <Link className="nav-link text-end py-2" to='payment-method'>
+                            <Link className="nav-link text-start  py-2" to='payment-method'>
                                 <span className=''>Customer Service PaymentMethod</span>
                             </Link>
-                            <Link className="nav-link text-end py-2" to='monthly-sale-report'>
+                            <Link className="nav-link text-start  py-2" to='monthly-sale-report'>
                                 <span className=''>Monthly Sale Report</span>
                             </Link>
-                            <Link className="nav-link text-end py-2" to='customer-membership'>
+                            {/* <Link className="nav-link text-end py-2" to='customer-membership'>
                                 <span className=''>Customer Membership</span>
                             </Link>
                             <Link className="nav-link text-end py-2" to='employee-sale-report'>
@@ -87,7 +87,7 @@ const Report = () => {
                             </Link>
                             <Link className="nav-link text-end py-2" to='product-best-seller'>
                                 <span className=''>Hour Sale Report</span>
-                            </Link>
+                            </Link> */}
                         </div>
                     </div>
                 </div>

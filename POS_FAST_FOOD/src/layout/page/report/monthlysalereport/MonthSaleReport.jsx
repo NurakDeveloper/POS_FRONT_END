@@ -38,7 +38,7 @@ const MonthSaleReport = () => {
     return (
         <div>
             <MonthlySalesReportChart data={monthlySalesData} />
-            <p className="my-3 fs-4 ps-4 border-start">Order reporting</p>
+            {/* <p className="my-3 fs-4 ps-4 border-start">Order reporting</p>
             <div className="card border-0 mb-5">
                 <div className="card-body p-0">
                     <table className="table-hover">
@@ -83,7 +83,7 @@ const MonthSaleReport = () => {
 
                     </table>
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }

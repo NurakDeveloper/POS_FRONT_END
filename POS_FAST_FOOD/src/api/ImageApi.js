@@ -1,5 +1,12 @@
 import axios from "axios";
+import { getToken } from "./AppConfig";
 
+
+const token = getToken();
+// Set default headers for axios if a token is available
+if (token) {
+    axios.defaults.headers.common['Authorization'] = `nurak ${token}`;
+}
 export const uploadImage = async (formData) => {
     try {
         const response = await axios.post("http://localhost:8085/api/images/upload", formData, {

@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
+import { SlGrid } from 'react-icons/sl';
+import { IoMdNotificationsOutline } from 'react-icons/io';
+import { IoSettingsOutline } from 'react-icons/io5';
+import { CiShoppingCart } from 'react-icons/ci';
+import { HiOutlineShoppingCart } from 'react-icons/hi2';
 const PosMenu = () => {
     function findTotalOrder() {
         try {
@@ -26,7 +31,7 @@ const PosMenu = () => {
     const goto = useNavigate();
     return (
         <>
-            <div className='pos-menu'>
+            <div className='pos-menu' style={{ overflow: 'visible' }}>
 
                 <nav className='pos-nav py-2 box-shadow'>
                     <div className='navbar-item'>
@@ -36,7 +41,8 @@ const PosMenu = () => {
                                 isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
                             }
                         >
-                            <i class="fa-solid fa-tablet-screen-button w-100"></i>
+                            <SlGrid />
+                            {/* <i class="fa-solid fa-tablet-screen-button w-100"></i> */}
 
                         </NavLink>
                     </div>
@@ -47,7 +53,8 @@ const PosMenu = () => {
                                 isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
                             }
                         >
-                            <i class="fa-solid fa-bell w-100"></i>
+                            <IoMdNotificationsOutline />
+                            {/* <i class="fa-solid fa-bell w-100"></i> */}
 
                         </NavLink>
                     </div>
@@ -58,7 +65,8 @@ const PosMenu = () => {
                                 isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
                             }
                         >
-                            <i class="fa-solid fa-gear w-100"></i>
+                            <IoSettingsOutline />
+                            {/* <i class="fa-solid fa-gear w-100"></i> */}
                         </NavLink>
                     </div>
                     <div className='navbar-item'>
@@ -69,7 +77,8 @@ const PosMenu = () => {
                             }
                         >
                             <div class="position-relative w-100">
-                                <i class="fa-solid fa-cart-shopping w-100"></i>
+                                <CiShoppingCart />
+                                {/* <i class="fa-solid fa-cart-shopping w-100"></i> */}
                                 <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger f-14" style={{ zIndex: '10' }}>
                                     {findTotalOrder()}
                                 </span>

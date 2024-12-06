@@ -44,6 +44,8 @@ import NetIncomeChart from './layout/page/report/netincome/NetIncomeChart'
 import PaymentMethod from './layout/page/report/paymentmethod/PaymentMethod'
 import MonthSaleReport from './layout/page/report/monthlysalereport/MonthSaleReport'
 import BestSellingMenuItemsChart from './layout/page/report/bestsellingproduct/BestSellingMenuItemsChart'
+import { IoSettingsOutline } from 'react-icons/io5'
+import { checkingTypeOfUser } from './api/AppConfig'
 function App() {
   const [userName, setUserName] = useState();
   const [role, setRole] = useState();
@@ -124,49 +126,13 @@ function App() {
       </>
     )
   }
-  const secretkey = "kans983(*93849Jnjsbd@*^@knskldn&^@($*LLjbHHSDuBKJ_)93849uIHUSHD&#%#&^$(@80928()*&*#$&(*"
+
   function applicationViewer() {
-    try {
-      const dataEncrypt = Cookies.get("user-data");
-      if (dataEncrypt) {
-        const userData = decryptData(dataEncrypt, secretkey);
-        if (userData) {
-          setRole(userData.role);
-          setUserName(userData.data.firstName + " " + userData.data.lastName);
-          setProfile(userData.data.image);
-          if (userData.role == "USER") {
-            setPageViewer(() => posApplication());
-          } else if (userData.role == "ADMIN") {
-            try {
-              const admin_viewer = Cookies.get('admin_viewer');
-              if (admin_viewer) {
-                if (admin_viewer == 1) {
-                  setPageViewer(() => administrator());
-                } else if (admin_viewer == 2) {
-                  setPageViewer(() => posApplication());
-                } else {
-                  setPageViewer(() => administrator());
-                }
-              } else {
-                setPageViewer(() => administrator());
-              }
-
-            } catch (error) {
-              setPageViewer(() => administrator());
-            }
-
-          } else {
-            setPageViewer(() => userLoging());
-          }
-
-        }
-      } else {
-        setPageViewer(() => userLoging());
-      }
-
-    } catch (error) {
-      setPageViewer(() => userLoging());
-    }
+    const userType = checkingTypeOfUser();
+    // alert(userType);
+    if (userType == 1) setPageViewer(() => administrator());
+    if (userType == 2) setPageViewer(() => posApplication());
+    if (userType == 3) setPageViewer(() => userLoging());
   }
 
   const header = () => {
@@ -213,7 +179,8 @@ function App() {
                 location.reload();
               }}
             >
-              <i class="fa-solid fa-gear p-3 rounded btn-sliver"></i>
+              <IoSettingsOutline />
+              {/* <i class="fa-solid fa-gear p-3 rounded btn-sliver"></i> */}
 
             </button>
           </div>
@@ -230,6 +197,7 @@ function App() {
               window.location.href = '/';
             }}
           >
+
             <i class="fa-solid fa-desktop btn-silver p-3 rounded-circle"></i>
           </button>
 
@@ -272,7 +240,7 @@ function App() {
                   <Route path='/accountant' element={<Accountant />} />
                   <Route path='/reporting' element={<Report />}>
 
-                    <Route path='' element={<RExpense />} />
+                    <Route path='' element={<NetIncomeChart />} />
                     <Route path='net-income' element={<NetIncomeChart />} />
                     <Route path='payment-method' element={<PaymentMethod />} />
                     <Route path='monthly-sale-report' element={<MonthSaleReport />} />

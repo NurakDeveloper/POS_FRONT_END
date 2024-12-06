@@ -6,6 +6,9 @@ import { getAllEmployee } from "../../api/EmployeeApi";
 import { json, useNavigate, useParams } from "react-router-dom";
 import { IoSaveSharp } from "react-icons/io5";
 import { IoIosArrowRoundBack } from "react-icons/io";
+import InputValidation from "../../components/input/InputValidation";
+import { uploadImage } from "../../api/ImageApi";
+import { hostName } from "../../api/host";
 
 const CreateEmployee = () => {
     const [employeeData, setEmployeeData] = useState({
@@ -71,9 +74,10 @@ const CreateEmployee = () => {
                     ["contact"]: reponse.data.contact,
                     ["startWorkingDate"]: reponse.data.startWorkingDate,
                     ["createdDate"]: reponse.data.createdDate,
-                    ["updatedDate"]: reponse.data.updatedDate,
+                    ["updatedDate"]: new Date(),
                     ["image"]: reponse.data.image,
                 }));
+                // alert(reponse.data.image)
 
             }).catch(e => {
                 console.error(e);
@@ -81,6 +85,8 @@ const CreateEmployee = () => {
         }
     }, [id])
 
+    const domainName = hostName();
+    const profilePath = `http://${domainName}:8085/api/images/`
     function findBranchName(id) {
         try {
             return branch.find(b => b.id == id).branchName;
@@ -105,24 +111,195 @@ const CreateEmployee = () => {
             [name]: value
         }));
     };
-    function saveEmployee(e) {
-        e.preventDefault();
-        if (id) {
-            updateEmployee(id, employeeData).then((response) => {
-                alert(json.stringify(response.data));
-            }).catch(e => {
-                console.warn(e);
-            })
-            return 0
+    // using error check if error lenth bigger than zero is error on another field
+    const [errors, setErrors] = useState({});
+    // validation field
+    const validateEmployeeForm = () => {
+        const newErrors = {};
+
+        if (!employeeData.lastName) {
+            newErrors.lastName = 'Last Name is required.';
         }
 
+        if (!employeeData.firstName) {
+            newErrors.firstName = 'First Name is required.';
+        }
+
+        if (!employeeData.schedule) {
+            newErrors.schedule = 'Schedule is required.';
+        }
+
+        if (!employeeData.workShiftID) {
+            newErrors.workShiftID = 'Work Shift ID is required.';
+        }
+
+        if (!id) {
+            if (!employeeData.managerID) {
+                newErrors.managerID = 'Manager ID is required.';
+            }
+        }
+
+        if (!employeeData.cv) {
+            newErrors.cv = 'CV is required.';
+        }
+
+        // if (!employeeData.positionID) {
+        //     newErrors.positionID = 'Position ID is required.';
+        // }
+
+        if (!employeeData.companyID) {
+            newErrors.companyID = 'Company ID is required.';
+        }
+
+        if (!employeeData.resume) {
+            newErrors.resume = 'Resume is required.';
+        }
+
+        if (!employeeData.dayOff) {
+            newErrors.dayOff = 'Day Off is required.';
+        }
+
+        if (!employeeData.email) {
+            newErrors.email = 'Email is required.';
+        } else if (!/^\S+@\S+\.\S+$/.test(employeeData.email)) {
+            newErrors.email = 'Invalid Email format.';
+        }
+
+        if (!employeeData.mobile) {
+            newErrors.mobile = 'Mobile Number is required.';
+        } else if (!/^\d{8,15}$/.test(employeeData.mobile)) {
+            newErrors.mobile = 'Mobile Number must be between 8 and 15 digits.';
+        }
+
+        if (!employeeData.gender) {
+            newErrors.gender = 'Gender is required.';
+        }
+
+        if (!employeeData.salary) {
+            newErrors.salary = 'Salary is required.';
+        } else if (isNaN(employeeData.salary) || employeeData.salary <= 0) {
+            newErrors.salary = 'Salary must be a positive number.';
+        }
+
+        if (!employeeData.address) {
+            newErrors.address = 'Address is required.';
+        }
+
+        if (!employeeData.bankAccount) {
+            newErrors.bankAccount = 'Bank Account is required.';
+        } else if (!/^\d{10,20}$/.test(employeeData.bankAccount)) {
+            newErrors.bankAccount = 'Bank Account must be between 10 and 20 digits.';
+        }
+
+        if (!employeeData.contact) {
+            newErrors.contact = 'Contact is required.';
+        }
+
+        if (!employeeData.startWorkingDate) {
+            newErrors.startWorkingDate = 'Start Working Date is required.';
+        } else if (isNaN(Date.parse(employeeData.startWorkingDate))) {
+            newErrors.startWorkingDate = 'Invalid Start Working Date.';
+        }
+
+        if (!employeeData.image) {
+            newErrors.image = 'Image is required.';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // Returns true if no errors
+    };
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [file, setFile] = useState(null);
+    const handleFileChange = (event) => {
+        // set file select from path
+        setFile(event.target.files[0]);
+        const f = event.target.files[0];
+        if (!f) {
+            return
+        }
+        if (f) {
+            const imageURL = URL.createObjectURL(f);
+            setSelectedImage(imageURL); // Create a URL for the selected file
+        }
+        // set image name to store in database
+        setEmployeeData((prevData) => ({
+            ...prevData,
+            ["image"]: event.target.files[0].name
+        }));
+    };
+
+
+    function saveEmployee(e) {
+        e.preventDefault();
+        // check validaiton form
+        if (!validateEmployeeForm()) {
+            return
+        }
+        // if file not selected
+        if (!file) {
+            // if no select file but user update get image name sure we dont validation on file
+            if (!employeeData.image) {
+                return
+            }
+        }
+
+        // update employee
+        if (id) {
+            updateEmployee(id, employeeData).then((response) => {
+                alert(JSON.stringify(response.data, null, 2));
+                setEmployeeData(
+                    {
+                        lastName: '',
+                        firstName: '',
+                        schedule: '',
+                        workShiftID: '',
+                        managerID: '',
+                        cv: '',
+                        positionID: '',
+                        companyID: '',
+                        resume: '',
+                        dayOff: '',
+                        email: '',
+                        mobile: '',
+                        gender: '',
+                        salary: '',
+                        address: '',
+                        bankAccount: '',
+                        contact: '',
+                        startWorkingDate: '',
+                        createdDate: new Date(),
+                        updatedDate: '',
+                        image: ''
+                    }
+                )
+            }).catch(e => {
+                return
+            })
+        }
+        // add employee
         newEmployee(employeeData).then((response) => {
             console.log(response.data);
         }).catch(error => {
-            console.log(error);
+            return
         })
+        // upload file to folder project backend
+        if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            try {
+                // Use the `uploadImage` function to send the file
+                // const response = await uploadImage(formData);
+                uploadImage(formData).then((response) => {
+                    setMessage("Create Product Successfull");
+                    alert('knaskldnl')
+                })
+            } catch (error) {
+                return
+            }
+        }
     }
 
+    // preveiew employee data JSON alert
     function preview(e) {
         e.preventDefault();
         const jsonString = JSON.stringify(employeeData, null, 2); // 'null, 2' formats the JSON for readability
@@ -155,59 +332,73 @@ const CreateEmployee = () => {
                             <div className="form-heder w-100 bg-white p-3 ps-1">
                                 <div className="row" >
                                     <div className='col-xl-6 col-md-6 col-12 '>
-                                        <div className='w-100 start h-100'>
-                                            <div className="fs-2">
-                                                <input className='text-start text-secondary input-box' placeholder="eng. first name"
-                                                    type="text"
-                                                    name="firstName"
-                                                    value={employeeData.firstName}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="fs-2">
-                                                <input type="text" className='text-start text-secondary input-box' placeholder="eng. lastname"
-                                                    name="lastName"
-                                                    value={employeeData.lastName}
-                                                    onChange={handleInputChange}
-                                                    required />
-                                            </div>
+                                        <div className='w-100 h-100'>
+                                            <InputValidation
+                                                label='First Name'
+                                                id='firstName'
+                                                type='text'
+                                                name='firstName'
+                                                value={employeeData.firstName}
+                                                onChange={handleInputChange}
+                                                error={errors.firstName}
+                                                fontSize={14}
+                                                require={'true'}
+                                            />
+                                            <InputValidation
+                                                label='Last Name'
+                                                type='text'
+                                                id='lastName'
+                                                name='lastName'
+                                                value={employeeData.lastName}
+                                                onChange={handleInputChange}
+                                                error={errors.lastName}
+                                                fontSize={14}
+                                                require={'true'}
+                                            />
 
                                         </div>
                                     </div>
 
                                     <div className='col-xl-6 col-md-6 col-12 end'>
-                                        <div className='' style={{ height: '150px', width: '170px', overflow: 'hidden' }}>
+                                        <div className='' style={{ height: '100%', width: '180px', overflow: 'hidden' }}>
                                             <div className='d-none text-center fs-6' style={{ width: '40px' }}>
-                                                <input type="file" name="" className='d-none' id="fileImage"
-                                                    onChange={(e) => {
-                                                        setEmployeeData((prevData) => ({
-                                                            ...prevData,
-                                                            ["image"]: e.target.files[0].name
-                                                        }));
-                                                    }}
+                                                <input type="file" name="" className='d-none w-100' id="fileImage"
+                                                    onChange={handleFileChange}
                                                 />
 
 
                                             </div>
-                                            <label htmlFor="fileImage" className='center border rounded-circle pointer' style={{ height: '120px', width: '120px', overflow: 'hidden' }}>
-                                                <img src={`/src/assets/image/${employeeData.image}`} alt="" className="h-100" />
-                                            </label>
+                                            <label htmlFor="fileImage" className=' rounded py-2 border pointer center' style={{ height: '200px', width: '180px', overflow: 'hidden' }}>
+                                                {/* <img src={`http://localhost:8085/api/images/profile.jpg}`} alt="no image" className="h-100" /> */}
+                                                <img src={selectedImage ? selectedImage : `${profilePath}${employeeData.image}`} alt="" className="h-100 " />
+                                                {/* <img src={} alt="" className="w-100 rounded" /> */}
+                                            </label> <br />
+                                            <span className='validation-error f-12'>{errors.image ? errors.image : ''}</span>
                                         </div>
                                     </div>
                                 </div>
 
                             </div>
                             <div className="row">
-                                <div className='col-xl-6 col-12 d-block text-start fs-6 bg-white'>
-                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>Branch  </p>
-                                        <div class="dropdown w-75">
-                                            <button className="w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <p className="w-75 text-start">{findBranchName(employeeData.companyID)}</p>
+                                <div className='col-xl-6 col-12 d-block text-start bg-white'>
+                                    <InputValidation
+                                        label='Full Name'
+                                        type='text'
+                                        id='fullname'
+                                        value={employeeData.firstName + ' ' + employeeData.lastName}
+                                        onChange={handleInputChange}
+                                        // error={errors.contact}
+                                        fontSize={14}
+                                    // require={'true'}
+                                    />
+                                    <div className='input-wrapper' style={{ fontSize: 14 }}>
+                                        <p className='input-label'>Branch  <span className='text-danger ps-3'>*</span></p>
+                                        <div class=" cursor-i dropdown w-100">
+                                            <p className="w-100 d-flex text-secondary cursor-i input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <input type="text" className='border-0 w-100' value={findBranchName(employeeData.companyID)} />
                                                 <i class="w-25 text-end">&#10141;</i>
-                                            </button>
-                                            <ul className="dropdown-menu w-100 box-shadow">
+                                            </p>
+                                            <ul className="cursor-i dropdown-menu w-100 box-shadow f-14 border-0">
                                                 {
                                                     branch.map(c =>
                                                         <li>
@@ -227,9 +418,10 @@ const CreateEmployee = () => {
                                                 }
 
                                             </ul>
+                                            <span className='validation-error f-12'>{errors.companyID ? errors.companyID : ''}</span>
                                         </div>
                                     </div>
-                                    <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
+                                    {/* <div className='group-input center w-100  pb-3' style={{ fontSize: 14 }}>
                                         <p className='w-25 text-start '>Position  </p>
                                         <div class="dropdown w-75">
                                             <button className=" btn w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -257,15 +449,15 @@ const CreateEmployee = () => {
                                                 }}>Seller</a></li>
                                             </ul>
                                         </div>
-                                    </div>
-                                    <div className='group-input center w-100 ' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>Manger  </p>
-                                        <div class="dropdown w-75">
-                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <p className="w-75 text-start">{findManager(employeeData.managerID)}</p>
-                                                <i class=" w-25 text-end">&#10141;</i>
-                                            </button>
-                                            <ul className="dropdown-menu w-100 box-shadow">
+                                    </div> */}
+                                    <div className='input-wrapper' style={{ fontSize: 14 }}>
+                                        <p className='input-label'>Manager  <span className='text-danger ps-3'>*</span></p>
+                                        <div class=" cursor-i dropdown w-100">
+                                            <p className="w-100 d-flex text-secondary cursor-i input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <input type="text" className='border-0 w-100' value={findManager(employeeData.managerID)} />
+                                                <i class="w-25 text-end">&#10141;</i>
+                                            </p>
+                                            <ul className="cursor-i dropdown-menu w-100 box-shadow f-14 border-0">
                                                 {
                                                     employee.map(e => {
                                                         if (e.managerID == null) {
@@ -282,43 +474,51 @@ const CreateEmployee = () => {
                                                     })
                                                 }
 
-
                                             </ul>
+                                            <span className='validation-error f-12'>{errors.managerID ? errors.managerID : ''}</span>
                                         </div>
                                     </div>
 
-                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>Contact ? </p>
-                                        <input type="text" className='w-75 text-start text-secondary input-box p-0' placeholder=""
-                                            name="contact"
-                                            value={employeeData.contact}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
+                                    <InputValidation
+                                        label='Contact'
+                                        type='text'
+                                        id='contact'
+                                        name='contact'
+                                        value={employeeData.contact}
+                                        onChange={handleInputChange}
+                                        error={errors.contact}
+                                        fontSize={14}
+                                        require={'true'}
+                                    />
                                 </div>
                                 <div className='col-xl-6 col-12  d-block text-start bg-white'>
-                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>Stat Working ? </p>
-                                        <input type="date" className='w-75 text-start text-secondary input-box' placeholder=""
-                                            name="startWorkingDate"
-                                            value={employeeData.startWorkingDate}
-                                            onChange={handleInputChange}
-                                            required />
-                                    </div>
-                                    <div className='group-input center w-100' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>Work Email ? </p>
-                                        <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" "
-                                            name="email"
-                                            value={employeeData.email}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
+                                    <InputValidation
+                                        label='Start Working Date'
+                                        type='date'
+                                        id='startWorkingDate'
+                                        name='startWorkingDate'
+                                        value={employeeData.startWorkingDate}
+                                        onChange={handleInputChange}
+                                        error={errors.startWorkingDate}
+                                        fontSize={14}
+                                        require={'true'}
+                                    />
+                                    <InputValidation
+                                        label='Work Email'
+                                        type='email'
+                                        id='email'
+                                        name='email'
+                                        value={employeeData.email}
+                                        onChange={handleInputChange}
+                                        error={errors.email}
+                                        fontSize={14}
+                                        require={'true'}
+                                    />
 
 
                                 </div>
                             </div>
+                            {/* // tap */}
                             <div className='bg-white py-3'>
                                 <ul className="nav nav-tabs" id="myTab" role="tablist">
                                     <li className="nav-item" role="presentation">
@@ -345,59 +545,62 @@ const CreateEmployee = () => {
                                         />
                                     </div>
                                     <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                                        <div className='group-input center w-75 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Schedule  </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="schedule"
-                                                value={employeeData.schedule}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className='group-input center w-75 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Work Shift ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="workShiftID"
-                                                value={employeeData.workShiftID}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className='group-input center w-75 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Manager ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="managerID"
-                                                value={employeeData.managerID}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className='group-input center w-75 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Cv ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" "
-                                                name="cv"
-                                                value={employeeData.cv}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className='group-input center w-75 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Position </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" "
-                                                name="positionID"
-                                                value={employeeData.positionID}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className='group-input center w-75 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Branch ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="companyID"
-                                                value={employeeData.companyID}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </div>
+                                        <InputValidation
+                                            label='Schedule'
+                                            type='text'
+                                            id='schedule'
+                                            name='schedule'
+                                            value={employeeData.schedule}
+                                            onChange={handleInputChange}
+                                            error={errors.schedule}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
+                                        <InputValidation
+                                            label='workShift'
+                                            type='number'
+                                            id='workShiftID'
+                                            name='workShiftID'
+                                            value={employeeData.workShiftID}
+                                            onChange={handleInputChange}
+                                            error={errors.workShiftID}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
+                                        {/* <InputValidation
+                                            label='managerID'
+                                            type='number'
+                                            id='managerID'
+                                            name='managerID'
+                                            value={findManager(employeeData.managerID)}
+                                            // onChange={handleInputChange}
+                                            error={errors.workShiftID}
+                                            fontSize={14}
+                                            require={'true'}
+                                        /> */}
+                                        <InputValidation
+                                            label='Cv Photo'
+                                            type='text'
+                                            id='cv'
+                                            name='cv'
+                                            value={employeeData.cv}
+                                            onChange={handleInputChange}
+                                            error={errors.cv}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
+                                        <InputValidation
+                                            label='positionID'
+                                            type='number'
+                                            id='positionID'
+                                            name='positionID'
+                                            value={employeeData.positionID}
+                                            onChange={handleInputChange}
+                                            error={errors.positionID}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
+
                                     </div>
                                     <div class="border-0 tab-pane " id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                                         <div className="p-3">
@@ -406,51 +609,62 @@ const CreateEmployee = () => {
 
                                     </div>
                                     <div class="border-0 tab-pane p-2" id="private-tab-pane" role="tabpanel" aria-labelledby="private-tab" tabindex="0">
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>mobile ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="mobile"
-                                                value={employeeData.mobile}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Gender ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="gender"
-                                                value={employeeData.gender}
-                                                onChange={handleInputChange}
-                                                required />
-                                        </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Salary ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="salary"
-                                                value={employeeData.salary}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Address ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="address"
-                                                value={employeeData.address}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
+                                        <InputValidation
+                                            label='mobile'
+                                            type='text'
+                                            id='mobile'
+                                            name='mobile'
+                                            value={employeeData.mobile}
+                                            onChange={handleInputChange}
+                                            error={errors.mobile}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
+                                        <InputValidation
+                                            label='Gender'
+                                            type='text'
+                                            id='gender'
+                                            name='gender'
+                                            value={employeeData.gender}
+                                            onChange={handleInputChange}
+                                            error={errors.gender}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
+                                        <InputValidation
+                                            label='Salary'
+                                            type='number'
+                                            id='salary'
+                                            name='salary'
+                                            value={employeeData.salary}
+                                            onChange={handleInputChange}
+                                            error={errors.salary}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
+                                        <InputValidation
+                                            label='Address'
+                                            type='text'
+                                            id='address'
+                                            name='address'
+                                            value={employeeData.address}
+                                            onChange={handleInputChange}
+                                            error={errors.address}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
 
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Bank Account ? </p>
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder=""
-                                                name="bankAccount"
-                                                value={employeeData.bankAccount}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
+                                        <InputValidation
+                                            label='Bank Account'
+                                            type='text'
+                                            id='bankAccount'
+                                            name='bankAccount'
+                                            value={employeeData.bankAccount}
+                                            onChange={handleInputChange}
+                                            error={errors.bankAccount}
+                                            fontSize={14}
+                                            require={'true'}
+                                        />
                                     </div>
                                 </div>
                             </div>

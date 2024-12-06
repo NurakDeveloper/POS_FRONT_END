@@ -293,7 +293,7 @@ const Customer = () => {
         <>
             <div className='w-100'>
                 <div className="container-fluid p-0 ">
-                    <div className='container-fluid'>
+                    <div className='container-fluid p-0'>
                         {menu()}
                     </div>
 

@@ -296,3 +296,54 @@ p {
 .remove:hover {
   color: hsl(1, 57%, 48%);
 }
+
+.text-badges-green {
+  padding: 7px 10px;
+  background-color: #b3deb5;
+  color: #136c17;
+  /* border: 0.3px solid #7ba97d; */
+  border-radius: 6px;
+
+}
+
+.text-badges-warning {
+  padding: 7px 10px;
+  background-color: #fff4db;
+  color: #985c07;
+  /* border: 0.3px solid #7ba97d; */
+  border-radius: 6px;
+  font-weight: 500;
+
+}
+
+.text-badges-danger {
+  /* width: 100%; */
+  padding: 7px 10px;
+  background-color: #ffd1d1;
+  color: #960909;
+  /* border: 0.3px solid #7ba97d; */
+  border-radius: 6px;
+}
+
+.text-badges-red {
+  /* width: 100%; */
+  padding: 7px 10px;
+  background-color: #ffecec;
+  color: #853333;
+  /* border: 0.3px solid #7ba97d; */
+  border-radius: 6px;
+}
+
+.bold {
+  font-weight: 500;
+}
+
+.text-badges-danger {
+  /* width: 100%; */
+  padding: 7px 10px;
+  background-color: #ffd1d1;
+  color: #960909;
+  /* border: 0.3px solid #7ba97d; */
+  border-radius: 6px;
+
+}

@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import * as XLSX from 'xlsx';
 import { FaFileExcel, FaFilter, FaPlus, FaPrint, FaSearch } from 'react-icons/fa';
 import { Th } from '../../../../components/table/DataGrid';
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 const ViewOrder = () => {
     const goto = useNavigate();
     const [order, setOrder] = useState([]);
@@ -31,6 +32,29 @@ const ViewOrder = () => {
         style: 'currency',
         currency: 'USD'
     });
+    const rowsPerPage = 15; // Define how many rows to display per page
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    // Slice the categories array to display only the current page's rows
+    const currentData = order.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(order.length / rowsPerPage);
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
+    };
 
     function menu() {
         return (
@@ -69,6 +93,28 @@ const ViewOrder = () => {
 
                 {/* Right Section */}
                 <div className="list-header-right">
+                    <span className="page-info f-14 text-secondary">
+                        {currentPage} / {totalPages}
+                    </span>
+                    <div className="pagination">
+                        <div className='pe-2'>
+                            <button
+                                className="button previous"
+                                onClick={handlePrevious}
+                                disabled={currentPage === 1}
+                            >
+                                <SlArrowLeft />
+                            </button>
+                        </div>
+
+                        <button
+                            className="button next"
+                            onClick={handleNext}
+                            disabled={currentPage === totalPages}
+                        >
+                            <SlArrowRight />
+                        </button>
+                    </div>
 
                     {/* Filter Button */}
                     <button className="list-header-button filter box-shadow">
@@ -117,7 +163,7 @@ const ViewOrder = () => {
                         <tbody>
                             {
 
-                                order.map((u, i) =>
+                                currentData.map((u, i) =>
                                     <tr className="pointer" onClick={() => goto(`/order-detail/${u.id}`)}>
                                         <td>
                                             <input type="checkbox" name="" className='rounded-0 border px-3' id="" />

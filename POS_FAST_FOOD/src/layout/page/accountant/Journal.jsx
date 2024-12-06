@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import * as XLSX from 'xlsx';
 import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
 import { Th } from '../../../components/table/DataGrid';
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 const Journal = () => {
 
     const [journal, setJounal] = useState([])
@@ -27,6 +28,30 @@ const Journal = () => {
             month: 'numeric',     // Full month name (e.g., "November")
             year: 'numeric'    // Full year (e.g., "2024")
         }).format(date); // 'dd' for day, 'MMMM' for full month, 'yy' for year
+    };
+
+    const rowsPerPage = 15; // Define how many rows to display per page
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    // Slice the categories array to display only the current page's rows
+    const currentData = journal.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(journal.length / rowsPerPage);
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
     };
 
     const goto = useNavigate();
@@ -55,7 +80,7 @@ const Journal = () => {
                         </thead>
                         <tbody>
                             {
-                                journal.map((j, i) =>
+                                currentData.map((j, i) =>
                                     <tr className="pointer" onClick={() => goto(`/journal-detail/${j.id}`)}>
                                         <td>
                                             <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
@@ -116,6 +141,7 @@ const Journal = () => {
 
                 </div>
                 <div className="list-header-right">
+
                     <div className="list-header-search">
                         <FaSearch className="list-header-icon search-icon" />
                         <input
@@ -130,7 +156,28 @@ const Journal = () => {
                 <div className="list-header-right">
                     {/* Print Button */}
 
+                    <span className="page-info f-14 text-secondary">
+                        {currentPage} / {totalPages}
+                    </span>
+                    <div className="pagination">
+                        <div className='pe-2'>
+                            <button
+                                className="button previous"
+                                onClick={handlePrevious}
+                                disabled={currentPage === 1}
+                            >
+                                <SlArrowLeft />
+                            </button>
+                        </div>
 
+                        <button
+                            className="button next"
+                            onClick={handleNext}
+                            disabled={currentPage === totalPages}
+                        >
+                            <SlArrowRight />
+                        </button>
+                    </div>
                     {/* Filter Button */}
                     <button className="list-header-button filter box-shadow">
                         <FaFilter className="list-header-icon" />

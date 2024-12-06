@@ -29,6 +29,15 @@ import { hostName } from '../../../api/host';
 import { getDefualtUserId } from '../../../api/AppConfig';
 import { MdFastfood } from 'react-icons/md';
 import { IoFastFoodOutline } from 'react-icons/io5';
+import { LiaSearchSolid } from 'react-icons/lia';
+import { IoIosAdd } from 'react-icons/io';
+import { LuMinus } from 'react-icons/lu';
+import { BsPlus } from 'react-icons/bs';
+import { CiShoppingCart } from 'react-icons/ci';
+import { HiShoppingCart } from 'react-icons/hi2';
+import Text from '../.././../components/text/Text'
+import ProductCard from '../../../components/card/ProductCard';
+
 
 const PosLight = () => {
     const { id } = useParams();
@@ -693,19 +702,19 @@ const PosLight = () => {
     };
     function calculator() {
         return (
-            <div style={{ maxWidth: '100%', margin: '0 auto', textAlign: 'center' }}>
-                <div className='f-20' style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
-                    <button className='btn-calculator' onClick={() => handleClick('1')}>1</button>
-                    <button className='btn-calculator' onClick={() => handleClick('2')}>2</button>
-                    <button className='btn-calculator' onClick={() => handleClick('3')}>3</button>
-                    <button className='btn-calculator' onClick={() => handleClick('4')}>4</button>
-                    <button className='btn-calculator' onClick={() => handleClick('5')}>5</button>
-                    <button className='btn-calculator' onClick={() => handleClick('6')}>6</button>
-                    <button className='btn-calculator' onClick={() => handleClick('7')}>7</button>
-                    <button className='btn-calculator' onClick={() => handleClick('8')}>8</button>
-                    <button className='btn-calculator' onClick={() => handleClick('9')}>9</button>
-                    <button className='btn-calculator' onClick={() => handleClick('0')}>0</button>
-                    <button className='btn-calculator' onClick={() => handleClick('.')}>.</button>
+            <div style={{ maxWidth: '100%', width: '100%', textAlign: 'center' }}>
+                <div className='f-20 w-100' style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+                    <button className='button calculator' onClick={() => handleClick('1')}>1</button>
+                    <button className='button calculator' onClick={() => handleClick('2')}>2</button>
+                    <button className='button calculator' onClick={() => handleClick('3')}>3</button>
+                    <button className='button calculator' onClick={() => handleClick('4')}>4</button>
+                    <button className='button calculator' onClick={() => handleClick('5')}>5</button>
+                    <button className='button calculator' onClick={() => handleClick('6')}>6</button>
+                    <button className='button calculator' onClick={() => handleClick('7')}>7</button>
+                    <button className='button calculator' onClick={() => handleClick('8')}>8</button>
+                    <button className='button calculator' onClick={() => handleClick('9')}>9</button>
+                    <button className='button calculator' onClick={() => handleClick('0')}>0</button>
+                    <button className='button calculator' onClick={() => handleClick('.')}>.</button>
                     <button className='bg-danger btn-calculator' onClick={handleBackspace}>&larr;</button>
                 </div>
             </div>
@@ -749,215 +758,260 @@ const PosLight = () => {
     };
     return (
         <>
-            <div className="d-flex" style={{ color: `${colorChange}`, background: `${bgChange}` }}>
-                <div className="pos-info w-100 d-flex rounded">
-                    <div className='w-100'>
-                        <div className="w-100 mt-1 d-flex px-2 py-1 pt-0" style={{
-                            overflowX: 'scroll',
-                            scrollbarWidth: 'none', // For Firefox
-                            msOverflowStyle: 'none',
-                        }}>
-                            <div className="center">
-                                <button
-                                    // style={{ color: `${colorChange}`, background: `${bgChange}` }}
-                                    className={`button-pos-menu category me-3 ${activeIndex === 0 ? "button-pos-menu active-category" : ""
-                                        }`}
+            <div className="d-flex pos">
+                <div className="pos-info w-100 d-flex rounded" style={{
+                    scrollbarWidth: 'none', // For Firefox
+                    msOverflowStyle: 'none',
+                }}>
+                    <div className='w-100 px-2'>
+                        <div className='d-flex justify-content-between align-items-center my-2 px-2 py-3 box-shadow rounded bg-white'>
+                            {/* <div className='w-100 d-flex justify-content-between align-items-center px-3 pe-1' style={{ maxWidth: '400px' }}>
+                                <LiaSearchSolid className='f-20 pointer' /><input type="text" className='ms-2 w-100 border rounded p-2 px-3' placeholder='search' />
+                            </div> */}
+                            <div className='d-flex text-start'>
+                                <p className="text-start d-block center" style={{ height: '40px' }}>
+                                    <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" alt="" className='h-100' />
+                                </p>
+                                <p className='f-14 ps-2 d-block'>
+                                    <p>Nurak Oerun</p>
+                                    <p className='f-10 text-secondary'>Sale admin</p>
+                                </p>
 
-                                    onClick={() => {
-                                        setActiveIndex(0)
-                                        setCId(null)
-                                    }} // Update active index on click
-                                >
-                                    <IoFastFoodOutline />
-                                    <div className="f-12 py-2">{'All Category'}</div>
-                                </button>
                             </div>
-                            {
-                                categories.map((c, index) =>
-                                    <div className="center">
-                                        <button
-                                            key={c.id}
-                                            // style={{ color: `${colorChange}`, background: `${bgChange}` }}
-                                            className={`button-pos-menu category me-3 ${activeIndex === index + 1 ? "button-pos-menu active-category" : ""
-                                                }`}
-
-                                            onClick={() => {
-                                                setActiveIndex(index + 1)
-                                                setCId(c.id)
-                                            }} // Update active index on click
-                                        >
-                                            <MdFastfood />
-                                            <div className="f-12 py-2 ps-3">{c.name}</div>
-                                        </button>
-                                    </div>
-                                )
-                            }
+                            <div>
+                                <button className="button pay" style={{ fontSize: '14px' }}><HiShoppingCart /><span className='ps-2'>View Order</span></button>
+                            </div>
 
 
                         </div>
-                        <div className=" p-0 center">
-                            <div className="row p-0 w-100">
+
+                        <div className='bg-white px-2 h-100 rounded box-shadow'>
+                            <div className='d-flex justify-content-between align-items-center my-2 py-1 pt-2 '>
+                                <p className="text-start d-block">
+                                    <div className='ps-3 f-20 border-start'>Category</div>
+                                    <div className='f-10 text-secondary border-start ps-3 '>select food categroy</div>
+
+                                </p>
+
+                                <div className='w-100 d-flex justify-content-between align-items-center px-3 pe-0' style={{ maxWidth: '400px' }}>
+                                    <LiaSearchSolid className='f-20 pointer' /><input type="text" className='ms-2 w-100 border rounded p-2 px-3' placeholder='search' />
+                                </div>
+                            </div>
+                            <div className="w-100 mt-1 d-flex py-1 pt-0" style={{
+                                overflowX: 'scroll',
+                                scrollbarWidth: 'none', // For Firefox
+                                msOverflowStyle: 'none',
+                            }}>
+                                <div className="center">
+                                    <button
+                                        // style={{ color: `${colorChange}`, background: `${bgChange}` }}
+                                        className={`button-pos-category category me-1 ${activeIndex === 0 ? "button-pos-category active-category" : ""
+                                            }`}
+
+                                        onClick={() => {
+                                            setActiveIndex(0)
+                                            setCId(null)
+                                        }} // Update active index on click
+                                    >
+                                        <div className="" style={{ height: '40px', overflow: 'hidden' }}>
+                                            <img src="https://cdn-icons-png.flaticon.com/512/737/737967.png " className='h-100' alt="" />
+                                        </div>
+                                        <div className="f-12 py-2 ps-3">{'All Category'}</div>
+                                    </button>
+                                </div>
                                 {
-                                    product.map((i, index) => {
+                                    categories.map((c, index) =>
+                                        <div className="center">
+                                            <button
+                                                key={c.id}
+                                                // style={{ color: `${colorChange}`, background: `${bgChange}` }}
+                                                className={`button-pos-category category me-1 ${activeIndex === index + 1 ? "button-pos-category active-category" : ""
+                                                    }`}
 
-                                        if ((i.categoryId) == (categoryId)) {
-                                            return (
-                                                <div className="col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-6 p-0" key={i.id}>
-                                                    <div className='p-1'>
-                                                        <div className="card border pointer rounded " style={{ height: '250px', overflow: 'hidden' }} onClick={() => { addToCart(i.id, 1, i.price, i.image, index) }}>
-                                                            <div className="card-body p-0">
-                                                                <div className="center " style={{ width: '100%', height: '150px', overflow: 'hidden' }}>
-                                                                    <img src={`${imageUrl}${i.image}`} alt="img" className="h-100" />
-                                                                    {/* <img src="http://localhost:8085/api/images/BEEF-SKEWERS-3-1536x767.jpg" alt="" /> */}
-                                                                </div>
-                                                                <div className="f-14  hover-line w-100 text-start px-2 pe-1 text-secondary"
-                                                                    style={{ height: '50px' }}>{i.productName}</div>
-                                                                <div className="card-header bg-none border-0 rounded  px-2 pe-1 start" style={{ width: '100%', height: '50px', overflow: 'hidden' }}>
-                                                                    <span className='fs-5 text-purple'>{formatCurrency.format(i.price)}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div className="card-img-overlay hover-opacity p-0">
-                                                                <div className="card border-0 p-0 bg-none">
-                                                                    <div className="card-header text-end p-0 bg-none border-0 p-1 end  text-secondary">
-                                                                        +<i class="fa-solid fa-cart-shopping ps-1"></i>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                onClick={() => {
+                                                    setActiveIndex(index + 1)
+                                                    setCId(c.id)
+                                                }} // Update active index on click
+                                            >
+                                                <div className='' style={{ height: '40px', overflow: 'hidden' }}>
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="" className='h-100' />
+                                                </div>
+                                                <div className='py-2 ps-3 d-block text-start'>
+                                                    <div className="f-12">
+                                                        {c.name}
 
-
-                                                        </div>
+                                                    </div>
+                                                    <div className='f-10'>
+                                                        16 Item
                                                     </div>
                                                 </div>
-                                            )
-                                        }
-                                        if ((categoryId) == null) {
-                                            return (
-                                                <div className="col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-6 p-0" key={i.id}>
-                                                    <div className='p-1'>
-                                                        <div className="card border pointer rounded " style={{ height: '250px', overflow: 'hidden' }} onClick={() => { addToCart(i.id, 1, i.price, i.image, index) }}>
-                                                            <div className="card-body p-0">
-                                                                <div className="center " style={{ width: '100%', height: '150px', overflow: 'hidden' }}>
-                                                                    <img src={`${imageUrl}${i.image}`} alt="img" className="h-100" />
-                                                                    {/* <img src="http://localhost:8085/api/images/BEEF-SKEWERS-3-1536x767.jpg" alt="" /> */}
-                                                                </div>
-                                                                <div className="f-14  hover-line w-100 text-start px-2 pe-1 text-secondary"
-                                                                    style={{ height: '50px' }}>{i.productName}</div>
-                                                                <div className="card-header bg-none border-0 rounded  px-2 pe-1 start" style={{ width: '100%', height: '50px', overflow: 'hidden' }}>
-                                                                    <span className='fs-5 text-purple'>{formatCurrency.format(i.price)}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div className="card-img-overlay hover-opacity p-0">
-                                                                <div className="card border-0 p-0 bg-none">
-                                                                    <div className="card-header text-end p-0 bg-none border-0 p-1 end  text-secondary">
-                                                                        +<i class="fa-solid fa-cart-shopping ps-1"></i>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
 
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )
-                                        }
-
-                                    }
+                                            </button>
+                                        </div>
                                     )
                                 }
 
+
+                            </div>
+                            <div className='row py-2'>
+                                {
+                                    product.map(p => {
+                                        if (p.categoryId == categoryId) {
+                                            return (
+                                                <>
+                                                    <div className="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6 col-12 pb-3">
+                                                        <ProductCard
+                                                            image={p.image}
+                                                            price={p.price}
+                                                            name={p.productName}
+                                                            onClick={() => addToCart(p.id, 1, p.price, p.image)}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )
+                                        } else if (categoryId == null) {
+                                            return (
+                                                <>
+                                                    <div className="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6 col-12 pb-3">
+                                                        <ProductCard
+                                                            image={p.image}
+                                                            price={p.price}
+                                                            name={p.productName}
+                                                            onClick={() => addToCart(p.id, 1, p.price, p.image)}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )
+                                        }
+                                    }
+                                    )
+                                }
                             </div>
                         </div>
-                    </div>
 
+                    </div >
 
-                </div>
-
-
+                </div >
                 <div className="d-block d-xl-none fixed-bottom border border-secondary rounded-0 bg-white">
 
                     <button class="btn-pay w-100 rounded-0 py-3 text-white" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">{formatCurrency.format(totalPay)}</button>
                 </div>
-                <div className='pos-view-order ps-0 p-0 bg-none  d-none d-xl-block bg-light'>
-                    <div className="border-0 order box-shadow h-100 p-2" style={{
-                        overflow: 'scroll',
+                <div className='pos-view-order ps-2 p-0  d-none d-xl-block bg-light p-1 rounded'>
+                    <div className="border-0 h-100 bg-white box-shadow" style={{
+                        overflowY: 'scroll',
+                        overflowX: 'hidden',
                         scrollbarWidth: 'none', // For Firefox
                         msOverflowStyle: 'none',
+                        position: 'relative'
                     }}>
 
-                        {
-                            itemOrder.map((i, index) =>
-                                <>
-                                    <div className="w-100 border-0 border-bottom border-secondary" style={{ height: '110px' }}>
-                                        <div className="between px-1 border-0 w-100">
-                                            <div className='rounded img-pos-order center p-2 pb-2 ' style={{ height: '100px' }}>
-                                                <img src={`${imageUrl}${i.image}`} alt="" className="h-100 srounded" />
-                                            </div>
-                                            <div className='d-block ps-2 w-100'>
-                                                <div className='between' style={{ height: '50px' }}>
-                                                    <span className='font-12 w-100'>{findProductName(i.productId)}</span>
-                                                    <i class="fa-solid fa-trash pointer"></i>
+                        <div className='px-2' style={{
+                            overflowY: 'scroll',
+                            overflowX: 'hidden',
+                            scrollbarWidth: 'none', // For Firefox
+                            msOverflowStyle: 'none',
+                        }}>
+                            {
+                                itemOrder.map((i, index) =>
+                                    <>
+                                        <div className="w-100 border-0 border-bottom border-secondary" style={{ height: '110px' }}>
+                                            <div className="between border-0 w-100">
+                                                <div className='rounded img-pos-order center p-2 pb-2 ' style={{ height: '100px' }}>
+                                                    <img src={`${imageUrl}${i.image}`} alt="" className="h-100 srounded" />
                                                 </div>
-                                                <div className='fs-6 between' style={{ height: '50px' }}>
-                                                    <div className='w-100'>
-                                                        <span className=' fs-5'>{formatCurrency.format(i.price)}</span>
-                                                        <span className=' font-12 ps-2'> / unit</span>
+                                                <div className='d-block ps-2 w-100'>
+                                                    <div className='between' style={{ height: '50px' }}>
+                                                        <span className='font-12 w-100'>{findProductName(i.productId)}</span>
+                                                        {/* <i class="fa-solid fa-trash pointer"></i> */}
                                                     </div>
-                                                    <div className='font-12 text-danger'>
-                                                        <span className='font-12  small-i box-shadow' onClick={() => updateQty(2, i.productId)}>-</span>
-                                                        <span className='bg-none small-i mx-1 text-dark'>{i.qty}</span>
-                                                        <span className='font-12 small-i box-shadow' onClick={() => updateQty(1, i.productId)}>+</span>
+                                                    <div className='fs-6 between' style={{ height: '50px' }}>
+                                                        <div className='w-100'>
+                                                            <span className=' fs-5 text-badges-red'>{formatCurrency.format(i.price)}</span>
+                                                            <span className=' font-12 ps-2'> / unit</span>
+                                                        </div>
+                                                        <div className='font-12 text-danger d-flex'>
+                                                            <span className='small-i text-badges-danger box-shadow' onClick={() => updateQty(2, i.productId)}><LuMinus /></span>
+                                                            <span className='bg-none text-dark text-badges-danger'>{i.qty}</span>
+                                                            <span className='small-i text-badges-green box-shadow' onClick={() => updateQty(1, i.productId)}><IoIosAdd /></span>
 
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </>
+                                )
+                            }
+                        </div>
+
+                        <div className=''>
+                            <div className='position-absolute bottom-0 w-100 px-3'>
+                                <div className="between text-dark  py-3">
+                                    <div className='w-100 start text-secondary'>Total Payment :</div>
+                                    <div className='text-dark fw-bold'><span className='text-badges-green'>{formatCurrency.format(totalPay)}</span></div>
+                                </div>
+                                <div className="button-grid m-0">
+                                    <button className='btn-grid'><i class="fa-solid fa-user-plus pe-2"></i> Customer </button>
+                                    <button className='btn-grid'><i class="fa-solid fa-circle-info pe-2"></i> Enter Code</button>
+                                </div>
+                                <button className='bg-orange btn-grid w-100'>
+                                    <input type="text" className='border-0 bg-none h-100 w-100' placeholder='Enter number of table' value={input} />
+                                </button>
+
+                                <div className='row mt-1 p-2 rounded px-0'>
+                                    <div className='col-7 pe-0'>
+                                        {calculator()}
                                     </div>
-                                </>
-                            )
-                        }
+                                    <div className="col-5 pe-0">
+                                        <div className="row h-100 w-100">
+                                            <div className="col-12 pe-0">
 
-                        <div className="between text-dark  fs-4 py-3">
-                            <div className='w-100 start fs-5'>Total Payment :</div>
-                            <div className='text-dark fw-bold'>{formatCurrency.format(totalPay)}</div>
-                        </div>
-                        <div className="button-grid">
-                            <button className='btn-grid'><i class="fa-solid fa-user-plus pe-2"></i> Customer </button>
-                            <button className='btn-grid'><i class="fa-solid fa-cart-shopping pe-2"></i> Order Table</button>
-                            <button className='bg-orange btn-grid'>
-                                <input type="text" className='border-0 bg-none h-100 w-100' placeholder='Enter number of table' value={input} />
-                            </button>
-                            <button className='btn-grid'><i class="fa-solid fa-circle-info pe-2"></i> Enter Code</button>
-                        </div>
+                                                <div className="p-1 pt-0 h-100 w-100 px-0">
+                                                    <button className="button hold-order h-100 w-100"
+                                                        onClick={() => saveTableOrder()}
+                                                    >
+                                                        <i class="fa-solid fa-utensils"></i>
+                                                        <span className='ps-2'>Hold Order</span>
+                                                    </button>
+                                                </div>
 
-                        <div className='d-flex mt-1'>
-                            <div style={{ height: '100%' }}>
-                                {calculator()}
-                            </div>
-                            <div className="d-block w-100">
-                                <button className="btn-silver rounded-0 h-25 border box-shadow w-100 d-block fs-5"
-                                    data-bs-toggle="offcanvas" data-bs-target="#payment" aria-controls="payment"
-                                    onClick={() => {
-                                        setInput('')
-                                        setIsPayment(true);
-                                    }}
-                                >
-                                    <i class="fa-solid fa-arrow-right pe-2"></i> Payment
-                                </button>
-                                <button className="btn-order rounded-0 h-75  text-white py-4 box-shadow w-100 d-block fs-5"
-                                    onClick={() => saveTableOrder()}
-                                >
-                                    <i class="fa-solid fa-utensils p-3"></i>
-                                    Hold Order
-                                </button>
+                                            </div>
+                                            <div className="col-12 pe-0 ">
 
+                                                <div className='p-1 pb-0 h-100 w-100 px-0'>
+                                                    <button className="button pay h-100 w-100"
+                                                        data-bs-toggle="offcanvas" data-bs-target="#payment" aria-controls="payment"
+                                                        onClick={() => {
+                                                            setInput('')
+                                                            setIsPayment(true);
+                                                        }}
+                                                    >
+                                                        <i class="fa-solid fa-arrow-right pe-2"></i> Payment
+                                                    </button>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
-            </div>
+
+
+            </div >
+
+
+
+
+
+            {/* </div > */}
             {/* {shopingCard()} */}
-            <div className="modal fade " id="printer" tabindex="-1" aria-labelledby="printer" aria-hidden="true">
+            <div className="modal fade " id="printer" tabindex="-1" aria-labelledby="printer" aria-hidden="true" >
                 <div class="modal-dialog bg-none">
                     <div class="modal-content bg-none">
 
@@ -968,6 +1022,8 @@ const PosLight = () => {
                     </div>
                 </div>
             </div>
+
+            {/* </div > */}
             <div className="modal slideInLeft " id="numberOfTable" tabindex="-1" aria-labelledby="numberOfTable" aria-hidden="true">
                 <div class="modal-dialog modal-dialog modal-lg bg-none">
                     <div class="modal-content bg-white">
@@ -1176,8 +1232,6 @@ const PosLight = () => {
                     </div>
                 </div>
             </div>
-
-
         </>
     )
 }

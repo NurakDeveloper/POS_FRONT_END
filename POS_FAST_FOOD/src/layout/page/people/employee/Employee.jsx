@@ -5,11 +5,14 @@ import { getAllBranch } from '../../../../api/Branch';
 import * as XLSX from 'xlsx';
 import { el } from 'date-fns/locale';
 import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../../components/table/DataGrid'
-import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
-
+import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge, FaUserEdit } from "react-icons/fa";
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { hostName } from '../../../../api/host';
 const Employee = () => {
     const [employee, setEmployee] = useState([]);
     const [branch, setBranch] = useState([]);
+    const domainName = hostName();
+    const imageUrl = `http://${domainName}:8085/api/images/`
     function getEmployee() {
         getAllEmployee().then((response) => {
             setEmployee(response.data);
@@ -65,7 +68,29 @@ const Employee = () => {
         setSortConfig({ key, direction });
         setEmployee(sortedData);
     };
+    const rowsPerPage = 15; // Define how many rows to display per page
+    const [currentPage, setCurrentPage] = useState(1);
 
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    // Slice the categories array to display only the current page's rows
+    const currentData = employee.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(employee.length / rowsPerPage);
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
+    };
 
     const goto = useNavigate();
     function listCard() {
@@ -73,23 +98,26 @@ const Employee = () => {
             <div className="row w-100">
 
                 {
-                    employee.map(o =>
-                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-                            <div className="card bg-white p-0 pointer mb-2 border"
+                    currentData.map(o =>
+                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-1">
+                            <div className="card bg-white p-0 pointer border"
                                 onClick={() => goto(`/employee-detail/${o.id}`)}
                             >
-                                <div className="card-body p-0 inv-card rounded">
+                                <div className="card-body p-0 rounded">
                                     <div className="d-flex">
                                         <div className="center p-1" style={{ width: '40%' }}>
-                                            <div className="center rounded" style={{ height: '200px', overflow: 'hidden' }}>
-                                                <img src={`/src/assets/image/${o.image}`} alt="" className='h-100 rounded' />
+                                            <div className="center rounded" style={{ height: '150px', overflow: 'hidden' }}>
+                                                <img src={`${imageUrl}${o.image}`} alt="" className='h-100 rounded' />
                                             </div>
                                         </div>
                                         <div className='f-12 ps-4 py-3' style={{ width: '60%' }}>
                                             <div className='f-16'>{o.firstName} {o.lastName}</div>
                                             <div className='text-secondary f-14'>{findBranchName(o.companyID)}.</div>
-                                            <div><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email}</div>
-                                            <div className='text-start'><i class="fa-solid fa-phone px-1 ps-0"></i>{o.mobile}</div>
+
+                                            <div className='text-secondary f-12'>
+                                                <i class="fa-solid fa-phone px-1 ps-0"></i>{o.mobile}
+                                            </div>
+                                            <div className='py-2 f-12'><span className='text-badges-warning'><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email} </span></div>
 
 
                                         </div>
@@ -111,14 +139,14 @@ const Employee = () => {
                     <DataGrid>
                         <table>
                             <Thead>
-                                <Th resizable columnWidth={50}>
+                                <Th columnWidth={20}>
                                     <input type="checkbox" name="" className='rounded-0 border pointer px-3' id="" />
                                 </Th>
                                 <Th
                                     onSort={() => handleSort("id")}
                                     sortDirection={sortConfig.key === "id" ? sortConfig.direction : ""}
-                                    resizable
-                                    columnWidth={50}
+
+                                    columnWidth={20}
                                 >
                                     No
                                 </Th>
@@ -190,7 +218,7 @@ const Employee = () => {
                                         sortConfig.key === "companyID" ? sortConfig.direction : ""
                                     }
                                     resizable
-                                    columnWidth={60}
+                                    columnWidth={150}
 
                                 >
                                     Company
@@ -205,25 +233,36 @@ const Employee = () => {
                                 >
                                     startWorkingDate
                                 </Th>
-                                <Th resizable columnWidth={50}>Action</Th>
+                                <Th resizable columnWidth={80}>Action</Th>
                             </Thead>
                             <tbody>
                                 {
-                                    employee.map((f, i) =>
-                                        <tr className="pointer" onClick={() => goto(`/employee-detail/${f.id}`)}>
+                                    currentData.map((f, i) =>
+                                        <tr className="pointer">
                                             <td>
                                                 <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
                                             </td>
-                                            <td className='py-3'>{f.id}</td>
-                                            <td>{f.firstName} {f.lastName}</td>
-                                            <td>Sofware Developer</td>
-                                            <td>{f.mobile}</td>
-                                            <td>{f.email}</td>
-                                            <td>{f.workShiftID}</td>
-                                            <td>{f.address}</td>
-                                            <td>{findBranchName(f.companyID)}</td>
-                                            <td>{f.startWorkingDate}</td>
-                                            <td><i class="fa-solid fa-trash-can pointer"></i></td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} className='py-3'>{f.id}</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.firstName} {f.lastName}</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >Sofware Developer</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.mobile}</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.email}</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.workShiftID}</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.address}</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} > <span className='text-badges-warning'>{findBranchName(f.companyID)}</span></td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.startWorkingDate}</td>
+                                            <td>
+                                                <div className="between">
+                                                    <span className='text-badges-danger'>
+                                                        <i class="fa-solid fa-trash-can"></i>
+                                                    </span>
+                                                    <span className='text-badges-green' onClick={() => goto(`/update-employee/${f.id}`)}>
+                                                        <FaUserEdit />
+                                                    </span>
+
+
+                                                </div>
+                                            </td>
 
 
 
@@ -237,141 +276,6 @@ const Employee = () => {
 
                 </div>
             </div>
-        )
-        return (
-            <>
-                <DataGrid>
-                    <table>
-                        <Thead>
-                            <Th
-                                onSort={() => handleSort("id")}
-                                sortDirection={sortConfig.key === "id" ? sortConfig.direction : ""}
-                                resizable
-                                columnWidth={50}
-                            >
-                                No
-                            </Th>
-                            <Th
-                                onSort={() => handleSort("productName")}
-                                sortDirection={
-                                    sortConfig.key === "productName" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={150}
-                            >
-                                ProductName
-                            </Th>
-                            <Th
-                                onSort={() => handleSort("price")}
-                                sortDirection={
-                                    sortConfig.key === "price" ? sortConfig.direction : ""
-                                }
-                                columnWidth={70}
-                                resizable
-                            >
-                                Price
-                            </Th>
-                            <Th resizable columnWidth={200}>Description</Th>
-                            <Th
-                                onSort={() => handleSort("categoryId")}
-                                sortDirection={
-                                    sortConfig.key === "categoryId" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={120}
-                            >
-                                Category
-                            </Th>
-
-                            <Th
-                                onSort={() => handleSort("branchId")}
-                                sortDirection={
-                                    sortConfig.key === "branchId" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={100}
-
-                            >
-                                BranchId
-                            </Th>
-                            <Th
-                                onSort={() => handleSort("prepareTime")}
-                                sortDirection={
-                                    sortConfig.key === "prepareTime" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={70}
-                            >
-                                PrepareTime
-                            </Th>
-                            <Th
-                                onSort={() => handleSort("calories")}
-                                sortDirection={
-                                    sortConfig.key === "calories" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={70}
-                            >
-                                Calories
-                            </Th>
-                            <Th
-                                onSort={() => handleSort("status")}
-                                sortDirection={
-                                    sortConfig.key === "status" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={60}
-
-                            >
-                                Status
-                            </Th>
-                            <Th
-                                onSort={() => handleSort("productOrigin")}
-                                sortDirection={
-                                    sortConfig.key === "productOrigin" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={100}
-                            >
-                                ProductOrigin
-                            </Th>
-                            <Th
-                                onSort={() => handleSort("sugar")}
-                                sortDirection={
-                                    sortConfig.key === "sugar" ? sortConfig.direction : ""
-                                }
-                                resizable
-                                columnWidth={70}
-                            >
-                                Sugar
-                            </Th>
-                            <Th resizable columnWidth={50}>Action</Th>
-                        </Thead>
-                        <Tbody>
-                            {
-                                employee.map((f, i) =>
-                                    <tr className="pointer" onClick={() => goto(`/employee-detail/${f.id}`)}>
-                                        <td>
-                                            <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
-                                        </td>
-                                        <td className='py-3'>{i + 1}</td>
-                                        <td>{f.firstName} {f.lastName}</td>
-                                        <td>{f.positionId}</td>
-                                        <td>{f.mobile}</td>
-                                        <td>{f.email}</td>
-                                        <td>{f.workShiftID}</td>
-                                        <td>{f.address}</td>
-                                        <td>{findBranchName(f.companyID)}</td>
-                                        <td>{f.startWorkingDate}</td>
-
-
-                                    </tr>
-                                )
-                            }
-                        </Tbody>
-                    </table>
-                </DataGrid>
-            </>
         )
     }
     const [itemView, setItemView] = useState();
@@ -431,6 +335,28 @@ const Employee = () => {
                 {/* Right Section */}
                 <div className="list-header-right">
                     {/* Print Button */}
+                    <span className="page-info f-14 text-secondary">
+                        {currentPage} / {totalPages}
+                    </span>
+                    <div className="pagination">
+                        <div className='pe-2'>
+                            <button
+                                className="button previous"
+                                onClick={handlePrevious}
+                                disabled={currentPage === 1}
+                            >
+                                <SlArrowLeft />
+                            </button>
+                        </div>
+
+                        <button
+                            className="button next"
+                            onClick={handleNext}
+                            disabled={currentPage === totalPages}
+                        >
+                            <SlArrowRight />
+                        </button>
+                    </div>
 
                     <button className="list-header-button list box-shadow" onClick={() => setView(2)}>
                         <FaThList className="list-header-icon" />
@@ -455,7 +381,7 @@ const Employee = () => {
         <>
             <div className='w-100'>
                 <div className="container-fluid p-0 ">
-                    <div className='container-fluid'>
+                    <div className='container-fluid p-0'>
                         {menu()}
                     </div>
 

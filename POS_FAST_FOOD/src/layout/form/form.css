@@ -14,20 +14,6 @@
     color: rgb(38, 202, 123);
 }
 
-.input-box {
-    border: none;
-    background: none;
-    border-bottom: 1px solid rgb(240, 240, 240);
-    padding: 0px;
-}
-
-.input-box:hover {
-    border-bottom: 1px solid rgb(170, 170, 170);
-}
-
-.input-box:focus {
-    border-bottom: 1px solid rgb(42, 41, 41);
-}
 
 
 textarea:focus {
@@ -43,7 +29,7 @@ textarea:focus {
     border: 1px solid white;
     /* border: 10px; */
     border-radius: 10px;
-    background: rgba(189, 189, 189, 0.1);
+    background: rgba(62, 62, 62, 0.1);
 }
 
 .form-back {
@@ -71,5 +57,5 @@ textarea:focus {
 }
 
 .login {
-    background-image: url('https://malis.thalias.com.kh/wp-content/uploads/2024/07/old-cement-wall-texture-scaled.jpg');
+    background-image: url('https://asset.gecdesigns.com/img/wallpapers/beautiful-magical-misty-mountains-reflection-river-ultra-hd-wallpaper-4k-sr10012420-1706505766369-cover.webp');
 }

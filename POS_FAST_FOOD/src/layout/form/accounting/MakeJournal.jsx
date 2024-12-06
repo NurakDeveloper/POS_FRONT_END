@@ -7,6 +7,8 @@ import { IoSaveSharp } from 'react-icons/io5'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 import { Th } from "../../../components/table/DataGrid";
 import { getBranchId } from "../../../api/Branch";
+import { Key } from "@mui/icons-material";
+import InputValidation from "../../../components/input/InputValidation";
 const MakeJournal = () => {
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
@@ -36,6 +38,23 @@ const MakeJournal = () => {
         "reference": '',
         "status": "Posted"
     });
+    const [errors, setError] = useState([]);
+    function validation() {
+        const newError = {};
+        // if (!journalData.branchId) {
+        //     newError.branch = 'Branch is not found';
+        // }
+        if (!journalData.journal) {
+            newError.journal = 'journal is require';
+        }
+        if (!journalData.reference) {
+            newError.reference = 'reference is require';
+        }
+
+
+        setError(newError);
+        return Object.keys(newError).length === 0;
+    }
 
     // Function to add a new row
     const addRow = () => {
@@ -68,12 +87,13 @@ const MakeJournal = () => {
     function handleChanges(e) {
         const { name, value } = e.target;
         setJournalData({ ...journalData, [name]: value });
-
-
-
+        // setJournalData({ ...journalData, ["total"]: findTotal() });
     }
     const saveJournal = (e) => {
         e.preventDefault();
+        if (!validation()) {
+            return
+        }
         createJournal(journalData).then((response) => {
             for (let i = 0; i < rows.length; i++) {
                 const updatedRows = [...rows];
@@ -109,7 +129,7 @@ const MakeJournal = () => {
     }
     function preview(e) {
         e.preventDefault();
-        alert(JSON.stringify(rows));
+        alert(JSON.stringify(rows, null, 2));
     }
     const navigate = useNavigate();
 
@@ -139,37 +159,58 @@ const MakeJournal = () => {
                         <div className="col-12">
                             {formHeader()}
                             <div className="border bg-white w-100 rounded">
-                                <div className="d-flex">
-                                    <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <label htmlFor='references' className='w-25 text-start'>Reference  </label>
-                                            <input type="text" id='reference' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
+                                <div className="row">
+                                    <div className="col-md-6 col-12">
+                                        <div className='d-block text-start fs-6 bg-white px-4 py-2'>
+                                            {/* <div className='group-input center w-100 pb-3' style={{ fontSize: 14 }}>
+                                                <label htmlFor='references' className='w-25 text-start'>Reference <span className="text-danger">*</span>  </label>
+                                                <input type="text" id='reference' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
+                                                    name='reference'
+                                                    value={journalData.reference}
+                                                    onChange={handleChanges}
+                                                />
+                                            </div> */}
+                                            <InputValidation
+                                                label="Reference"
+                                                id="reference"
+                                                type='text'
                                                 name='reference'
                                                 value={journalData.reference}
+                                                require="true"
                                                 onChange={handleChanges}
+                                                error={errors.reference}
+                                                fontSize={14}
                                             />
+
+
                                         </div>
-
                                     </div>
-                                    <div className='d-block text-start bg-white px-4 py-2 w-50 mt-1'>
+                                    <div className="col-md-6 col-12">
+                                        <div className='d-block text-start bg-white px-4 py-2'>
 
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <label htmlFor='j-date' className='w-25 text-start'>Date  </label>
-                                            <input type="date" id='j-date' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
+
+                                            <InputValidation
+                                                label="Date Journal"
+                                                id="data"
+                                                type='date'
                                                 name='date'
                                                 value={journalData.date}
+                                                require="true"
                                                 onChange={handleChanges}
+                                                error={errors.date}
                                             />
-                                        </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <label htmlFor='j-date' className='w-25 text-start'>Journal  </label>
-                                            <input type="text" id='j-date' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
+                                            <InputValidation
+                                                label="Journal"
+                                                id="journal"
+                                                type='text'
                                                 name='journal'
                                                 value={journalData.journal}
+                                                require="true"
                                                 onChange={handleChanges}
+                                                error={errors.journal}
                                             />
-                                        </div>
 
+                                        </div>
                                     </div>
                                 </div>
 
@@ -187,14 +228,14 @@ const MakeJournal = () => {
                                     <div class="tab-content border-0" id="myTabContent">
                                         <div class="border-0 tab-pane show active " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                                             <div className="p-3">
-                                                <table className="border-0 table w-100">
+                                                <table className="border-0 table w-100 f-14">
                                                     <thead>
                                                         <tr className="">
                                                             <Th className="py-3" resizable columnWidth={300}>Account</Th>
                                                             <Th className="py-3" resizable>Label</Th>
                                                             <Th className="py-3">Debit</Th>
                                                             <Th className="py-3">Credit</Th>
-                                                            <Th className="py-3">Action</Th>
+                                                            <Th className="py-3" columnWidth={50}>Action</Th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -262,7 +303,7 @@ const MakeJournal = () => {
                                                                 </td>
                                                                 <td>
                                                                     <span className="pointer" onClick={() => removeRow(index)}>
-                                                                        <i class="fa-solid fa-trash-can"></i>
+                                                                        <i class="fa-solid fa-trash-can remove"></i>
                                                                     </span>
                                                                 </td>
                                                             </tr>
@@ -283,7 +324,7 @@ const MakeJournal = () => {
                                 </div>
 
                             </div>
-                            <h6 className="bg-white text-end p-3">Total : {total}</h6>
+                            <h6 className="bg-white text-end p-3">Total : {journalData.total}</h6>
                         </div>
 
                     </div>

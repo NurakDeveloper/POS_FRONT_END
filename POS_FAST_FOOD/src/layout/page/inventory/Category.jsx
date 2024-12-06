@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { getAllCategory } from '../../../api/Category'
 import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../components/table/DataGrid'
 import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl'
 const Category = () => {
 
     const [categories, setCategories] = useState([]);
@@ -68,21 +69,106 @@ const Category = () => {
             </div>
         )
     }
+    const rowsPerPage = 15; // Define how many rows to display per page
+    const [currentPage, setCurrentPage] = useState(1);
 
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    // Slice the categories array to display only the current page's rows
+    const currentData = categories.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(categories.length / rowsPerPage);
+
+    // Handle Next and Previous button clicks
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
+    };
+    // function listTable() {
+    //     return (
+    //         <>
+    //             <DataGrid>
+    //                 <table>
+    //                     <Thead>
+    //                         <Th columnWidth={20}>
+    //                             <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
+    //                         </Th>
+    //                         <Th
+    //                             onSort={() => handleSort("id")}
+    //                             sortDirection={sortConfig.key === "id" ? sortConfig.direction : ""}
+
+    //                             columnWidth={20}
+    //                         >
+    //                             No
+    //                         </Th>
+    //                         <Th
+    //                             onSort={() => handleSort("name")}
+    //                             sortDirection={
+    //                                 sortConfig.key === "name" ? sortConfig.direction : ""
+    //                             }
+    //                             resizable
+    //                         // columnWidth={200}
+    //                         // columnWidth={150}
+
+    //                         >
+    //                             Category
+    //                         </Th>
+    //                         <Th
+    //                             onSort={() => handleSort("description")}
+    //                             sortDirection={
+    //                                 sortConfig.key === "description" ? sortConfig.direction : ""
+    //                             }
+    //                             resizable
+    //                         >
+    //                             Description
+    //                         </Th>
+
+
+    //                     </Thead>
+    //                     <Tbody>
+    //                         {
+    //                             categories.map((f, i) =>
+    //                                 <tr className="pointer" onClick={() => goto(`/item-detail`)}>
+    //                                     <td>
+    //                                         <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
+    //                                     </td>
+    //                                     <td className='py-3'>{i + 1}</td>
+    //                                     <td>{f.name}</td>
+    //                                     <td>{f.description}</td>
+    //                                 </tr>
+    //                             )
+    //                         }
+    //                     </Tbody>
+    //                 </table>
+    //             </DataGrid>
+    //         </>
+    //     )
+    // }
     function listTable() {
+
+
         return (
             <>
                 <DataGrid>
                     <table>
                         <Thead>
-                            <Th resizable columnWidth={50}>
-                                <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
+                            <Th columnWidth={20}>
+                                <input type="checkbox" name="" className="rounded-0 border px-3" id="" />
                             </Th>
                             <Th
                                 onSort={() => handleSort("id")}
                                 sortDirection={sortConfig.key === "id" ? sortConfig.direction : ""}
-                                resizable
-                                columnWidth={50}
+                                columnWidth={20}
                             >
                                 No
                             </Th>
@@ -92,8 +178,6 @@ const Category = () => {
                                     sortConfig.key === "name" ? sortConfig.direction : ""
                                 }
                                 resizable
-                            // columnWidth={150}
-
                             >
                                 Category
                             </Th>
@@ -106,28 +190,37 @@ const Category = () => {
                             >
                                 Description
                             </Th>
-
-
                         </Thead>
                         <Tbody>
-                            {
-                                categories.map((f, i) =>
-                                    <tr className="pointer" onClick={() => goto(`/item-detail`)}>
-                                        <td>
-                                            <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
-                                        </td>
-                                        <td className='py-3'>{i + 1}</td>
-                                        <td>{f.name}</td>
-                                        <td>{f.description}</td>
-                                    </tr>
-                                )
-                            }
+                            {currentData.map((f, i) => (
+                                <Tr
+                                    key={f.id}
+                                    className="pointer"
+                                    onClick={() => goto(`/item-detail`)}
+                                >
+                                    <Td>
+                                        <input
+                                            type="checkbox"
+                                            name=""
+                                            className="rounded-0 border px-3"
+                                            id=""
+                                        />
+                                    </Td>
+                                    <Td className="py-3">{startIndex + i + 1}</Td>
+                                    <Td>{f.name}</Td>
+                                    <Td>{f.description}</Td>
+                                </Tr>
+                            ))}
                         </Tbody>
                     </table>
                 </DataGrid>
+                {/* Pagination Controls */}
+
             </>
-        )
+        );
     }
+
+
     const [itemView, setItemView] = useState();
     useEffect(() => {
         setView(1);
@@ -176,6 +269,28 @@ const Category = () => {
 
                 {/* Right Section */}
                 <div className="list-header-right">
+                    <span className="page-info f-14 text-secondary">
+                        {currentPage} / {totalPages}
+                    </span>
+                    <div className="pagination">
+                        <div className='pe-2'>
+                            <button
+                                className="button previous"
+                                onClick={handlePrevious}
+                                disabled={currentPage === 1}
+                            >
+                                <SlArrowLeft />
+                            </button>
+                        </div>
+
+                        <button
+                            className="button next"
+                            onClick={handleNext}
+                            disabled={currentPage === totalPages}
+                        >
+                            <SlArrowRight />
+                        </button>
+                    </div>
                     {/* Print Button */}
 
                     <button className="list-header-button list box-shadow" onClick={() => setView(2)}>
@@ -199,7 +314,7 @@ const Category = () => {
     }
     return (
         <>
-            <div className='container-fluid'>
+            <div className='container-fluid p-0 center'>
                 <div className="row">
                     <div className=''>
                         {menu()}

@@ -1,0 +1,13 @@
+.text-container {
+    display: block;
+    padding: 10px 0px;
+}
+
+.t-title {
+    color: rgb(98, 98, 98);
+}
+
+.t-value {
+    padding: 10px 0px;
+    color: #252525;
+}

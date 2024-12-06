@@ -2,23 +2,29 @@ import { Link } from 'react-router-dom'
 import './item.css'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getAllProduct } from '../../../api/Product'
+import { getAllProduct, removeProductById } from '../../../api/Product'
 import Loading from '../loading/Loading'
 import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../components/table/DataGrid'
 import { getAllCategory } from '../../../api/Category'
 import { getAllBranch } from '../../../api/Branch'
 import ListHeader from '../../../components/listheader/ListHeader'
-import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
+import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge, FaUserEdit } from "react-icons/fa";
 import { hostName } from '../../../api/host'
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import * as XLSX from 'xlsx';
-
+import RemoveLoading from '../loading/RemoveLoading'
+import { RiEditFill } from 'react-icons/ri'
+import { id } from 'date-fns/locale'
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl'
 const Item = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingRemove, setIsLoadingRemove] = useState(false);
     const [product, setProduct] = useState([]);
     const [itemView, setItemView] = useState();
     const [category, setCategories] = useState([]);
     const [branch, setBranch] = useState([]);
     const domainName = hostName();
+    const [productId, setProductId] = useState();
     useEffect(() => {
         setView(2);
     }, [product])
@@ -43,18 +49,18 @@ const Item = () => {
         })
     }, [])
     const goto = useNavigate();
-    function funtionBoolean(check) {
-        if (check) {
+    function findStatus(value) {
+        if (value == 1) {
             return (
                 <>
-                    <span class="badge text-bg-success">True</span>
+                    <span class="text-badges-green"><i class="fa-solid fa-check"></i> Active</span>
 
                 </>
             )
-        } else {
+        } else if (value == 2) {
             return (
                 <>
-                    <span class="badge text-bg-danger">false</span>
+                    <span class="text-badges-danger"><i class="fa-solid fa-check"></i>None Active</span>
                 </>
             )
         }
@@ -95,11 +101,11 @@ const Item = () => {
     };
     function listCard() {
         return (
-            <div className="row w-100 p-0">
+            <div className="row w-100 p-0 animation-opacity">
                 {
-                    product.map(o =>
-                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-                            <div className="card bg-white p-0 pointer mb-3"
+                    currentData.map(o =>
+                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-1">
+                            <div className="card bg-white p-0 pointer mb-1"
                                 onClick={() => goto(`/item-detail/${o.id}`)}
                                 style={{ height: '180px', overflow: 'hidden' }}
                             >
@@ -113,7 +119,7 @@ const Item = () => {
                                                 {o.productName}
                                             </div>
                                             <div className='text-secondary f-14'>{findCategoryName(o.categoryId)}</div>
-                                            <div className=''><span class="f-10 badge text-bg-danger">Price : ${o.price}</span></div>
+                                            <div className='py-2'><span class="f-14 text-badges-red">Price : ${o.price}</span></div>
                                             <textarea name="" className='border-0 text-secondary w-100 py-2 h-100 f-10' id="" value={o.description} readOnly></textarea>
 
                                         </div>
@@ -128,11 +134,35 @@ const Item = () => {
             </div >
         )
     }
+    const rowsPerPage = 15; // Define how many rows to display per page
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    // Slice the categories array to display only the current page's rows
+    const currentData = product.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(product.length / rowsPerPage);
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
+    };
+
     function listTable() {
         return (
-            <>
+            <div className='animation-opacity pe-1 '>
                 <DataGrid>
-                    <table>
+                    <table >
                         <Thead>
                             <Th
                                 onSort={() => handleSort("id")}
@@ -157,7 +187,7 @@ const Item = () => {
                                 sortDirection={
                                     sortConfig.key === "price" ? sortConfig.direction : ""
                                 }
-                                columnWidth={70}
+                                columnWidth={100}
                                 resizable
                             >
                                 Price
@@ -180,7 +210,7 @@ const Item = () => {
                                     sortConfig.key === "branchId" ? sortConfig.direction : ""
                                 }
                                 resizable
-                                columnWidth={100}
+                                columnWidth={150}
 
                             >
                                 BranchId
@@ -211,7 +241,7 @@ const Item = () => {
                                     sortConfig.key === "status" ? sortConfig.direction : ""
                                 }
                                 resizable
-                                columnWidth={60}
+                                columnWidth={100}
 
                             >
                                 Status
@@ -236,29 +266,42 @@ const Item = () => {
                             >
                                 Sugar
                             </Th>
-                            <Th resizable columnWidth={50}>Action</Th>
+                            <Th columnWidth={100}>Action</Th>
                         </Thead>
                         <Tbody>
-                            {product.map((item) => (
+                            {currentData.map((item) => (
                                 <tr key={item.id}>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.id}</td>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.productName}</td>
-                                    <td onClick={() => goto(`/item-detail/${item.id}`)}>{formatCurrency.format(item.price)}</td>
+                                    <td onClick={() => goto(`/item-detail/${item.id}`)}> <span className='text-badges-red bold'>{formatCurrency.format(item.price)}</span></td>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.description}</td>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{findCategoryName(item.categoryId)}</td>
-                                    <td onClick={() => goto(`/item-detail/${item.id}`)}>{findBranchName(item.branchId)}</td>
+                                    <td onClick={() => goto(`/item-detail/${item.id}`)}> <span className='text-badges-warning'>{findBranchName(item.branchId)}</span></td>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.prepareTime} <span className='text-secondary'>Min</span></td>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.calories} </td>
-                                    <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.status}</td>
+                                    <td onClick={() => goto(`/item-detail/${item.id}`)}>{findStatus(item.status)}</td>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.productOrigin}</td>
                                     <td onClick={() => goto(`/item-detail/${item.id}`)}>{item.sugar} <span className='text-secondary'>G</span></td>
-                                    <td><i class="fa-solid fa-trash-can pointer remove"></i></td>
+                                    <td>
+                                        <div className="between">
+                                            <span className='pointer text-badges-danger' onClick={() => {
+                                                setProductId(item.id);
+                                                setIsLoadingRemove(true);
+                                            }}>
+                                                <i class="fa-solid fa-trash-can " ></i>
+                                            </span>
+                                            <span className='pointer text-badges-green' onClick={() => goto(`/update-item/${id}`)}>
+                                                <RiEditFill />
+                                            </span>
+
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </Tbody>
                     </table>
                 </DataGrid>
-            </>
+            </div>
         )
     }
     const ExportExcel = (data, fileName) => {
@@ -280,22 +323,37 @@ const Item = () => {
 
     function setView(index) {
         if (index == 1) {
+            setIsLoading(true);
             setItemView(() => listCard())
         } else {
+            setIsLoading(true)
             setItemView(() => listTable())
         }
     }
-    const [isLoading, setIsLoading] = useState(true);
+
 
     useEffect(() => {
         // Set a timeout to hide the loading screen after 0.5 seconds
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 500);
+        }, 200);
 
         // Cleanup the timer
         return () => clearTimeout(timer);
-    }, []);
+    }, [isLoading]);
+    useEffect(() => {
+        // Set a timeout to hide the loading screen after 0.5 seconds
+        const timer = setTimeout(() => {
+            setIsLoadingRemove(false);
+        }, 8000);
+        // Cleanup the timer
+        return () => {
+            clearTimeout(timer)
+
+        };
+
+    }, [isLoadingRemove]);
+
     function menu() {
         return (
             <div className="list-header-container">
@@ -333,6 +391,28 @@ const Item = () => {
 
                 {/* Right Section */}
                 <div className="list-header-right">
+                    <span className="page-info f-14 text-secondary">
+                        {currentPage} / {totalPages}
+                    </span>
+                    <div className="pagination">
+                        <div className='pe-2'>
+                            <button
+                                className="button previous"
+                                onClick={handlePrevious}
+                                disabled={currentPage === 1}
+                            >
+                                <SlArrowLeft />
+                            </button>
+                        </div>
+
+                        <button
+                            className="button next"
+                            onClick={handleNext}
+                            disabled={currentPage === totalPages}
+                        >
+                            <SlArrowRight />
+                        </button>
+                    </div>
                     {/* Print Button */}
 
                     <button className="list-header-button list box-shadow" onClick={() => setView(2)}>
@@ -354,6 +434,17 @@ const Item = () => {
             </div>
         );
     }
+
+    function removeProduct(id) {
+        if (id) {
+            // removeProductById(id).then((respnse) => {
+            //     console.log(respnse.data);
+            // }).catch(e => {
+            //     console.error(e);
+            // })
+            alert('product' + id + 'has been removed')
+        }
+    }
     return (
         <>
             <div className='w-100'>
@@ -368,7 +459,9 @@ const Item = () => {
                 <div>
                     {isLoading ? (
                         // Loading Screen
-                        <Loading />
+                        <>
+                            <Loading />
+                        </>
                     ) : (
                         // Main Content
                         <div className="center">
@@ -377,6 +470,39 @@ const Item = () => {
                         </div>
                     )}
                 </div>
+
+                {isLoadingRemove ? (
+                    // Loading Screen
+                    <>
+                        <div className="fixed-top">
+                            <div className='center'>
+                                <div className='p-3 box-shadow bg-white mt-4'>
+                                    <RemoveLoading />
+                                    <div className="" style={{
+                                        width: '340px',
+                                        // width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <button className='button add px-5' onClick={() => setIsLoadingRemove(false)}><i class="fa-solid fa-xmark pe-2"></i>No</button>
+                                        <button className='button preview px-5' onClick={() => {
+                                            setIsLoadingRemove(false);
+                                            removeProduct(productId);
+                                            setProductId();
+                                        }}><i class="fa-solid fa-check pe-2"></i>Yes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+
+                ) : (
+                    // Main Content
+                    <>
+                        {/* {alert("successfull ")} */}
+                    </>
+                )}
 
 
 

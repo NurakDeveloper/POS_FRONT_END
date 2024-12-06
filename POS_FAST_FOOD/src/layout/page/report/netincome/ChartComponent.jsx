@@ -101,7 +101,7 @@ const ChartComponent = () => {
     };
 
     return (
-        <div style={{ width: "100%", maxHeight: '500px', height: '100%' }}>
+        <div style={{ width: "100%", height: '100%' }}>
             <Bar data={chartData} options={options} />
         </div>
     );

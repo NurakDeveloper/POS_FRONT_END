@@ -1,13 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getEmployee } from "../../../../api/EmployeeApi";
 import { getAllBranch } from "../../../../api/Branch";
 import { getAllEmployee } from "../../../../api/EmployeeApi";
 import { el } from "date-fns/locale";
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { hostName } from "../../../../api/host";
+import Text from "../../../../components/text/Text";
+
+
 
 const EmployeeDetail = () => {
     const navigate = useNavigate();
+    const domainName = hostName();
+    const profilePath = `http://${domainName}:8085/api/images/`
     const [employeeData, setEmployeeData] = useState({
         lastName: '',
         firstName: '',
@@ -110,11 +116,7 @@ const EmployeeDetail = () => {
     function getCompanyName(id) {
         const findCompanyName = company.find(f => f.id == id);
         if (findCompanyName) {
-            return (
-                <>
-                    <span className="fw-bold">{findCompanyName.branchName}</span> <br />
-                </>
-            )
+            return findCompanyName.branchName
         } else {
             return (
                 <>
@@ -124,32 +126,38 @@ const EmployeeDetail = () => {
         }
     }
     const navi = useNavigate();
+
     return (
         <>
 
-            <div className="container-fluid center">
+            <div className="container center">
 
-                <div className="row w-100 p-0">
+                <div className="row w-100 ">
                     <div className="col-12 p-0">
-                        <div className="d-flex justify-content-start align-items-center py-3">
-                            <div className="pe-3">
-                                <button className="button cancel box-shadow" onClick={() => navi(`/employees`)}><IoIosArrowRoundBack /> Back</button>
+                        <div className="d-flex justify-content-between align-items-center py-3">
+                            <div className="d-flex">
+                                <p>
+                                    <span className="f-14 text-secondary">Employee / profile / </span>{employeeData.firstName} {employeeData.lastName}
+                                </p>
+                                {/* <p></p> */}
                             </div>
-                            <button className="button add box-shadow" onClick={() => navi(`/update-employee/${id}`)}><i class="fa-solid fa-pen"></i><span className='px-2'>Edit</span></button>
+                            <div className="d-flex">
+                                <div className="pe-3">
+                                    <button className="button cancel box-shadow" onClick={() => navi(`/employees`)}><IoIosArrowRoundBack /> Back</button>
+                                </div>
+                                <button className="button add box-shadow" onClick={() => navi(`/update-employee/${id}`)}><i class="fa-solid fa-pen"></i><span className='px-2'>Edit</span></button>
+                            </div>
                         </div>
-                        <div className="border rounded px-2">
+                        <div className="rounded p-4 box-shadow w-100">
                             <div className="form-heder w-100 bg-white" style={{ maxHeight: '100%' }}>
                                 <form className="d-flex h-100" >
-                                    <div className='start w-50 p-2'>
-                                        <div className='w-100 px-4'>
-                                            <div className="fs-2">{employeeData.firstName} {employeeData.lastName}</div>
-                                            <div className="fs-6 text-secondary"> softwere engineer</div>
+                                    <div className='start'>
+                                        <div className='center' style={{ width: '150px', overflow: 'hidden' }}>
+                                            <img src={`${profilePath}${employeeData.image}`} alt="" className="w-100 rounded" />
                                         </div>
-                                    </div>
-
-                                    <div className='end p-2 w-50 d-flex'>
-                                        <div className='d-flex' style={{ width: '150px', overflow: 'hidden' }}>
-                                            <img src={`/src/assets/image/${employeeData.image}`} alt="" className="w-100 rounded" />
+                                        <div className='w-100 ps-4'>
+                                            <div className="fs-4">{employeeData.firstName} {employeeData.lastName}</div>
+                                            <div className="f-14 text-secondary"> softwere engineer</div>
                                         </div>
                                     </div>
                                 </form>
@@ -157,41 +165,20 @@ const EmployeeDetail = () => {
                             </div>
                             <div className="row">
                                 <div className="col-md-6 col-12">
-                                    <div className='d-block text-start fs-6 bg-white px-4 py-2'>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Branch  </p>
-                                            <p className='w-75 text-start '>{getCompanyName(employeeData.companyID)}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Address  </p>
-                                            <p className='w-75 text-start '>{employeeData.address}</p>
-                                        </div>
-
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Manger  </p>
-                                            <p className='w-75 text-start text-primary hover-line' onClick={() => navigate(`/employee-detail/${employeeData.managerID}`)}>{getManagerName(employeeData.managerID)}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Work Email</p>
-                                            <p className='w-75 text-start'>{employeeData.email}</p>
-                                        </div>
-
-
+                                    <div className='d-block text-start fs-6 bg-white py-2'>
+                                        <Text title='Compnay' value={getCompanyName(employeeData.companyID)} fontSize={14} />
+                                        <Text title='Employee Address' value={employeeData.address} fontSize={14} />
+                                        <Text classValue={'pointer'} title='Manager ? ' value={getManagerName(employeeData.managerID)} fontSize={14} click={() => navigate(`/employee-detail/${employeeData.managerID}`)} />
+                                        <Text title='Work Email' value={employeeData.email} fontSize={14} />
                                     </div>
                                 </div>
                                 <div className="col-md-6 col-12">
-                                    <div className='d-block text-start fs-6 bg-white px-4 py-2'>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Stat Working  </p>
-                                            <p className='w-75 text-start'>{formatDate(employeeData.startWorkingDate)}</p>
-                                        </div>
-                                        <div className='group-input center w-100 ' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Contact  </p>
-                                            <p className='w-75 text-start'>{employeeData.contact}</p>
-                                        </div>
-
+                                    <div>
 
                                     </div>
+                                    <Text title='Stat Working' value={formatDate(employeeData.startWorkingDate)} fontSize={14} />
+                                    <Text title='Contac phone ' value={employeeData.contact} fontSize={14} />
+
                                 </div>
                             </div>
                             <div className='bg-white py-3'>
@@ -212,33 +199,12 @@ const EmployeeDetail = () => {
 
                                 <div class="tab-content border-0" id="myTabContent">
                                     <div class="border-0 tab-pane show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                                        <textarea name="" id="" className='w-100 border-0 p-3 f-14' value={employeeData.resume}></textarea>
+
                                     </div>
                                     <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Schedule  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.schedule}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Work Shift  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.workShiftID}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Manager  </p>
-                                            <p className='w-75 text-start text-secondary'>{getManagerName(employeeData.managerID)}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Cv  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.cv}</p>
-                                        </div>
-                                        <div className='group-input center w-100 ' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Position </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.positionID}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Branch  </p>
-                                            <p className='w-75 text-start text-secondary'>{getCompanyName(employeeData.companyID)}</p>
-                                        </div>
+                                        <Text title='Schedule work ' value={employeeData.schedule} fontSize={14} />
+                                        <Text title='Work Shift ' value={employeeData.workShiftID} fontSize={14} />
+                                        <Text title='Cv ' value={employeeData.cv} fontSize={14} />
                                     </div>
                                     <div class="border-0 tab-pane " id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                                         {/* <p className="mb-0">Create User</p>
@@ -247,34 +213,21 @@ const EmployeeDetail = () => {
                                     <p className="mb-0">Attencden</p> */}
                                     </div>
                                     <div class="border-0 tab-pane p-2" id="private-tab-pane" role="tabpanel" aria-labelledby="private-tab" tabindex="0">
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Email  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.email}</p>
+
+                                        <div className="row">
+                                            <div className="col-md-6 col-12">
+                                                <Text title='Employee Email' value={employeeData.email} fontSize={14} />
+                                                <Text title='Phone Number' value={employeeData.mobile} fontSize={14} />
+                                                <Text title='Gender' value={employeeData.gender} fontSize={14} />
+                                            </div>
+                                            <div className="col-md-6 col-12">
+                                                <Text title='Salary' value={' $ ' + employeeData.salary} fontSize={14} />
+                                                <Text title='Address' value={employeeData.address} fontSize={14} />
+                                                <Text title='Day Off' value={employeeData.dayOff + ' day '} fontSize={14} />
+                                                <Text title='Bank' value={employeeData.bankAccount} fontSize={14} />
+                                            </div>
                                         </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>mobile  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.mobile}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Gender  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.gender}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Salary  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.salary}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Address  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.address}</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Date Of Birth  </p>
-                                            <p className='w-75 text-start text-secondary'>no data update system more..</p>
-                                        </div>
-                                        <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                            <p className='w-25 text-start'>Bank Account  </p>
-                                            <p className='w-75 text-start text-secondary'>{employeeData.bankAccount}</p>
-                                        </div>
+
                                     </div>
                                 </div>
                             </div>
