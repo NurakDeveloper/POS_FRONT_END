@@ -1,25 +1,46 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getAllEmployee } from '../../../../api/EmployeeApi';
 import { getAllBranch } from '../../../../api/Branch';
+import { deleteEmployeeById, getAllEmployee } from '../../../../api/EmployeeApi';
 import * as XLSX from 'xlsx';
 import { el } from 'date-fns/locale';
 import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../../components/table/DataGrid'
-import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge, FaUserEdit } from "react-icons/fa";
+import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge, FaUserEdit, FaSlack } from "react-icons/fa";
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { hostName } from '../../../../api/host';
+import RemoveMessage from '../../../../components/alert/RemoveMessage';
 const Employee = () => {
     const [employee, setEmployee] = useState([]);
     const [branch, setBranch] = useState([]);
+    const [employeeId, setEmployeeId] = useState();
+    const [isRemoveOpen, setIsRemoveOpen] = useState(false);
+
+    const generateRandomColor = () => {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        return `rgba(${r},${g},${b},0.9)`; // Random color with 60% opacity
+    };
     const domainName = hostName();
     const imageUrl = `http://${domainName}:8085/api/images/`
     function getEmployee() {
         getAllEmployee().then((response) => {
             setEmployee(response.data);
-            console.log(response.data);
-
         }).catch(error => {
             console.error(error);
+        })
+    }
+    useEffect(() => {
+        getEmployee();
+        getBranch();
+    }, [])
+    function removeEmployeeById(id) {
+        if (!id) return
+        // alert('employee id' + id + 'has been remove')
+        deleteEmployeeById(id).then(reponse => {
+            getEmployee();
+        }).catch(e => {
+            alert(e);
         })
     }
     function getBranch() {
@@ -68,7 +89,7 @@ const Employee = () => {
         setSortConfig({ key, direction });
         setEmployee(sortedData);
     };
-    const rowsPerPage = 15; // Define how many rows to display per page
+    const rowsPerPage = 10; // Define how many rows to display per page
     const [currentPage, setCurrentPage] = useState(1);
 
     // Calculate the index of the first and last item on the current page
@@ -106,8 +127,18 @@ const Employee = () => {
                                 <div className="card-body p-0 rounded">
                                     <div className="d-flex">
                                         <div className="center p-1" style={{ width: '40%' }}>
-                                            <div className="center rounded" style={{ height: '150px', overflow: 'hidden' }}>
-                                                <img src={`${imageUrl}${o.image}`} alt="" className='h-100 rounded' />
+                                            <div className="center rounded" style={{ height: '150px', width: '100%', overflow: 'hidden' }}>
+                                                {
+                                                    o.image ?
+                                                        (<img src={`${imageUrl}${o.image}`} alt="" className='h-100 rounded' />)
+                                                        : (
+                                                            // if no image
+                                                            <div className="h-100 text-white w-100 fs-1 center" style={{ backgroundColor: generateRandomColor() }}>
+                                                                {o.firstName.substring(0, 1)}{o.lastName.substring(0, 1)}
+                                                            </div>
+                                                        )
+                                                }
+
                                             </div>
                                         </div>
                                         <div className='f-12 ps-4 py-3' style={{ width: '60%' }}>
@@ -242,7 +273,7 @@ const Employee = () => {
                                             <td>
                                                 <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
                                             </td>
-                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} className='py-3'>{f.id}</td>
+                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} className='py-3'>{i + 1}</td>
                                             <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.firstName} {f.lastName}</td>
                                             <td onClick={() => goto(`/employee-detail/${f.id}`)} >Sofware Developer</td>
                                             <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.mobile}</td>
@@ -253,7 +284,10 @@ const Employee = () => {
                                             <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.startWorkingDate}</td>
                                             <td>
                                                 <div className="between">
-                                                    <span className='text-badges-danger'>
+                                                    <span className='text-badges-danger' onClick={() => {
+                                                        setIsRemoveOpen(true)
+                                                        setEmployeeId(f.id)
+                                                    }}>
                                                         <i class="fa-solid fa-trash-can"></i>
                                                     </span>
                                                     <span className='text-badges-green' onClick={() => goto(`/update-employee/${f.id}`)}>
@@ -278,23 +312,10 @@ const Employee = () => {
             </div>
         )
     }
-    const [itemView, setItemView] = useState();
+    // display if table view or card view
+    const [isTable, setIsTable] = useState(false);
 
 
-    function setView(index) {
-        if (index == 1) {
-            setItemView(() => listCard())
-        } else {
-            setItemView(() => listTable())
-        }
-    }
-    useEffect(() => {
-        getEmployee();
-        getBranch();
-    }, [])
-    useEffect(() => {
-        setView(2);
-    }, [employee])
 
 
     function menu() {
@@ -358,13 +379,13 @@ const Employee = () => {
                         </button>
                     </div>
 
-                    <button className="list-header-button list box-shadow" onClick={() => setView(2)}>
+                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(true)}>
                         <FaThList className="list-header-icon" />
                         List
                     </button>
 
                     {/* Export Button */}
-                    <button className="list-header-button list box-shadow" onClick={() => setView(1)}>
+                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(false)}>
                         <FaThLarge className="list-header-icon" />
                         Card
                     </button>
@@ -387,8 +408,20 @@ const Employee = () => {
 
                 </div>
                 <div className="center">
-                    {itemView}
+                    {isTable ? listTable() : listCard()}
                 </div>
+
+                <RemoveMessage
+                    isOpen={isRemoveOpen}
+                    description='A confirmation message is intended to prompt users before proceeding with a delete action. It clearly informs them of the irreversible nature of the deletion to prevent accidental loss of data or content.'
+                    message='Are you sure ?'
+                    cancelClcik={() => setIsRemoveOpen(false)}
+                    acceptedClick={() => {
+                        employeeId ? removeEmployeeById(employeeId) : alert('Employee id is null')
+                        setEmployeeId()
+                        setIsRemoveOpen(false);
+                    }}
+                />
 
             </div>
         </>

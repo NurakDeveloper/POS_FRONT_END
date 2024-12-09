@@ -16,6 +16,7 @@ import RemoveLoading from '../loading/RemoveLoading'
 import { RiEditFill } from 'react-icons/ri'
 import { id } from 'date-fns/locale'
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl'
+import RemoveMessage from '../../../components/alert/RemoveMessage'
 const Item = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingRemove, setIsLoadingRemove] = useState(false);
@@ -29,6 +30,9 @@ const Item = () => {
         setView(2);
     }, [product])
     useEffect(() => {
+        getData();
+    }, [])
+    function getData() {
         getAllProduct().then((respnse) => {
             setProduct(respnse.data);
             console.log(respnse.data);
@@ -47,7 +51,7 @@ const Item = () => {
         }).catch(error => {
             console.error(error);
         })
-    }, [])
+    }
     const goto = useNavigate();
     function findStatus(value) {
         if (value == 1) {
@@ -290,7 +294,7 @@ const Item = () => {
                                             }}>
                                                 <i class="fa-solid fa-trash-can " ></i>
                                             </span>
-                                            <span className='pointer text-badges-green' onClick={() => goto(`/update-item/${id}`)}>
+                                            <span className='pointer text-badges-green' onClick={() => goto(`/update-item/${item.id}`)}>
                                                 <RiEditFill />
                                             </span>
 
@@ -353,6 +357,7 @@ const Item = () => {
         };
 
     }, [isLoadingRemove]);
+    const [isTable, setIsTable] = useState(true);
 
     function menu() {
         return (
@@ -415,13 +420,13 @@ const Item = () => {
                     </div>
                     {/* Print Button */}
 
-                    <button className="list-header-button list box-shadow" onClick={() => setView(2)}>
+                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(true)}>
                         <FaThList className="list-header-icon" />
                         List
                     </button>
 
                     {/* Export Button */}
-                    <button className="list-header-button list box-shadow" onClick={() => setView(1)}>
+                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(false)}>
                         <FaThLarge className="list-header-icon" />
                         Card
                     </button>
@@ -437,12 +442,11 @@ const Item = () => {
 
     function removeProduct(id) {
         if (id) {
-            // removeProductById(id).then((respnse) => {
-            //     console.log(respnse.data);
-            // }).catch(e => {
-            //     console.error(e);
-            // })
-            alert('product' + id + 'has been removed')
+            removeProductById(id).then((respnse) => {
+                getData();
+            }).catch(e => {
+                alert(e);
+            })
         }
     }
     return (
@@ -465,44 +469,21 @@ const Item = () => {
                     ) : (
                         // Main Content
                         <div className="center">
-                            {itemView}
-                            {/* {listTable()} */}
+                            {isTable ? listTable() : listCard()}
                         </div>
                     )}
                 </div>
-
-                {isLoadingRemove ? (
-                    // Loading Screen
-                    <>
-                        <div className="fixed-top">
-                            <div className='center'>
-                                <div className='p-3 box-shadow bg-white mt-4'>
-                                    <RemoveLoading />
-                                    <div className="" style={{
-                                        width: '340px',
-                                        // width: '100%',
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center'
-                                    }}>
-                                        <button className='button add px-5' onClick={() => setIsLoadingRemove(false)}><i class="fa-solid fa-xmark pe-2"></i>No</button>
-                                        <button className='button preview px-5' onClick={() => {
-                                            setIsLoadingRemove(false);
-                                            removeProduct(productId);
-                                            setProductId();
-                                        }}><i class="fa-solid fa-check pe-2"></i>Yes</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </>
-
-                ) : (
-                    // Main Content
-                    <>
-                        {/* {alert("successfull ")} */}
-                    </>
-                )}
+                <RemoveMessage
+                    cancelClcik={() => setIsLoadingRemove(false)}
+                    acceptedClick={() => {
+                        setIsLoadingRemove(false);
+                        removeProduct(productId);
+                        setProductId();
+                    }}
+                    message='Are you sure ?'
+                    description='A confirmation message is intended to prompt users before proceeding with a delete action. It clearly informs them of the irreversible nature of the deletion to prevent accidental loss of data or content.'
+                    isOpen={isLoadingRemove}
+                />
 
 
 

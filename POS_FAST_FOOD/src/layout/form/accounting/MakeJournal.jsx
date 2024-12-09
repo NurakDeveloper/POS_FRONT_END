@@ -5,16 +5,16 @@ import { set } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { IoSaveSharp } from 'react-icons/io5'
 import { IoIosArrowRoundBack } from 'react-icons/io'
-import { Th } from "../../../components/table/DataGrid";
+import { Tbody, Th, Thead } from "../../../components/table/DataGrid";
 import { getBranchId } from "../../../api/Branch";
 import { Key } from "@mui/icons-material";
 import InputValidation from "../../../components/input/InputValidation";
+import Cookies from "js-cookie";
 const MakeJournal = () => {
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
     const [account, setAccount] = useState([]);
     const [acName, setAcName] = useState([])
-    const branchId = getBranchId();
     useEffect(() => {
         getAllAccount().then((reponse) => {
             setAccount(reponse.data);
@@ -31,7 +31,7 @@ const MakeJournal = () => {
     }
     const [journalData, setJournalData] = useState({
         "journal": '',
-        "branchId": branchId,
+        "branchId": '',
         "partnerId": '',
         "date": '',
         "total": 0,
@@ -49,6 +49,9 @@ const MakeJournal = () => {
         }
         if (!journalData.reference) {
             newError.reference = 'reference is require';
+        }
+        if (!journalData.date) {
+            newError.date = 'date is require';
         }
 
 
@@ -79,6 +82,14 @@ const MakeJournal = () => {
         setRows(updatedRows);
 
     };
+    function removeRow(index) {
+        const updatedRows = [...rows]; // Create a copy of the array
+        const updateAccountName = [...acName];
+        updatedRows.splice(index, 1); // Remove the row at the specified index
+        updateAccountName.splice(index, 1);
+        setAcName(updateAccountName);
+        setRows(updatedRows); // Update the state
+    }
     useEffect(() => {
         setJournalData({ ...journalData, ["total"]: findTotal() });
     }, [rows])
@@ -101,27 +112,19 @@ const MakeJournal = () => {
                 updatedRows[i]["journalEntriesId"] = response.data.id;
                 setRows(updatedRows);
                 createTransaction(rows[i]).then((responseT) => {
-                    alert(JSON.stringify(responseT.data));
-
-                    setJournalData({
-                        "journal": '',
-                        "branchId": '',
-                        "partnerId": '',
-                        "date": '',
-                        "total": 0,
-                        "reference": '',
-                        "status": "Posted"
-                    });
-                    setRows([{
-                        "journalEntriesId": '',
-                        "accountId": '',
-                        "label": '',
-                        "debit": 0,
-                        "credit": 0
-                    }]);
                 })
 
             }
+            setJournalData({
+                "journal": '',
+                "branchId": '',
+                "partnerId": '',
+                "date": '',
+                "total": 0,
+                "reference": '',
+                "status": "Posted"
+            });
+            setRows([]);
         }).catch(e => {
             console.error(e);
         })
@@ -155,10 +158,10 @@ const MakeJournal = () => {
 
             <div className="container">
                 <div className="container-fluid p-0 center">
-                    <div className="row w-100">
+                    <div className="row w-100 box-shadow p-3">
                         <div className="col-12">
                             {formHeader()}
-                            <div className="border bg-white w-100 rounded">
+                            <div className="bg-white w-100 rounded">
                                 <div className="row">
                                     <div className="col-md-6 col-12">
                                         <div className='d-block text-start fs-6 bg-white px-4 py-2'>
@@ -196,6 +199,7 @@ const MakeJournal = () => {
                                                 name='date'
                                                 value={journalData.date}
                                                 require="true"
+                                                fontSize={14}
                                                 onChange={handleChanges}
                                                 error={errors.date}
                                             />
@@ -204,6 +208,7 @@ const MakeJournal = () => {
                                                 id="journal"
                                                 type='text'
                                                 name='journal'
+                                                fontSize={14}
                                                 value={journalData.journal}
                                                 require="true"
                                                 onChange={handleChanges}
@@ -225,94 +230,92 @@ const MakeJournal = () => {
                                         </li>
 
                                     </ul>
-                                    <div class="tab-content border-0" id="myTabContent">
-                                        <div class="border-0 tab-pane show active " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                                            <div className="p-3">
-                                                <table className="border-0 table w-100 f-14">
-                                                    <thead>
-                                                        <tr className="">
-                                                            <Th className="py-3" resizable columnWidth={300}>Account</Th>
-                                                            <Th className="py-3" resizable>Label</Th>
-                                                            <Th className="py-3">Debit</Th>
-                                                            <Th className="py-3">Credit</Th>
-                                                            <Th className="py-3" columnWidth={50}>Action</Th>
+                                    <div class="tab-content border-0 h-100" id="myTabContent">
+                                        <div class="border-0 tab-pane show active h-100" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0" style={{ overflow: 'visible' }}>
+                                            <table className="table h-100 w-100">
+                                                <thead  >
+                                                    <tr className="py-3">
+                                                        <Th resizable columnWidth={300} >Account</Th>
+                                                        <Th resizable>Label</Th>
+                                                        <Th columnWidth={100}>Debit</Th>
+                                                        <Th columnWidth={100}>Credit</Th>
+                                                        <Th columnWidth={50}>Action</Th>
+                                                    </tr>
+                                                </thead>
+                                                <Tbody>
+                                                    {rows.map((row, index) => (
+                                                        <tr key={index}>
+                                                            <td className="py-3" style={{ overflow: 'visible' }}>
+                                                                <div className="dropdown cursor-i p-0">
+                                                                    <input type="text"
+                                                                        className="w-100 d-flex text-secondary input-box rounded-0 cursor-i"
+                                                                        data-bs-toggle="dropdown"
+                                                                        // style={{ height: '25px' }}
+                                                                        aria-expanded="false"
+                                                                        value={acName[index] ? acName[index].name : "Select Account"}
+                                                                    />
+                                                                    <ul className="dropdown-menu w-100 box-shadow f-14" style={{ maxHeight: '300px', overflowY: 'scroll' }}>
+                                                                        {account.map(a => (
+                                                                            <li key={a.id}>
+                                                                                <a
+                                                                                    className="dropdown-item pointer"
+                                                                                    onClick={() => {
+                                                                                        const updatedRows = [...rows];
+                                                                                        updatedRows[index]["accountId"] = a.id;
+
+                                                                                        // Set the selected account name for the specific row
+                                                                                        const updatedAcName = [...acName];
+                                                                                        updatedAcName[index] = { name: a.code + " " + a.accountName };
+                                                                                        setRows(updatedRows);
+                                                                                        setAcName(updatedAcName);
+                                                                                    }}
+                                                                                >
+                                                                                    <span className="text-secondary">{a.code}</span> {" "}{a.accountName}
+                                                                                </a>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="text"
+                                                                    name="label"
+                                                                    value={row.label || ""}
+                                                                    onChange={(e) => handleChange(index, e)}
+                                                                    className="input-box w-100"
+                                                                    placeholder="type yout label"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="number"
+                                                                    name="debit"
+                                                                    value={row.debit}
+                                                                    onChange={(e) => handleChange(index, e)}
+                                                                    className="input-box w-100"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    type="number"
+                                                                    name="credit"
+                                                                    value={row.credit}
+                                                                    onChange={(e) => handleChange(index, e)}
+                                                                    className="input-box w-100"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <span className="pointer" onClick={() => removeRow(index)}>
+                                                                    <i class="fa-solid fa-trash-can remove"></i>
+                                                                </span>
+                                                            </td>
                                                         </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {rows.map((row, index) => (
-                                                            <tr key={index}>
-                                                                <td className="py-3" style={{ overflow: 'visible' }}>
-                                                                    <div className="dropdown cursor-i p-0">
-                                                                        <input type="text"
-                                                                            className="p-0 w-100 d-flex text-secondary input-box rounded-0 cursor-i"
-                                                                            data-bs-toggle="dropdown"
-                                                                            // style={{ height: '25px' }}
-                                                                            aria-expanded="false"
-                                                                            value={acName[index] ? acName[index].name : "Select Account"}
-                                                                        />
-                                                                        <ul className="dropdown-menu w-100 box-shadow f-14" style={{ maxHeight: '200px', overflow: 'scroll' }}>
-                                                                            {account.map(a => (
-                                                                                <li key={a.id}>
-                                                                                    <a
-                                                                                        className="dropdown-item pointer"
-                                                                                        onClick={() => {
-                                                                                            const updatedRows = [...rows];
-                                                                                            updatedRows[index]["accountId"] = a.id;
+                                                    ))}
 
-                                                                                            // Set the selected account name for the specific row
-                                                                                            const updatedAcName = [...acName];
-                                                                                            updatedAcName[index] = { name: a.code + " " + a.accountName };
-                                                                                            setRows(updatedRows);
-                                                                                            setAcName(updatedAcName);
-                                                                                        }}
-                                                                                    >
-                                                                                        <span className="text-secondary">{a.code}</span> {" "}{a.accountName}
-                                                                                    </a>
-                                                                                </li>
-                                                                            ))}
-                                                                        </ul>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <input
-                                                                        type="text"
-                                                                        name="label"
-                                                                        value={row.label || ""}
-                                                                        onChange={(e) => handleChange(index, e)}
-                                                                        className="input-box w-100"
-                                                                        placeholder="type yout label"
-                                                                    />
-                                                                </td>
-                                                                <td>
-                                                                    <input
-                                                                        type="number"
-                                                                        name="debit"
-                                                                        value={row.debit}
-                                                                        onChange={(e) => handleChange(index, e)}
-                                                                        className="input-box w-100"
-                                                                    />
-                                                                </td>
-                                                                <td>
-                                                                    <input
-                                                                        type="number"
-                                                                        name="credit"
-                                                                        value={row.credit}
-                                                                        onChange={(e) => handleChange(index, e)}
-                                                                        className="input-box w-100"
-                                                                    />
-                                                                </td>
-                                                                <td>
-                                                                    <span className="pointer" onClick={() => removeRow(index)}>
-                                                                        <i class="fa-solid fa-trash-can remove"></i>
-                                                                    </span>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-
-                                                    </tbody>
-                                                </table>
-                                                <button className="button add border-0 border-bottom" onClick={addRow}>Add Line</button>
-                                            </div>
+                                                </Tbody>
+                                            </table>
+                                            <button className="button add border-0 border-bottom" onClick={addRow}>Add Line</button>
                                         </div>
                                         <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
 
@@ -324,7 +327,7 @@ const MakeJournal = () => {
                                 </div>
 
                             </div>
-                            <h6 className="bg-white text-end p-3">Total : {journalData.total}</h6>
+                            <h6 className="bg-white text-end mt-3">Total : {journalData.total}</h6>
                         </div>
 
                     </div>

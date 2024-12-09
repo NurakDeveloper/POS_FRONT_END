@@ -67,12 +67,8 @@ const Login = () => {
         const obj = { username, password };
         loginAccount(obj).then((reponse) => {
             const encryptUser = encryptData(reponse.data, secretkey);
-            Cookies.set("user-data", encryptUser, { expires: 1 });
-            Cookies.set("user_id", reponse.data.userId, { expires: 1 });
-            // if (reponse.data.data.companyID) {
-            //     Cookies.set("branchId", reponse.data.data.companyID);
-            // }
-            alert("success");
+            Cookies.set("user-data", encryptUser);
+            Cookies.set("user_id", reponse.data.userId);
             location.reload();
         }).catch(error => {
             alert(error);

@@ -46,10 +46,17 @@ import MonthSaleReport from './layout/page/report/monthlysalereport/MonthSaleRep
 import BestSellingMenuItemsChart from './layout/page/report/bestsellingproduct/BestSellingMenuItemsChart'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { checkingTypeOfUser } from './api/AppConfig'
+import { userObject } from './api/AppConfig'
+import CategoriesForm from './layout/form/inventory/CategoriesForm'
 function App() {
   const [userName, setUserName] = useState();
   const [role, setRole] = useState();
   const [profile, setProfile] = useState();
+  useEffect(() => {
+    // setUserName(userObject().userName ? userObject().userName : 'No User Please login');
+    // setRole(userObject().role);
+    // setProfile(userObject().image);
+  }, [])
   useEffect(() => {
     applicationViewer();
   }, [userName])
@@ -220,6 +227,9 @@ function App() {
               <div className="app-page">
                 <Routes>
                   <Route path='/' element={<Dashboard UserName={userName} />} />
+                  {/* // Categories */}
+                  <Route path='/create-category' element={<CategoriesForm />} />
+                  <Route path='update-category/:id' element={<CategoriesForm />} />
                   <Route path='/desk' element={<Desk />} />
                   <Route path='/list-item' element={<Item />} />
                   <Route path='/create-item' element={<InsertItem />} />
@@ -239,7 +249,6 @@ function App() {
                   <Route path='/inventory' element={<Inventory />} />
                   <Route path='/accountant' element={<Accountant />} />
                   <Route path='/reporting' element={<Report />}>
-
                     <Route path='' element={<NetIncomeChart />} />
                     <Route path='net-income' element={<NetIncomeChart />} />
                     <Route path='payment-method' element={<PaymentMethod />} />

@@ -152,12 +152,12 @@ const EmployeeDetail = () => {
                             <div className="form-heder w-100 bg-white" style={{ maxHeight: '100%' }}>
                                 <form className="d-flex h-100" >
                                     <div className='start'>
-                                        <div className='center' style={{ width: '150px', overflow: 'hidden' }}>
-                                            <img src={`${profilePath}${employeeData.image}`} alt="" className="w-100 rounded" />
+                                        <div className='center rounded box-shadow' style={{ height: '150px', width: '200px', overflow: 'hidden' }}>
+                                            <img src={`${profilePath}${employeeData.image}`} alt="" className="h-100 rounded" />
                                         </div>
                                         <div className='w-100 ps-4'>
                                             <div className="fs-4">{employeeData.firstName} {employeeData.lastName}</div>
-                                            <div className="f-14 text-secondary"> softwere engineer</div>
+                                            <div className="f-14 text-secondary">position / softwere engineer</div>
                                         </div>
                                     </div>
                                 </form>
@@ -165,17 +165,12 @@ const EmployeeDetail = () => {
                             </div>
                             <div className="row">
                                 <div className="col-md-6 col-12">
-                                    <div className='d-block text-start fs-6 bg-white py-2'>
-                                        <Text title='Compnay' value={getCompanyName(employeeData.companyID)} fontSize={14} />
-                                        <Text title='Employee Address' value={employeeData.address} fontSize={14} />
-                                        <Text classValue={'pointer'} title='Manager ? ' value={getManagerName(employeeData.managerID)} fontSize={14} click={() => navigate(`/employee-detail/${employeeData.managerID}`)} />
-                                        <Text title='Work Email' value={employeeData.email} fontSize={14} />
-                                    </div>
+                                    <Text title='Compnay' value={getCompanyName(employeeData.companyID)} fontSize={14} />
+                                    <Text title='Employee Address' value={employeeData.address} fontSize={14} />
+                                    <Text classValue={'pointer'} title='Manager ? ' value={getManagerName(employeeData.managerID)} fontSize={14} click={() => navigate(`/employee-detail/${employeeData.managerID}`)} />
+                                    <Text title='Work Email' value={employeeData.email} fontSize={14} />
                                 </div>
                                 <div className="col-md-6 col-12">
-                                    <div>
-
-                                    </div>
                                     <Text title='Stat Working' value={formatDate(employeeData.startWorkingDate)} fontSize={14} />
                                     <Text title='Contac phone ' value={employeeData.contact} fontSize={14} />
 

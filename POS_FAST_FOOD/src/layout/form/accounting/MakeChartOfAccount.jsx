@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { createAccount } from "../../../api/Account";
 import { getAllAccountType } from "../../../api/AccountType";
+import CustomCommoBox from "../../../components/select/CustomCommoBox";
+import InputValidation from "../../../components/input/InputValidation";
+import { IoSaveSharp } from "react-icons/io5";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import { useNavigate, useParams } from "react-router-dom";
+
 
 const MakeChartOfAccount = () => {
     const [acType, setAcType] = useState([]);
     const [acTypeName, setAcTypeName] = useState([]);
-
+    const { id } = useParams()
 
     useEffect(() => {
         getAllAccountType().then((response) => {
@@ -19,12 +25,31 @@ const MakeChartOfAccount = () => {
         accountName: '',
         currency: '',
     });
+    const [errors, setErrors] = useState([]);
+    function validaiton() {
+        const newErrors = {}
+        if (!accountData.accountTypeId) {
+            newErrors.accountType = 'Account type is require'
+        }
+        // if(!accountData.branchId){
+        //     newErrors.branch = 'Account type is require'
+        // }
+        if (!accountData.code) {
+            newErrors.code = 'Code  is require'
+        }
+        if (!accountData.accountName) {
+            newErrors.accountName = 'AccountName  is require'
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length == 0;
+    }
     const handleChange = (e) => {
         const { name, value } = e.target;
         setAccountData({ ...accountData, [name]: value });
     };
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!validaiton()) return
         createAccount(accountData).then((reponse) => {
 
         }).catch(error => {
@@ -32,128 +57,86 @@ const MakeChartOfAccount = () => {
         })
         // Add your form submission logic here, such as an API call
     };
+    const handleItemSelected = (item) => {
+        setAccountData({ ...accountData, ["accountTypeId"]: item.id });
+    };
+    const navigate = useNavigate();
+    function formHeader() {
+        return (
+            <div className='form-header-content p-0 py-3'>
+                <div className="start">
+                    <button type="button" class="button cancel box-shadow " onClick={() => navigate('/chart-of-account')}><IoIosArrowRoundBack /><span className='px-2'>Cancel</span> </button>
+                    <div className="ps-3 fs-4 ms-2 border-start text-secondary">{id ? 'Update account' : 'Create new account'}</div>
+                </div>
+                <div className='d-flex'>
+                    {/* <button type="button" class="button preview box-shadow " onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button> */}
+                    <div className='px-3 pe-0'>
+                        <button type="button" class="button add box-shadow px-4" onClick={handleSubmit}><IoSaveSharp /><span className='px-2'>Save</span> </button>
+                    </div>
+                </div>
 
+
+            </div>
+        );
+    }
     return (
         <>
 
             <form action="">
-                <div className="container-fluid p-0 center">
-                    <div className="row w-100">
-                        <div className="col-xl-9" style={{ height: '900px' }}>
-                            <div class="btn-group my-2" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-outline-secondary px-4" onClick={handleSubmit}><i class="fa-solid fa-floppy-disk"></i></button>
-                                <button type="button" class="btn btn-outline-secondary"><i class="fa-solid fa-circle-xmark"></i></button>
-                            </div>
-                            <div className="border bg-white w-100 rounded">
-                                <div className="d-flex h-100" >
-                                    <div className='start w-50 p-2'>
-                                        <div className='w-100 px-4'>
-                                            <div className="fs-2">
-                                                <p></p>
-                                            </div>
+                <div className="container p-3 center ">
+                    <div className="row w-100 p-3 box-shadow">
+                        <div className="col-12">
+                            {formHeader()}
+                            <div className="bg-white w-100 rounded">
+                                <div className="row">
+                                    <div className='d-block col-md-6 col-12'>
+                                        <InputValidation
+                                            label='Account code'
+                                            id='code'
+                                            fontSize={14}
+                                            name='code'
+                                            type='text'
+                                            value={accountData.code}
+                                            onChange={handleChange}
+                                            error={errors.code}
+                                        />
+                                        <CustomCommoBox
+                                            label="Select account type"
+                                            items={acType}
+                                            fontSize={14}
+                                            labelKeys={["accountType"]}
+                                            searchKey='accountType'
+                                            onItemSelected={handleItemSelected}
 
-                                        </div>
+                                        />
+
+
+
+                                    </div>
+                                    <div className='d-block col-md-6 col-12'>
+                                        <InputValidation
+                                            fontSize={14}
+                                            label='Account name'
+                                            id='name'
+                                            name='accountName'
+                                            type='text'
+                                            value={accountData.accountName}
+                                            onChange={handleChange}
+                                            error={errors.accountName}
+                                        />
+
+                                        {/* <CustomCommoBox
+                                            label="Select a Fruit"
+                                            items={branch}
+                                            labelKeys={["branchName"]}
+                                            searchKey='branchName'
+                                            onItemSelected={handleItemSelected}
+                                        /> */}
+
                                     </div>
 
                                 </div>
-                                <div className="d-flex">
-                                    <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <label htmlFor='p-name' className='w-25 text-start'>Code  </label>
-                                            <input type="text" id='p-name' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
-                                                name='code'
-                                                value={accountData.code}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start '>Branch   </p>
-                                            <div class="dropdown w-75">
-                                                <button className=" btn w-100 d-flex text-secondary input-box rounded-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <p className="w-75 text-start"></p>
-                                                    <i class=" w-25 text-end">&#10141;</i>
-                                                </button>
-                                                <ul className="dropdown-menu w-100 box-shadow">
-                                                    {/* <li><a className="dropdown-item"
-                                                onClick={() => {
-                                                    setEmployeeData((prevData) => ({
-                                                        ...prevData,
-                                                        ["companyID"]: 1
-                                                    }));
-                                                }}>Phnom Penh</a></li> */}
-                                                    <li><a className="dropdown-item pointer" onClick={() => {
-                                                        setAccountData({ ...accountData, ["branchId"]: 1 });
-                                                    }}>Phnom Penh</a></li>
-                                                    <li><a className="dropdown-item pointer"
-                                                        onClick={() => {
-                                                            setAccountData({ ...accountData, ["branchId"]: 2 });
-                                                        }}>Bathambong</a></li>
 
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div className='d-block text-start bg-white px-4 py-2 w-50 mt-1'>
-
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <label htmlFor='j-date' className='w-25 text-start'>Account name  </label>
-                                            <input type="text" id='j-date' className='w-75 text-start text-secondary input-box rounded-0' placeholder=""
-                                                name='accountName'
-                                                value={accountData.accountName}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                            <p className='w-25 text-start'>Account type  </p>
-                                            <div class="dropdown w-75">
-                                                <button className=" btn w-100 d-flex text-secondary input-box rounded-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <p className="w-75 text-start">{acTypeName}</p>
-                                                    <i class=" w-25 text-end">&#10141;</i>
-                                                </button>
-                                                <ul className="dropdown-menu w-100 box-shadow">
-                                                    {
-                                                        acType.map(at =>
-                                                            <li><a className="dropdown-item pointer"
-                                                                onClick={() => {
-                                                                    setAccountData({ ...accountData, ["accountTypeId"]: at.id });
-                                                                    setAcTypeName(at.accountType)
-                                                                }} ><span className="f-14 text-seondary"></span> {" "} {at.accountType}</a></li>
-                                                        )
-                                                    }
-
-
-                                                </ul>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div className="col-md-3" style={{ height: '900px' }}>
-                            <div className="card border-0 rounded bg-white h-100 w-100 p-2">
-                                <div className='d-flex p-2 border rounded start pointer' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
-                                    </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>Dara Chhun</div>
-                                        <div className='text-secondary'>Seller / pos</div>
-                                        <div className='f-16 hover-line pointer'>mobile : +885990340943</div>
-                                    </div>
-                                </div>
-                                <div className='d-flex p-2 border rounded start pointer mt-2' style={{ height: '90px' }}>
-                                    <div className="admin-img center" style={{ height: '90%' }}>
-                                        <img src="https://cdn.pixabay.com/photo/2022/09/08/15/16/cute-7441224_640.jpg" alt="" className='h-100' />
-                                    </div>
-                                    <div className="text f-14 px-3">
-                                        <div className='f-16'>General</div>
-                                        <div className='text-secondary'>membership : no</div>
-                                        <div className='f-16 hover-line pointer'>Contact : +885990340943</div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

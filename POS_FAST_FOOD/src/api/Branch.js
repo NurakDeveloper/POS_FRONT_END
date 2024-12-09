@@ -1,20 +1,40 @@
 import axios from "axios";
 import { hostName } from "./host";
-import Cookies from "js-cookie";
 import { getToken } from "./AppConfig";
 
-
-
+// Configure API base URL and token
 const domainName = hostName();
-const URL = "http://" + domainName + ":8085/api/branch/"
+const BASE_URL_BRANCH = `http://${domainName}:8085/api/branch`;
+
 const token = getToken();
-// Set default headers for axios if a token is available
-if (token) {
-    axios.defaults.headers.common['Authorization'] = `nurak ${token}`;
-}
-export const getAllBranch = () => axios.get(URL + 'list-branch');
-export const getBranchById = (id) => axios.get(URL + 'get/' + id);
-export const removeBranchById = (id) => axios.delete(URL + 'remove/' + id);
+const headers = token ? { "Authorization": `nurak ${token}` } : {};
+
+// Branch API Functions
+
+// Get all branches
+export const getAllBranch = () => {
+    return axios.get(`${BASE_URL_BRANCH}/list-branch`, { headers });
+};
+
+// Get branch by ID
+export const getBranchById = (id) => {
+    return axios.get(`${BASE_URL_BRANCH}/get/${id}`, { headers });
+};
+
+// Remove branch by ID
+export const removeBranchById = (id) => {
+    return axios.delete(`${BASE_URL_BRANCH}/remove/${id}`, { headers });
+};
+
+// Add a new branch
+export const createBranch = (branch) => {
+    return axios.post(`${BASE_URL_BRANCH}/create`, branch, { headers });
+};
+
+// Update branch by ID
+export const updateBranch = (id, branch) => {
+    return axios.put(`${BASE_URL_BRANCH}/update/${id}`, branch, { headers });
+};
 
 export const getBranchId = () => {
     try {

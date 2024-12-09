@@ -5,11 +5,19 @@ import * as XLSX from 'xlsx';
 import { el } from 'date-fns/locale';
 import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../../components/table/DataGrid'
 import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
-
+import { hostName } from '../../../../api/host';
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 const Customer = () => {
 
     const [customer, setCustomer] = useState([]);
-
+    const generateRandomColor = () => {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        return `rgba(${r},${g},${b},2)`; // Random color with 60% opacity
+    };
+    const domainName = hostName();
+    const imageUrl = `http://${domainName}:8085/api/images/`
 
     function getCustomer() {
         getAllCustomer().then((response) => {
@@ -20,6 +28,29 @@ const Customer = () => {
             console.error(error);
         })
     }
+    const rowsPerPage = 10; // Define how many rows to display per page
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    // Slice the categories array to display only the current page's rows
+    const currentData = customer.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(customer.length / rowsPerPage);
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
+    };
 
 
     const ExportExcel = (data, fileName) => {
@@ -53,31 +84,44 @@ const Customer = () => {
     useEffect(() => {
         getCustomer();
     }, [])
-
-
     const goto = useNavigate();
     function listCard() {
         return (
             <div className="row w-100">
 
-                {/* {
-                    customer.map(o =>
-                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12">
-                            <div className="card bg-white p-0 pointer mb-2 border"
+                {
+                    currentData.map(o =>
+                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-1">
+                            <div className="card bg-white p-0 pointer border"
                                 onClick={() => goto(`/employee-detail/${o.id}`)}
                             >
-                                <div className="card-body p-0 inv-card rounded">
+                                <div className="card-body p-0 rounded">
                                     <div className="d-flex">
                                         <div className="center p-1" style={{ width: '40%' }}>
-                                            <div className="center rounded" style={{ height: '200px', overflow: 'hidden' }}>
-                                                <img src={`/src/assets/image/${o.image}`} alt="" className='h-100 rounded' />
+                                            <div className="center rounded" style={{ height: '150px', width: '100%', overflow: 'hidden' }}>
+                                                {
+                                                    o.image ?
+                                                        (<img src={`${imageUrl}${o.image}`} alt="" className='h-100 rounded' />)
+                                                        : (
+                                                            // if no image
+                                                            <div className="h-100 text-white w-100 fs-1 center" style={{ backgroundColor: generateRandomColor() }}>
+                                                                {o.firstName.substring(0, 1)}{o.lastName.substring(0, 1)}
+                                                            </div>
+                                                        )
+                                                }
+
                                             </div>
                                         </div>
                                         <div className='f-12 ps-4 py-3' style={{ width: '60%' }}>
                                             <div className='f-16'>{o.firstName} {o.lastName}</div>
-                                            <div className='text-secondary f-14'>{findBranchName(o.companyID)}.</div>
-                                            <div><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email}</div>
-                                            <div className='text-start'><i class="fa-solid fa-phone px-1 ps-0"></i>{o.mobile}</div>
+                                            <div className='text-secondary f-14'>
+                                                {o.membershipStatus}
+                                            </div>
+
+                                            <div className='text-secondary f-12'>
+                                                <i class="fa-solid fa-phone px-1 ps-0"></i>{o.phoneNumber}
+                                            </div>
+                                            <div className='py-2 f-12'><span className='text-badges-warning'><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email} </span></div>
 
 
                                         </div>
@@ -88,7 +132,7 @@ const Customer = () => {
                             </div>
                         </div>
                     )
-                } */}
+                }
             </div>
         )
     }
@@ -183,11 +227,11 @@ const Customer = () => {
                                 >
                                     JoinDate
                                 </Th>
-                                <Th resizable columnWidth={50}>Membership</Th>
+                                <Th columnWidth={100}>Membership</Th>
                             </Thead>
                             <tbody>
                                 {
-                                    customer.map((f, i) =>
+                                    currentData.map((f, i) =>
                                         <tr className="pointer" onClick={() => goto(`/item-detail`)}>
                                             <td>
                                                 <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
@@ -216,19 +260,6 @@ const Customer = () => {
         )
 
     }
-    const [itemView, setItemView] = useState();
-
-
-    function setView(index) {
-        if (index == 1) {
-            setItemView(() => listCard())
-        } else {
-            setItemView(() => listTable())
-        }
-    }
-    useEffect(() => {
-        setView(2);
-    }, [customer])
 
 
     function menu() {
@@ -268,15 +299,37 @@ const Customer = () => {
 
                 {/* Right Section */}
                 <div className="list-header-right">
+                    <span className="page-info f-14 text-secondary">
+                        {currentPage} / {totalPages}
+                    </span>
+                    <div className="pagination">
+                        <div className='pe-2'>
+                            <button
+                                className="button previous"
+                                onClick={handlePrevious}
+                                disabled={currentPage === 1}
+                            >
+                                <SlArrowLeft />
+                            </button>
+                        </div>
+
+                        <button
+                            className="button next"
+                            onClick={handleNext}
+                            disabled={currentPage === totalPages}
+                        >
+                            <SlArrowRight />
+                        </button>
+                    </div>
                     {/* Print Button */}
 
-                    <button className="list-header-button list box-shadow" onClick={() => setView(2)}>
+                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(true)}>
                         <FaThList className="list-header-icon" />
                         List
                     </button>
 
                     {/* Export Button */}
-                    <button className="list-header-button list box-shadow" onClick={() => setView(1)}>
+                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(false)}>
                         <FaThLarge className="list-header-icon" />
                         Card
                     </button>
@@ -289,6 +342,7 @@ const Customer = () => {
             </div>
         );
     }
+    const [isTable, setIsTable] = useState(false);
     return (
         <>
             <div className='w-100'>
@@ -299,7 +353,7 @@ const Customer = () => {
 
                 </div>
                 <div className="center">
-                    {itemView}
+                    {isTable ? listTable() : listCard()}
                 </div>
 
             </div>

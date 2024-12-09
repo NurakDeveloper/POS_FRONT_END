@@ -460,6 +460,38 @@ input:focus {
     width: 250px;
 }
 
+.h-10 {
+    height: 10%;
+}
+
+.h-40 {
+    height: 40%;
+}
+
+.h-55 {
+    height: 55%;
+}
+
+.h-45 {
+    height: 45%;
+}
+
+.h-60 {
+    height: 60%;
+}
+
+.h-20 {
+    height: 20%;
+}
+
+.h-90 {
+    height: 90%;
+}
+
+.h-80 {
+    height: 80%;
+}
+
 .active-category {
     text-overflow: clip;
     background: #fffcf8;

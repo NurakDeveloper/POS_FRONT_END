@@ -1,11 +1,11 @@
 import React from "react";
 import "./inputvalidation.css";
 
-const InputValidation = ({ label, id, name, type, value, onChange, error, fontSize, require }) => {
+const InputValidation = ({ label, id, name, type, value, onChange, error, fontSize, require, placeHolder }) => {
     return (
         <div className="input-wrapper">
             <label htmlFor={id} className="input-label"
-                style={{ fontSize: `${fontSize}px` }}
+                style={{ fontSize: `${fontSize - 1}px` }}
             >
                 <span>{label}</span>
                 <span className="text-danger ps-3">{require ? '*' : ''}</span>
@@ -18,10 +18,11 @@ const InputValidation = ({ label, id, name, type, value, onChange, error, fontSi
                 name={name}
                 value={value}
                 onChange={onChange}
+                placeholder={placeHolder}
             />
-            <span className="validation-error"
+            {error ? <span className="validation-error"
                 style={{ fontSize: `${fontSize - 2}px` }}
-            >{error}</span>
+            >{error}</span> : ''}
         </div>
     );
 };

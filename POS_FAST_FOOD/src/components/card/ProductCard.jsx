@@ -6,12 +6,12 @@ const ProductCard = ({ image, name, price, category, onClick }) => {
     const domainName = hostName();
     const imageUrl = `http://${domainName}:8085/api/images/`
     return (
-        <div className="product-card pb-3" onClick={onClick}>
+        <div className="product-card" onClick={onClick}>
             <div className="center p-2 rounded" style={{ height: '120px', overflow: 'hidden' }}>
                 <img src={`${imageUrl}${image}`} alt={name} className="h-100 rounded" />
             </div>
-            <div className="card-body p-2">
-                <div className="product-name f-12">{name}</div>
+            <div className="card-body p-2 pt-0">
+                <div className="product-name f-14">{name}</div>
 
                 <p className="product-price f-16">${price ? price.toFixed(2) : ''}</p>
             </div>

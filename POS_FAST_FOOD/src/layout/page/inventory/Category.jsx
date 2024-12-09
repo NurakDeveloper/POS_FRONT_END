@@ -2,21 +2,28 @@ import { Link } from 'react-router-dom'
 import './item.css'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getAllCategory } from '../../../api/Category'
+import { deleteCategoryById, getAllCategory } from '../../../api/Category'
 import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../components/table/DataGrid'
 import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl'
+import { RiEditFill } from 'react-icons/ri'
+import RemoveMessage from '../../../components/alert/RemoveMessage'
+import { hostName } from '../../../api/host'
 const Category = () => {
 
     const [categories, setCategories] = useState([]);
-
+    const domainName = hostName();
+    const categoryPathImage = `http://${domainName}:8085/api/images/`;
     useEffect(() => {
+        getCategory();
+    }, [])
+    function getCategory() {
         getAllCategory().then((response) => {
             setCategories(response.data);
         }).catch(e => {
             console.error(e);
         })
-    }, [])
+    }
     const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
 
     const handleSort = (key) => {
@@ -94,66 +101,15 @@ const Category = () => {
             setCurrentPage((prevPage) => prevPage - 1);
         }
     };
-    // function listTable() {
-    //     return (
-    //         <>
-    //             <DataGrid>
-    //                 <table>
-    //                     <Thead>
-    //                         <Th columnWidth={20}>
-    //                             <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
-    //                         </Th>
-    //                         <Th
-    //                             onSort={() => handleSort("id")}
-    //                             sortDirection={sortConfig.key === "id" ? sortConfig.direction : ""}
-
-    //                             columnWidth={20}
-    //                         >
-    //                             No
-    //                         </Th>
-    //                         <Th
-    //                             onSort={() => handleSort("name")}
-    //                             sortDirection={
-    //                                 sortConfig.key === "name" ? sortConfig.direction : ""
-    //                             }
-    //                             resizable
-    //                         // columnWidth={200}
-    //                         // columnWidth={150}
-
-    //                         >
-    //                             Category
-    //                         </Th>
-    //                         <Th
-    //                             onSort={() => handleSort("description")}
-    //                             sortDirection={
-    //                                 sortConfig.key === "description" ? sortConfig.direction : ""
-    //                             }
-    //                             resizable
-    //                         >
-    //                             Description
-    //                         </Th>
-
-
-    //                     </Thead>
-    //                     <Tbody>
-    //                         {
-    //                             categories.map((f, i) =>
-    //                                 <tr className="pointer" onClick={() => goto(`/item-detail`)}>
-    //                                     <td>
-    //                                         <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
-    //                                     </td>
-    //                                     <td className='py-3'>{i + 1}</td>
-    //                                     <td>{f.name}</td>
-    //                                     <td>{f.description}</td>
-    //                                 </tr>
-    //                             )
-    //                         }
-    //                     </Tbody>
-    //                 </table>
-    //             </DataGrid>
-    //         </>
-    //     )
-    // }
+    const [isRemoveCategories, setIsRemoveCategories] = useState(false);
+    const [categoryId, setCategoryId] = useState();
+    function removeCategroy(id) {
+        deleteCategoryById(id).then((reponse) => {
+            getCategory()
+        }).catch(e => {
+            alert(e);
+        })
+    }
     function listTable() {
 
 
@@ -190,6 +146,9 @@ const Category = () => {
                             >
                                 Description
                             </Th>
+                            <Th columnWidth={30}>
+                                Action
+                            </Th>
                         </Thead>
                         <Tbody>
                             {currentData.map((f, i) => (
@@ -207,8 +166,31 @@ const Category = () => {
                                         />
                                     </Td>
                                     <Td className="py-3">{startIndex + i + 1}</Td>
-                                    <Td>{f.name}</Td>
+                                    <Td>
+                                        <div className="d-flex start">
+                                            <div className="" style={{ height: '40px' }}>
+                                                <img src={`${categoryPathImage}${f.image}`} alt="" className="h-100" />
+                                            </div>
+                                            <div className='ps-3'>
+                                                {f.name}
+                                            </div>
+                                        </div>
+                                    </Td>
                                     <Td>{f.description}</Td>
+                                    <td>
+                                        <div className="between">
+                                            <span className='pointer text-badges-danger' onClick={() => {
+                                                setCategoryId(f.id);
+                                                setIsRemoveCategories(true);
+                                            }}>
+                                                <i class="fa-solid fa-trash-can " ></i>
+                                            </span>
+                                            <span className='pointer text-badges-green' onClick={() => navigate(`/update-category/${f.id}`)}>
+                                                <RiEditFill />
+                                            </span>
+
+                                        </div>
+                                    </td>
                                 </Tr>
                             ))}
                         </Tbody>
@@ -232,13 +214,14 @@ const Category = () => {
             setItemView(() => listTable())
         }
     }
+    const navigate = useNavigate();
     function menu() {
         return (
             <div className="list-header-container">
                 {/* Left Section */}
                 <div className="list-header-left">
                     {/* Add New Button */}
-                    <button className="list-header-button add-new box-shadow" >
+                    <button className="list-header-button add-new box-shadow" onClick={() => navigate('/create-category')}>
                         <FaPlus className="list-header-icon" />
                         Add New
                     </button>
@@ -325,6 +308,16 @@ const Category = () => {
 
                 </div>
             </div>
+            <RemoveMessage
+                isOpen={isRemoveCategories}
+                message='Are you sure ?'
+                description='A confirmation message is intended to prompt users before proceeding with a delete action. It clearly informs them of the irreversible nature of the deletion to prevent accidental loss of data or content.'
+                cancelClcik={() => setIsRemoveCategories(false)}
+                acceptedClick={() => {
+                    removeCategroy(categoryId)
+                    setIsRemoveCategories(false)
+                }}
+            />
         </>
     )
 }

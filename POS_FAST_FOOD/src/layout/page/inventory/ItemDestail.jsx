@@ -122,17 +122,14 @@ const ItemDetail = () => {
                                 </div >
 
                                 <div className="border bg-white w-100 rounded p-4">
-                                    <div className="d-flex h-100" >
-                                        <div className='start'>
-                                            <div className='center border rounded box-shadow' style={{ height: '120px', overflow: 'hidden' }}>
-                                                <img src={`http://${domainName}:8085/api/images/${productData.image}`} alt="" className="h-100" />
-                                            </div>
-                                            <div className='w-100 px-4'>
-                                                <div className="fs-2">
-                                                    <p>{productData.productName}</p>
-                                                    <p className='f-14 text-secondary'>{findCategoryName(productData.categoryId)}</p>
-                                                </div>
-
+                                    <div className="d-flex" style={{ height: '200px' }}>
+                                        <div className='center rounded box-shadow' style={{ height: '190px', width: '300px', overflow: 'hidden' }}>
+                                            <img src={`http://${domainName}:8085/api/images/${productData.image}`} alt="" className="h-100" />
+                                        </div>
+                                        <div className='ps-4'>
+                                            <div className="fs-2">
+                                                <p>{productData.productName}</p>
+                                                {/* <p className='fs-4 text-secondary'>{findCategoryName(productData.categoryId)}</p> */}
                                             </div>
                                         </div>
 

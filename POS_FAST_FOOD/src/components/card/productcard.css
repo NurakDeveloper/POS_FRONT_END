@@ -1,11 +1,11 @@
 .product-card {
     background-color: white;
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 230px;
+    height: 210px;
 }
 
 .product-card:hover {
@@ -43,5 +43,5 @@
     align-items: center;
     height: 30px;
     font-weight: 400;
-    color: #fd6b03;
+    color: #d95a00;
 }

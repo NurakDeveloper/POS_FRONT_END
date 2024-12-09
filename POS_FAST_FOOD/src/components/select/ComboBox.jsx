@@ -27,13 +27,14 @@ const ComboBox = ({
     labelKeys.map((key) => option[key]).join(" - "); // Combine keys with a separator.
 
   return (
-    <div className={`combo-box ${className}`}>
+    <div className={`${className} combo-box `}>
       <div
         className={`combo-box-input ${inputClassName}`}
         onClick={toggleDropdown}
         role="button"
         tabIndex="0"
       >
+
         {selectedValue ? formatLabel(selectedValue) : "Select an option"}
         <button className={`arrow ${isOpen ? "rotate" : ""}`}>{isOpen ? "▲" : "▼"}</button>
       </div>

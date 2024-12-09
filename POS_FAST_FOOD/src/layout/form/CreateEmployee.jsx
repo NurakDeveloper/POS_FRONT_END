@@ -9,6 +9,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import InputValidation from "../../components/input/InputValidation";
 import { uploadImage } from "../../api/ImageApi";
 import { hostName } from "../../api/host";
+import CustomCommoBox from "../../components/select/CustomCommoBox";
 
 const CreateEmployee = () => {
     const [employeeData, setEmployeeData] = useState({
@@ -34,6 +35,7 @@ const CreateEmployee = () => {
         updatedDate: '',
         image: ''
     });
+    const [employee, setEmployee] = useState([]);
     const [branchName, setBranchName] = useState('select branch');
     const [branch, setBranch] = useState([]);
     useEffect(() => {
@@ -49,6 +51,7 @@ const CreateEmployee = () => {
             console.error(e);
         })
     }, [])
+    const manager = employee.filter(e => e.managerID == null);
     const { id } = useParams();
     useEffect(() => {
         if (id) {
@@ -103,7 +106,19 @@ const CreateEmployee = () => {
     }
 
     const navigate = useNavigate();
-    const [employee, setEmployee] = useState([]);
+
+    function selectBranch(branch) {
+        setEmployeeData((prevData) => ({
+            ...prevData,
+            ['companyID']: branch.id
+        }));
+    }
+    function selectManager(manager) {
+        setEmployeeData((prevData) => ({
+            ...prevData,
+            ['managerID']: manager.id
+        }));
+    }
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEmployeeData((prevData) => ({
@@ -208,7 +223,7 @@ const CreateEmployee = () => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0; // Returns true if no errors
     };
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState();
     const [file, setFile] = useState(null);
     const handleFileChange = (event) => {
         // set file select from path
@@ -308,7 +323,7 @@ const CreateEmployee = () => {
     }
     function formHeader() {
         return (
-            <div className='form-header-content pt-2'>
+            <div className='form-header-content'>
                 <button type="button" class="button cancel box-shadow " onClick={() => navigate('/employees')}><IoIosArrowRoundBack /><span className='px-2'>Cancel</span> </button>
                 <div className='d-flex'>
                     <button type="button" class="button preview box-shadow " onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
@@ -324,39 +339,52 @@ const CreateEmployee = () => {
     return (
         <>
 
-            <form action="" className="">
-                {formHeader()}
-                <div className="container-fluid border rounded px-3">
+            <form action="" className="p-3">
+
+                <div className="container-fluid box-shadow rounded  d-block p-3">
+                    {formHeader()}
+
                     <div className="row ">
                         <div className="col-12">
                             <div className="form-heder w-100 bg-white p-3 ps-1">
                                 <div className="row" >
                                     <div className='col-xl-6 col-md-6 col-12 '>
-                                        <div className='w-100 h-100'>
-                                            <InputValidation
-                                                label='First Name'
-                                                id='firstName'
-                                                type='text'
-                                                name='firstName'
-                                                value={employeeData.firstName}
-                                                onChange={handleInputChange}
-                                                error={errors.firstName}
-                                                fontSize={14}
-                                                require={'true'}
-                                            />
-                                            <InputValidation
-                                                label='Last Name'
-                                                type='text'
-                                                id='lastName'
-                                                name='lastName'
-                                                value={employeeData.lastName}
-                                                onChange={handleInputChange}
-                                                error={errors.lastName}
-                                                fontSize={14}
-                                                require={'true'}
-                                            />
+                                        <di className="d-flex">
+                                            <div>
+                                                <label htmlFor="fileImage" className=' rounded box-shadow pointer center' style={{ height: '200px', width: '150px', overflow: 'hidden' }}>
+                                                    {/* <img src={`http://localhost:8085/api/images/profile.jpg}`} alt="no image" className="h-100" /> */}
+                                                    <img src={selectedImage ? selectedImage : `${profilePath}${employeeData.image}`} alt="" className="h-100 " />
+                                                    {/* <img src={} alt="" className="w-100 rounded" /> */}
+                                                </label> <br />
 
-                                        </div>
+                                                <span className='validation-error f-12'>{errors.image ? errors.image : ''}</span>
+                                            </div>
+                                            <div className='w-100 h-100 ps-3'>
+                                                <InputValidation
+                                                    label='First Name'
+                                                    id='firstName'
+                                                    type='text'
+                                                    name='firstName'
+                                                    value={employeeData.firstName}
+                                                    onChange={handleInputChange}
+                                                    error={errors.firstName}
+                                                    fontSize={14}
+                                                    require={'true'}
+                                                />
+                                                <InputValidation
+                                                    label='Last Name'
+                                                    type='text'
+                                                    id='lastName'
+                                                    name='lastName'
+                                                    value={employeeData.lastName}
+                                                    onChange={handleInputChange}
+                                                    error={errors.lastName}
+                                                    fontSize={14}
+                                                    require={'true'}
+                                                />
+
+                                            </div>
+                                        </di>
                                     </div>
 
                                     <div className='col-xl-6 col-md-6 col-12 end'>
@@ -365,15 +393,8 @@ const CreateEmployee = () => {
                                                 <input type="file" name="" className='d-none w-100' id="fileImage"
                                                     onChange={handleFileChange}
                                                 />
-
-
                                             </div>
-                                            <label htmlFor="fileImage" className=' rounded py-2 border pointer center' style={{ height: '200px', width: '180px', overflow: 'hidden' }}>
-                                                {/* <img src={`http://localhost:8085/api/images/profile.jpg}`} alt="no image" className="h-100" /> */}
-                                                <img src={selectedImage ? selectedImage : `${profilePath}${employeeData.image}`} alt="" className="h-100 " />
-                                                {/* <img src={} alt="" className="w-100 rounded" /> */}
-                                            </label> <br />
-                                            <span className='validation-error f-12'>{errors.image ? errors.image : ''}</span>
+
                                         </div>
                                     </div>
                                 </div>
@@ -391,93 +412,24 @@ const CreateEmployee = () => {
                                         fontSize={14}
                                     // require={'true'}
                                     />
-                                    <div className='input-wrapper' style={{ fontSize: 14 }}>
-                                        <p className='input-label'>Branch  <span className='text-danger ps-3'>*</span></p>
-                                        <div class=" cursor-i dropdown w-100">
-                                            <p className="w-100 d-flex text-secondary cursor-i input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <input type="text" className='border-0 w-100' value={findBranchName(employeeData.companyID)} />
-                                                <i class="w-25 text-end">&#10141;</i>
-                                            </p>
-                                            <ul className="cursor-i dropdown-menu w-100 box-shadow f-14 border-0">
-                                                {
-                                                    branch.map(c =>
-                                                        <li>
-                                                            <a className="dropdown-item pointer"
-                                                                onClick={() => {
-                                                                    setBranchName(c.branchName)
-                                                                    setEmployeeData((prevData) => ({
-                                                                        ...prevData,
-                                                                        ["companyID"]: c.id
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                {c.city} {" - "} {c.branchName}
-                                                            </a>
-                                                        </li>
-                                                    )
-                                                }
-
-                                            </ul>
-                                            <span className='validation-error f-12'>{errors.companyID ? errors.companyID : ''}</span>
-                                        </div>
-                                    </div>
-                                    {/* <div className='group-input center w-100  pb-3' style={{ fontSize: 14 }}>
-                                        <p className='w-25 text-start '>Position  </p>
-                                        <div class="dropdown w-75">
-                                            <button className=" btn w-100 d-flex text-secondary input-box rounded-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <p className="w-75 text-start"></p>
-                                                <i class=" w-25 text-end">&#10141;</i>
-                                            </button>
-                                            <ul className="dropdown-menu w-100 box-shadow">
-                                                <li><a className="dropdown-item" onClick={() => {
-                                                    setEmployeeData((prevData) => ({
-                                                        ...prevData,
-                                                        ["positionID"]: 1
-                                                    }));
-                                                }}>Software Developer</a></li>
-                                                <li><a className="dropdown-item" onClick={() => {
-                                                    setEmployeeData((prevData) => ({
-                                                        ...prevData,
-                                                        ["positionID"]: 2
-                                                    }));
-                                                }}>HR_Aadmin</a></li>
-                                                <li><a className="dropdown-item" onClick={() => {
-                                                    setEmployeeData((prevData) => ({
-                                                        ...prevData,
-                                                        ["positionID"]: 3
-                                                    }));
-                                                }}>Seller</a></li>
-                                            </ul>
-                                        </div>
-                                    </div> */}
-                                    <div className='input-wrapper' style={{ fontSize: 14 }}>
-                                        <p className='input-label'>Manager  <span className='text-danger ps-3'>*</span></p>
-                                        <div class=" cursor-i dropdown w-100">
-                                            <p className="w-100 d-flex text-secondary cursor-i input-box" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <input type="text" className='border-0 w-100' value={findManager(employeeData.managerID)} />
-                                                <i class="w-25 text-end">&#10141;</i>
-                                            </p>
-                                            <ul className="cursor-i dropdown-menu w-100 box-shadow f-14 border-0">
-                                                {
-                                                    employee.map(e => {
-                                                        if (e.managerID == null) {
-                                                            return (
-                                                                <li><a className="dropdown-item" onClick={() => {
-                                                                    setEmployeeData((prevData) => ({
-                                                                        ...prevData,
-                                                                        ["managerID"]: e.id
-                                                                    }));
-                                                                }}>{e.firstName} {" "} {e.lastName}</a></li>
-                                                            )
-                                                        }
-
-                                                    })
-                                                }
-
-                                            </ul>
-                                            <span className='validation-error f-12'>{errors.managerID ? errors.managerID : ''}</span>
-                                        </div>
-                                    </div>
+                                    <CustomCommoBox
+                                        fontSize={14}
+                                        label='Select Manager'
+                                        items={manager}
+                                        searchKey='firstName'
+                                        labelKeys={['firstName', 'lastName']}
+                                        onItemSelected={selectManager}
+                                        error={errors.manager}
+                                    />
+                                    <CustomCommoBox
+                                        fontSize={14}
+                                        label='Select Branch'
+                                        items={branch}
+                                        searchKey='branchName'
+                                        labelKeys={['branchName']}
+                                        onItemSelected={selectBranch}
+                                        error={errors.branch}
+                                    />
 
                                     <InputValidation
                                         label='Contact'

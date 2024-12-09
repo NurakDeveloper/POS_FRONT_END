@@ -1,10 +1,32 @@
 import axios from "axios";
 import { hostName } from "./host";
+import { getToken } from "./AppConfig";
 
+// Configure API base URL and token
 const domainName = hostName();
-const URL = "http://" + domainName + ":8085/api/customer/"
+const BASE_URL_CUSTOMER = `http://${domainName}:8085/api/customer`;
 
-export const getAllCustomer = () => axios.get(URL + 'list-customer');
-export const getCustomerById = (id) => axios.get(URL + 'get/' + id);
-export const removeCustomerById = (id) => axios.delete(URL + 'remove/' + id);
-export const upadateCustomer = (customer, id) => axios.put(URL + 'update/' + id, customer);
+const token = getToken();
+const headers = token ? { "Authorization": `nurak ${token}` } : {};
+
+// Customer API Functions
+
+// Get all customers
+export const getAllCustomer = () => {
+    return axios.get(`${BASE_URL_CUSTOMER}/list-customer`, { headers });
+};
+
+// Get customer by ID
+export const getCustomerById = (id) => {
+    return axios.get(`${BASE_URL_CUSTOMER}/get/${id}`, { headers });
+};
+
+// Remove customer by ID
+export const removeCustomerById = (id) => {
+    return axios.delete(`${BASE_URL_CUSTOMER}/remove/${id}`, { headers });
+};
+
+// Update customer details
+export const updateCustomer = (customer, id) => {
+    return axios.put(`${BASE_URL_CUSTOMER}/update/${id}`, customer, { headers });
+};

@@ -1,9 +1,44 @@
 import axios from "axios";
 import { hostName } from "./host";
+import { getToken } from "./AppConfig";
+
+// Get the base URL dynamically
 const setHostName = hostName();
-const URL = `http://${setHostName}:8085/api/employee`
-export const getAllEmployee = () => axios.get(URL + '/list-employee');
-export const newEmployee = (employee) => axios.post(`http://${setHostName}:8085/api/employee/create`, employee);
-export const countEmployee = () => axios.get(`http://${setHostName}:8085/api/employee/count`);
-export const getEmployee = (id) => axios.get(URL + '/get/' + id);
-export const updateEmployee = (id, employee) => axios.put(URL + '/update-employee/' + id, employee);
+const BASE_URL = `http://${setHostName}:8085/api/employee`;
+
+// Service functions for employee API
+export const getAllEmployee = () => {
+    const token = getToken();
+    const headers = token ? { "Authorization": `nurak ${token}` } : {};
+    return axios.get(`${BASE_URL}/list-employee`, { headers });
+};
+
+export const newEmployee = (employee) => {
+    const token = getToken();
+    const headers = token ? { "Authorization": `nurak ${token}` } : {};
+    return axios.post(`${BASE_URL}/create`, employee, { headers });
+};
+
+export const countEmployee = () => {
+    const token = getToken();
+    const headers = token ? { "Authorization": `nurak ${token}` } : {};
+    return axios.get(`${BASE_URL}/count`, { headers });
+};
+
+export const getEmployee = (id) => {
+    const token = getToken();
+    const headers = token ? { "Authorization": `nurak ${token}` } : {};
+    return axios.get(`${BASE_URL}/get/${id}`, { headers });
+};
+export const deleteEmployeeById = (id) => {
+    const token = getToken();
+    const headers = token ? { "Authorization": `nurak ${token}` } : {};
+    return axios.delete(`${BASE_URL}/remove/${id}`, { headers });
+};
+
+
+export const updateEmployee = (id, employee) => {
+    const token = getToken();
+    const headers = token ? { "Authorization": `nurak ${token}` } : {};
+    return axios.put(`${BASE_URL}/update-employee/${id}`, employee, { headers });
+};

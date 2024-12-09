@@ -2,13 +2,15 @@ import './postest.css'
 import { useNavigate } from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { SlGrid } from 'react-icons/sl';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { CiShoppingCart } from 'react-icons/ci';
 import { HiOutlineShoppingCart } from 'react-icons/hi2';
+import { userObject } from '../../../api/AppConfig';
 const PosMenu = () => {
+    const [checkUser, setCheckUser] = useState();
     function findTotalOrder() {
         try {
             const orderTables = JSON.parse(Cookies.get("table-order") || '[]'); // Default to empty array
@@ -26,7 +28,12 @@ const PosMenu = () => {
     }
 
     useEffect(() => {
-
+        if (userObject().role == 'ADMIN') {
+            setCheckUser(false)
+        }
+        if (userObject().role == 'SELLER') {
+            setCheckUser(true)
+        }
     }, [])
     const goto = useNavigate();
     return (
@@ -89,20 +96,37 @@ const PosMenu = () => {
                     </div>
                     <div className='navbar-item'>
 
-                        <NavLink
-                            to='/list-product'
-                            className={({ isActive }) =>
-                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
-                            }
-                            onClick={() => {
-                                Cookies.set("admin_viewer", 1);
-                                window.location.href = '/'
-                                location.reload();
-                            }}
-                        >
+                        {checkUser ? (
+                            <NavLink
+                                to='/list-product'
+                                className={({ isActive }) =>
+                                    isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                }
+                                onClick={() => {
+                                    Cookies.remove('user-data');
+                                    window.location.href = '/'
+                                }}
+                            >
 
-                            <i class="fa-solid fa-arrow-right-from-bracket w-100"></i>
-                        </NavLink>
+                                <i class="fa-solid fa-arrow-right-from-bracket w-100 text-danger"></i>
+                            </NavLink>
+                        ) : (
+                            <NavLink
+                                to='/list-product'
+                                className={({ isActive }) =>
+                                    isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                }
+                                onClick={() => {
+                                    Cookies.set("admin_viewer", 1);
+                                    window.location.href = '/'
+                                    location.reload();
+                                }}
+                            >
+
+                                <i class="fa-solid fa-arrow-right-from-bracket w-100"></i>
+                            </NavLink>
+
+                        )}
                     </div>
 
 

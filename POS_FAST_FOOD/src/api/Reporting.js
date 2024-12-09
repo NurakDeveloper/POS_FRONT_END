@@ -1,18 +1,32 @@
 import axios from "axios";
 import { hostName } from "./host";
+import { getToken } from "./AppConfig";
 
-// REST API 
-// CALL DOAMIN NAME
+// Configure API base URL and token
 const domain = hostName();
+const BASE_URL_REPORTING = `http://${domain}:8085/api/reporting`;
 
-const URL_EXPENSE = `http://${domain}:8085/api/reporting/expense`
-export const getExpenseReport = () => axios.get(URL_EXPENSE);
+const token = getToken();
+const headers = token ? { "Authorization": `nurak ${token}` } : {};
 
-const URL_MONHTLY_SALE = `http://${domain}:8085/api/reporting/monthly-sale`;
-export const getMonthlySaleReport = () => axios.get(URL_MONHTLY_SALE);
+// Reporting API functions
 
-const URL_NET_INCOME = `http://${domain}:8085/api/reporting/net-income`;
-export const getNetIncomeReport = () => axios.get(URL_NET_INCOME);
+// Get expense report
+export const getExpenseReport = () => {
+    return axios.get(`${BASE_URL_REPORTING}/expense`, { headers });
+};
 
-const URL_REVENUES = `http://${domain}:8085/api/reporting/revenues`;
-export const getRevenuesReport = () => axios.get(URL_REVENUES);
+// Get monthly sale report
+export const getMonthlySaleReport = () => {
+    return axios.get(`${BASE_URL_REPORTING}/monthly-sale`, { headers });
+};
+
+// Get net income report
+export const getNetIncomeReport = () => {
+    return axios.get(`${BASE_URL_REPORTING}/net-income`, { headers });
+};
+
+// Get revenues report
+export const getRevenuesReport = () => {
+    return axios.get(`${BASE_URL_REPORTING}/revenues`, { headers });
+};
