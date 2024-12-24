@@ -10,11 +10,25 @@ import { getBranchId } from "../../../api/Branch";
 import { Key } from "@mui/icons-material";
 import InputValidation from "../../../components/input/InputValidation";
 import Cookies from "js-cookie";
+import CustomCommoBox from "../../../components/select/CustomCommoBox";
+import { getVendor } from "../../../api/Vendor";
+import { getAllEmployee } from "../../../api/EmployeeApi";
 const MakeJournal = () => {
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
     const [account, setAccount] = useState([]);
     const [acName, setAcName] = useState([])
+    const [employee, setEmployee] = useState([]);
+    const [vendor, setVendor] = useState([]);
+    const [journalData, setJournalData] = useState({
+        "journal": 'POS',
+        "branchId": '',
+        "partnerId": '',
+        "date": '',
+        "total": 0,
+        "reference": '',
+        "status": "Posted"
+    });
     useEffect(() => {
         getAllAccount().then((reponse) => {
             setAccount(reponse.data);
@@ -29,15 +43,41 @@ const MakeJournal = () => {
         }
         return sum;// Set total with two decimal places
     }
-    const [journalData, setJournalData] = useState({
-        "journal": '',
-        "branchId": '',
-        "partnerId": '',
-        "date": '',
-        "total": 0,
-        "reference": '',
-        "status": "Posted"
-    });
+    function getPartner() {
+        getVendor().then((reponse) => {
+            setVendor(reponse.data);
+        }).catch(e => {
+
+        })
+        getAllEmployee().then((reponse) => {
+            setEmployee(reponse.data)
+        }).catch(e => {
+
+        })
+    }
+    useEffect(() => {
+        getPartner();
+    }, [journalData.journal])
+    const JOURNAL_TYPE = [
+        {
+            "key": 1,
+            "value": 'POS'
+        },
+        {
+            "key": 1,
+            "value": 'BILL'
+        },
+        {
+            "key": 1,
+            "value": 'PAY_ROLL'
+        },
+    ]
+
+    // journal request
+
+    function selectJournalType(type) {
+        setJournalData({ ...journalData, ['journal']: type.value })
+    }
     const [errors, setError] = useState([]);
     function validation() {
         const newError = {};
@@ -93,6 +133,8 @@ const MakeJournal = () => {
     useEffect(() => {
         setJournalData({ ...journalData, ["total"]: findTotal() });
     }, [rows])
+
+
 
 
     function handleChanges(e) {
@@ -163,7 +205,9 @@ const MakeJournal = () => {
                             {formHeader()}
                             <div className="bg-white w-100 rounded">
                                 <div className="row">
+
                                     <div className="col-md-6 col-12">
+
                                         <div className='d-block text-start fs-6 bg-white px-4 py-2'>
                                             {/* <div className='group-input center w-100 pb-3' style={{ fontSize: 14 }}>
                                                 <label htmlFor='references' className='w-25 text-start'>Reference <span className="text-danger">*</span>  </label>
@@ -184,6 +228,7 @@ const MakeJournal = () => {
                                                 error={errors.reference}
                                                 fontSize={14}
                                             />
+
 
 
                                         </div>
@@ -232,81 +277,66 @@ const MakeJournal = () => {
                                     </ul>
                                     <div class="tab-content border-0 h-100" id="myTabContent">
                                         <div class="border-0 tab-pane show active h-100" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0" style={{ overflow: 'visible' }}>
-                                            <table className="table h-100 w-100">
-                                                <thead  >
-                                                    <tr className="py-3">
-                                                        <Th resizable columnWidth={300} >Account</Th>
-                                                        <Th resizable>Label</Th>
-                                                        <Th columnWidth={100}>Debit</Th>
-                                                        <Th columnWidth={100}>Credit</Th>
-                                                        <Th columnWidth={50}>Action</Th>
-                                                    </tr>
+                                            <table className="table">
+                                                <thead>
+                                                    <Th resizable columnWidth={300} >Account</Th>
+                                                    <Th resizable>Label</Th>
+                                                    <Th columnWidth={100}>Debit</Th>
+                                                    <Th columnWidth={100}>Credit</Th>
+                                                    <Th columnWidth={50}>Action</Th>
                                                 </thead>
                                                 <Tbody>
                                                     {rows.map((row, index) => (
                                                         <tr key={index}>
-                                                            <td className="py-3" style={{ overflow: 'visible' }}>
-                                                                <div className="dropdown cursor-i p-0">
-                                                                    <input type="text"
-                                                                        className="w-100 d-flex text-secondary input-box rounded-0 cursor-i"
-                                                                        data-bs-toggle="dropdown"
-                                                                        // style={{ height: '25px' }}
-                                                                        aria-expanded="false"
-                                                                        value={acName[index] ? acName[index].name : "Select Account"}
-                                                                    />
-                                                                    <ul className="dropdown-menu w-100 box-shadow f-14" style={{ maxHeight: '300px', overflowY: 'scroll' }}>
-                                                                        {account.map(a => (
-                                                                            <li key={a.id}>
-                                                                                <a
-                                                                                    className="dropdown-item pointer"
-                                                                                    onClick={() => {
-                                                                                        const updatedRows = [...rows];
-                                                                                        updatedRows[index]["accountId"] = a.id;
+                                                            <td className="" style={{ overflow: 'visible' }}>
 
-                                                                                        // Set the selected account name for the specific row
-                                                                                        const updatedAcName = [...acName];
-                                                                                        updatedAcName[index] = { name: a.code + " " + a.accountName };
-                                                                                        setRows(updatedRows);
-                                                                                        setAcName(updatedAcName);
-                                                                                    }}
-                                                                                >
-                                                                                    <span className="text-secondary">{a.code}</span> {" "}{a.accountName}
-                                                                                </a>
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </div>
+                                                                <CustomCommoBox
+                                                                    bottom={0}
+                                                                    top={21}
+                                                                    className=''
+                                                                    items={account}
+                                                                    labelKeys={['accountName']}
+                                                                    searchKey={['accountName']}
+                                                                    onItemSelected={(e) => {
+                                                                        const updatedRows = [...rows];
+                                                                        updatedRows[index]["accountId"] = e.id;
+                                                                        setRows(updatedRows);
+                                                                    }}
+                                                                    fontSize={14}
+                                                                />
                                                             </td>
                                                             <td>
-                                                                <input
-                                                                    type="text"
-                                                                    name="label"
+                                                                <InputValidation
                                                                     value={row.label || ""}
+                                                                    fontSize={14}
+                                                                    name='label'
+                                                                    placeHolder='label'
                                                                     onChange={(e) => handleChange(index, e)}
-                                                                    className="input-box w-100"
-                                                                    placeholder="type yout label"
                                                                 />
                                                             </td>
                                                             <td>
-                                                                <input
-                                                                    type="number"
-                                                                    name="debit"
+                                                                <InputValidation
+                                                                    type='number'
                                                                     value={row.debit}
+                                                                    fontSize={14}
+                                                                    name='debit'
+                                                                    placeHolder='label'
                                                                     onChange={(e) => handleChange(index, e)}
-                                                                    className="input-box w-100"
                                                                 />
+
                                                             </td>
                                                             <td>
-                                                                <input
-                                                                    type="number"
-                                                                    name="credit"
+                                                                <InputValidation
+                                                                    type='number'
                                                                     value={row.credit}
+                                                                    fontSize={14}
+                                                                    name='credit'
+                                                                    placeHolder='credit'
                                                                     onChange={(e) => handleChange(index, e)}
-                                                                    className="input-box w-100"
                                                                 />
                                                             </td>
                                                             <td>
-                                                                <span className="pointer" onClick={() => removeRow(index)}>
+                                                                <span className="pointer center" onClick={() => removeRow(index)}>
                                                                     <i class="fa-solid fa-trash-can remove"></i>
                                                                 </span>
                                                             </td>
@@ -315,7 +345,7 @@ const MakeJournal = () => {
 
                                                 </Tbody>
                                             </table>
-                                            <button className="button add border-0 border-bottom" onClick={addRow}>Add Line</button>
+                                            <button className="button add border-0 border-bottom mt-2" onClick={addRow}>Add Line</button>
                                         </div>
                                         <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
 

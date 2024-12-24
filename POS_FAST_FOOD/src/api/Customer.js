@@ -11,13 +11,20 @@ const headers = token ? { "Authorization": `nurak ${token}` } : {};
 
 // Customer API Functions
 
+
+// Get all customers
+export const createCustomer = (customer) => {
+    return axios.post(`${BASE_URL_CUSTOMER}/create`, customer, { headers });
+};
+
+
 // Get all customers
 export const getAllCustomer = () => {
     return axios.get(`${BASE_URL_CUSTOMER}/list-customer`, { headers });
 };
 
 // Get customer by ID
-export const getCustomerById = (id) => {
+export const getCustomer = (id) => {
     return axios.get(`${BASE_URL_CUSTOMER}/get/${id}`, { headers });
 };
 

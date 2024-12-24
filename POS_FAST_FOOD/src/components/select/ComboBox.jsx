@@ -9,6 +9,7 @@ const ComboBox = ({
   inputClassName = "",
   optionsClassName = "",
   optionClassName = "",
+  placeholder
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState(null);
@@ -35,7 +36,7 @@ const ComboBox = ({
         tabIndex="0"
       >
 
-        {selectedValue ? formatLabel(selectedValue) : "Select an option"}
+        {selectedValue ? formatLabel(selectedValue) : placeholder ? `${placeholder}` : ''}
         <button className={`arrow ${isOpen ? "rotate" : ""}`}>{isOpen ? "▲" : "▼"}</button>
       </div>
       {isOpen && (
@@ -46,7 +47,7 @@ const ComboBox = ({
               className={`combo-box-option ${optionClassName}`}
               onClick={() => handleSelect(option)}
             >
-              {formatLabel(option)}
+              <span >{formatLabel(option)}</span>
             </li>
           ))}
         </ul>

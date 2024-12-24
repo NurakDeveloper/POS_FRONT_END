@@ -7,6 +7,9 @@ import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../../components/table
 import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
 import { hostName } from '../../../../api/host';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { motion } from 'framer-motion';
+import { exportToExcelFiles, globleCardVariants, globleRowVariants, perPage, searchData } from '../../../../api/AppConfig';
+import ActionHeader from '../../../../components/listheader/ActionHeader';
 const Customer = () => {
 
     const [customer, setCustomer] = useState([]);
@@ -28,7 +31,10 @@ const Customer = () => {
             console.error(error);
         })
     }
-    const rowsPerPage = 10; // Define how many rows to display per page
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    function selectPerPage(selected) {
+        setRowsPerPage(selected.value);
+    }
     const [currentPage, setCurrentPage] = useState(1);
 
     // Calculate the index of the first and last item on the current page
@@ -85,23 +91,38 @@ const Customer = () => {
         getCustomer();
     }, [])
     const goto = useNavigate();
+    const [searchTerm, setSearchTerm] = useState("");
+    useEffect(() => {
+        if (!searchTerm) {
+            getCustomer();
+            return
+        }
+        setCustomer(searchData(customer, searchTerm, ["firstName", "lastName", "email"]));
+
+    }, [searchTerm]);
     function listCard() {
         return (
             <div className="row w-100">
 
                 {
-                    currentData.map(o =>
-                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-1">
-                            <div className="card bg-white p-0 pointer border"
+                    currentData.map((o, index) =>
+                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-2 tranform-hover ">
+                            <motion.div
+                                className="bg-white p-0 pointer border box-shadow"
+                                key={o.id}
+                                custom={index}
+                                initial="hidden"
+                                animate="visible"
+                                variants={globleCardVariants}
                                 onClick={() => goto(`/employee-detail/${o.id}`)}
                             >
-                                <div className="card-body p-0 rounded">
+                                <div className="card-body p-0">
                                     <div className="d-flex">
                                         <div className="center p-1" style={{ width: '40%' }}>
-                                            <div className="center rounded" style={{ height: '150px', width: '100%', overflow: 'hidden' }}>
+                                            <div className="center" style={{ height: '180px', width: '100%', overflow: 'hidden' }}>
                                                 {
                                                     o.image ?
-                                                        (<img src={`${imageUrl}${o.image}`} alt="" className='h-100 rounded' />)
+                                                        (<img src={`${imageUrl}${o.image}`} alt="" className='w-100' />)
                                                         : (
                                                             // if no image
                                                             <div className="h-100 text-white w-100 fs-1 center" style={{ backgroundColor: generateRandomColor() }}>
@@ -127,9 +148,10 @@ const Customer = () => {
                                         </div>
 
 
+
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                     )
                 }
@@ -232,7 +254,13 @@ const Customer = () => {
                             <tbody>
                                 {
                                     currentData.map((f, i) =>
-                                        <tr className="pointer" onClick={() => goto(`/item-detail`)}>
+                                        <motion.tr
+                                            key={f.id}
+                                            custom={i}
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={globleRowVariants}
+                                            className="pointer" onClick={() => goto(`/item-detail`)}>
                                             <td>
                                                 <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
                                             </td>
@@ -247,7 +275,7 @@ const Customer = () => {
                                             <td>{f.membershipStatus}</td>
 
 
-                                        </tr>
+                                        </motion.tr>
                                     )
                                 }
                             </tbody>
@@ -348,7 +376,24 @@ const Customer = () => {
             <div className='w-100'>
                 <div className="container-fluid p-0 ">
                     <div className='container-fluid p-0'>
-                        {menu()}
+                        {/* {menu()} */}
+                        <ActionHeader
+                            btnAddName='New Customer'
+                            title="Customer"
+                            subtitle="Manage your customer."
+                            searchTerm={searchTerm}
+                            searchChange={(e) => setSearchTerm(e.target.value)}
+                            onCreate={() => goto('/create-customer')}
+                            // onPrint={() => setIsPrint(true)}
+                            onExport={() => exportToExcelFiles(customer, 'customer_data')}
+                            perPage={perPage()}
+                            selectPerPage={selectPerPage}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            handleNext={handleNext}
+                            handlePrevious={handlePrevious}
+                            isTableAction={() => isTable ? setIsTable(false) : setIsTable(true)}
+                        />
                     </div>
 
                 </div>

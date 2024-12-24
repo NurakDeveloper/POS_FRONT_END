@@ -6,16 +6,52 @@ import * as XLSX from 'xlsx';
 import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge } from "react-icons/fa";
 import { Th } from '../../../components/table/DataGrid';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { exportToExcelFiles, globleRowVariants, perPage, searchData } from '../../../api/AppConfig';
+import ActionHeader from '../../../components/listheader/ActionHeader';
+import { motion } from 'framer-motion';
+import { getAllEmployee } from '../../../api/EmployeeApi';
+import { getAllVendor } from '../../../api/Vendor';
+import { IoIosArrowRoundDown } from 'react-icons/io';
 const Journal = () => {
 
     const [journal, setJounal] = useState([])
     useEffect(() => {
+        getJournal();
+    }, [])
+    function getJournal() {
         getAllJournal().then((response) => {
             setJounal(response.data);
         }).catch(e => {
             console.error(e);
         })
+    }
+    const [employee, setEmployee] = useState([]);
+    const [vendor, setVendor] = useState([]);
+    function getPartner() {
+        getAllVendor().then((reponse) => {
+            setVendor(reponse.data);
+        }).catch(e => {
+
+        })
+        getAllEmployee().then((reponse) => {
+            setEmployee(reponse.data)
+        }).catch(e => {
+
+        })
+    }
+    useEffect(() => {
+        getPartner();
     }, [])
+    const [searchTerm, setSearchTerm] = useState("");
+    useEffect(() => {
+        if (!searchTerm) {
+            getJournal();
+            return
+        }
+        setJounal(searchData(journal, searchTerm, ["reference", "id", "partnerId"]));
+
+    }, [searchTerm]);
+
     const formatCurrency = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD'
@@ -30,7 +66,10 @@ const Journal = () => {
         }).format(date); // 'dd' for day, 'MMMM' for full month, 'yy' for year
     };
 
-    const rowsPerPage = 15; // Define how many rows to display per page
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    function selectPerPage(selected) {
+        setRowsPerPage(selected.value);
+    }
     const [currentPage, setCurrentPage] = useState(1);
 
     // Calculate the index of the first and last item on the current page
@@ -55,6 +94,47 @@ const Journal = () => {
     };
 
     const goto = useNavigate();
+    function findPartner(id, type) {
+        if (type == 'BILL') {
+            const vd = vendor.find(v => v.id == id);
+            return (
+                <>
+                    <div className='d-flex start'>
+                        <div className="" style={{ height: '50px' }}>
+                            <img src={vd ? 'http://localhost:8085/api/images/' + vd.image : ''} alt="" className="h-100" />
+                        </div>
+                        <div>
+                            <p className="f-12 ps-3 text-secondary">
+                                Supllier
+                            </p>
+                            <p className='f-16 ps-3'>{vd.displayName}</p>
+                        </div>
+                    </div>
+                </>
+            )
+        } else if (type == 'PAYROLL') {
+            const emp = employee.find(e => e.id == id);
+            // alert(emp.email + '');
+            return (
+                <>
+                    <div className='d-flex start'>
+                        <div className="" style={{ height: '50px' }}>
+                            <img src={emp ? 'http://localhost:8085/api/images/' + emp.image : ''} alt="" className="h-100" />
+                        </div>
+                        <div>
+                            <p className="f-12 ps-3 text-secondary">
+                                Employee
+                            </p>
+                            <p className='f-16 ps-3'>{emp ? emp.firstName + ' ' + emp.lastName : ''}</p>
+                        </div>
+                    </div>
+                </>
+            )
+        }
+        else {
+            return ''
+        }
+    }
 
     function listTable() {
         return (
@@ -68,6 +148,7 @@ const Journal = () => {
                                 </Th>
                                 <Th columnWidth={50} className='py-3'>No</Th>
                                 <Th resizable>Date</Th>
+                                <Th resizable>Partner</Th>
                                 <Th resizable>Reference</Th>
                                 <Th resizable>Journal</Th>
                                 <Th resizable>Total</Th>
@@ -81,20 +162,40 @@ const Journal = () => {
                         <tbody>
                             {
                                 currentData.map((j, i) =>
-                                    <tr className="pointer" onClick={() => goto(`/journal-detail/${j.id}`)}>
+
+                                    <motion.tr
+                                        key={j.id}
+                                        custom={i}
+                                        initial="hidden"
+                                        animate="visible"
+                                        variants={globleRowVariants}
+                                        className={j.journal == 'BILL' ? 'pointer' : 'pointer'} onClick={() => goto(`/journal-detail/${j.id}`)}>
                                         <td>
                                             <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
                                         </td>
                                         <td className='py-3'>{i + 1}</td>
+
                                         <td>{formatDate(j.date)}</td>
+                                        <td>{findPartner(j.partnerId, j.journal)}</td>
                                         <td>{j.reference}</td>
-                                        <td>POS</td>
-                                        <td>{formatCurrency.format(j.total)}</td>
+                                        <td>{j.journal}</td>
+                                        <td>
+                                            {j.journal == 'BILL' || j.journal == 'PAYROLL' ?
+                                                <>
+                                                    {/* <span className='text-danger'><IoIosArrowRoundDown /></span> */}
+                                                    <span className='text-danger'>
+                                                        - {formatCurrency.format(j.total)}
+                                                    </span>
+                                                </>
+                                                :
+                                                formatCurrency.format(j.total)
+                                            }
+                                        </td>
                                         <td>{j.status}</td>
                                         <td>Nurak Company's</td>
 
 
-                                    </tr>
+                                    </motion.tr>
                                 )
                             }
                         </tbody>
@@ -104,95 +205,27 @@ const Journal = () => {
             </div>
         )
     }
-    const ExportExcel = (data, fileName) => {
-        // 1. Convert data to a worksheet
-        const worksheet = XLSX.utils.json_to_sheet(data);
-
-        // 2. Create a workbook and append the worksheet
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-        // 3. Write the workbook to an Excel file
-        XLSX.writeFile(workbook, `${fileName}.xlsx`);
-    };
-
-    function menu() {
-        return (
-            <div className="list-header-container">
-                {/* Left Section */}
-                <div className="list-header-left">
-                    {/* Add New Button */}
-                    <button className="list-header-button add-new box-shadow" onClick={() => goto('/make-journal')}>
-                        <FaPlus className="list-header-icon" />
-                        Add New
-                    </button>
-                    <button className="list-header-button print box-shadow">
-                        <FaPrint className="list-header-icon" />
-                        Print
-                    </button>
-
-                    {/* Export Button */}
-                    <button className="list-header-button export box-shadow" onClick={() => ExportExcel(journal, "journal-data")}>
-                        <FaFileExport className="list-header-icon" />
-                        Export
-                    </button>
-
-                    {/* Search Input */}
-
-                </div>
-                <div className="list-header-right">
-
-                    <div className="list-header-search">
-                        <FaSearch className="list-header-icon search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="list-header-input"
-                        />
-                    </div>
-                </div>
-
-                {/* Right Section */}
-                <div className="list-header-right">
-                    {/* Print Button */}
-
-                    <span className="page-info f-14 text-secondary">
-                        {currentPage} / {totalPages}
-                    </span>
-                    <div className="pagination">
-                        <div className='pe-2'>
-                            <button
-                                className="button previous"
-                                onClick={handlePrevious}
-                                disabled={currentPage === 1}
-                            >
-                                <SlArrowLeft />
-                            </button>
-                        </div>
-
-                        <button
-                            className="button next"
-                            onClick={handleNext}
-                            disabled={currentPage === totalPages}
-                        >
-                            <SlArrowRight />
-                        </button>
-                    </div>
-                    {/* Filter Button */}
-                    <button className="list-header-button filter box-shadow">
-                        <FaFilter className="list-header-icon" />
-                        Filter
-                    </button>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <>
 
             <div>
-                {menu()}
+                <ActionHeader
+                    btnAddName='New Journal'
+                    title="Journal Entires"
+                    subtitle="View journal entires of all ."
+                    searchTerm={searchTerm}
+                    onCreate={() => goto('/make-journal')}
+                    searchChange={(e) => setSearchTerm(e.target.value)}
+                    // onPrint={() => setIsPrint(true)}
+                    onExport={() => exportToExcelFiles(journal, 'journal_data')}
+                    perPage={perPage()}
+                    selectPerPage={selectPerPage}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    handleNext={handleNext}
+                    handlePrevious={handlePrevious}
+                />
                 <div className="row">
                     <div className="col-12">
                         {listTable()}

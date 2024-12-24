@@ -42,20 +42,40 @@ import OrderTable from './layout/page/pos/OrderTable'
 import RExpense from './layout/page/report/accounting/RExpense'
 import NetIncomeChart from './layout/page/report/netincome/NetIncomeChart'
 import PaymentMethod from './layout/page/report/paymentmethod/PaymentMethod'
-import MonthSaleReport from './layout/page/report/monthlysalereport/MonthSaleReport'
+import MonthSaleReport from './layout/page/report/monthlysalereport/MonthSale'
 import BestSellingMenuItemsChart from './layout/page/report/bestsellingproduct/BestSellingMenuItemsChart'
-import { IoSettingsOutline } from 'react-icons/io5'
+import { IoChatbubble, IoChatbubbleEllipsesOutline, IoExitOutline, IoSettingsOutline, IoTimerOutline, IoTimeSharp } from 'react-icons/io5'
 import { checkingTypeOfUser } from './api/AppConfig'
 import { userObject } from './api/AppConfig'
 import CategoriesForm from './layout/form/inventory/CategoriesForm'
+import { hostName } from './api/host'
+import SaleReporting from './layout/page/report/SaleReporting/SaleReporting'
+import ExpenseChart from './layout/page/report/accounting/ExpenseChart'
+import Revenues from './layout/page/report/revenues/Revenues'
+import Expense from './layout/page/report/expense/Expense'
+import VendorForm from './layout/form/VendorForm'
+import ViewVendor from './layout/page/people/vendor/ViewVendor'
+import { RiSettings5Fill, RiVerifiedBadgeFill } from 'react-icons/ri'
+import { HiOutlineComputerDesktop } from 'react-icons/hi2'
+import OpenSalary from './layout/form/accounting/OpenSalary'
+import Company from './layout/page/company/Company'
+import BranchForm from './layout/form/BranchForm'
+import { findCompanyName } from './api/FindData'
+import { getAllBranch } from './api/Branch'
 function App() {
+  const domainName = hostName();
+  const profilePath = `http://${domainName}:8085/api/images/`
   const [userName, setUserName] = useState();
   const [role, setRole] = useState();
   const [profile, setProfile] = useState();
   useEffect(() => {
-    // setUserName(userObject().userName ? userObject().userName : 'No User Please login');
-    // setRole(userObject().role);
-    // setProfile(userObject().image);
+    try {
+      setUserName(userObject().userName ? userObject().userName : 'No User Please login');
+      setRole(userObject().role);
+      setProfile(userObject().image);
+    } catch (e) {
+
+    }
   }, [])
   useEffect(() => {
     applicationViewer();
@@ -141,55 +161,63 @@ function App() {
     if (userType == 2) setPageViewer(() => posApplication());
     if (userType == 3) setPageViewer(() => userLoging());
   }
-
+  const [branch, setBranch] = useState([]);
+  function findBranchName(id) {
+    const b = branch.find(b => b.id == id);
+    if (b) return b.branchName;
+    return 'No Company'
+  }
+  useEffect(() => {
+    getAllBranch().then((response) => {
+      setBranch(response.data);
+    })
+  }, [])
   const header = () => {
     return (
       <>
-        <div className='between w-100 py-2 bg-none d-none d-md-none d-lg-flex border-bottom'>
-          <div className="fs-5 text-secondary border-start text-start w-25 ps-3">
-            <i class="fa-solid fa-bars pointer" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
-          </div>
-          <div className='d-flex w-75 end '>
-            <div className=''>
+        <div className='d-flex justify-content-between align-items-center w-100 py-2 bg-white d-none d-md-none d-lg-flex  px-2 ps-0 rounded box-shadow'>
+          <div className="start">
+            <span className='f-16 text-secondary ps-3'>CAMBODIA</span>
+            <div className="f-16  text-start ps-3 border-start border-3 ms-2">
+              {findBranchName(userObject().branch)}
 
-              <button className="btn"
-                onClick={() => {
-                  Cookies.set('admin_viewer', 2);
-                  location.reload();
-                }}
-              >
-
-                <i class="fa-solid fa-message btn-silver p-3 rounded-circle"></i>
-              </button>
-              <button className="btn"
-                onClick={() => {
-                  Cookies.set('admin_viewer', 2);
-                  location.reload();
-                  window.location.href = '/';
-                }}
-              >
-                <i class="fa-solid fa-desktop btn-silver p-3 rounded-circle"></i>
-              </button>
             </div>
-            <div className="app-defualt-user d-flex start px-4 py-1 border-start border-1">
-              <img src={`/src/assets/image/${profile}`} alt="" className="user-img mx-2 rounded-circle " />
+          </div>
+          <div className=' end '>
+            <div className='fs-4 d-flex'>
+              <div className='pointer' onClick={() => {
+                Cookies.set('admin_viewer', 2)
+                window.location.href = '/';
+              }}>
+                <HiOutlineComputerDesktop />
+              </div>
+              <div className="position-relative fs-4 mx-3">
+                <IoChatbubbleEllipsesOutline />
+                <span className="position-absolute top-0 start-100 translate-middle f-14 text-danger">
+                  99+
+                  <span className="visually-hidden">unread messages</span>
+                </span>
+              </div>
+              <div className="">
+                <IoTimerOutline />
+              </div>
+
+            </div>
+            <div className="app-defualt-user d-flex start px-4 py-1 ">
+              <img src={`${profilePath}${profile}`} alt="" className="user-img mx-2 rounded-circle p-1 border border-success" />
               <div className="center">
                 <div>
-                  <div className='' style={{ fontSize: 15 }}>{userName}</div>
+                  <div className='start' style={{ fontSize: 15 }}> <span className='pe-2'>{userName}</span> {role == 'ADMIN' ? <RiVerifiedBadgeFill className='f-20 text-primary' /> : ''}</div>
                   <div className='text-secondary' style={{ fontSize: 10 }}>ROLE|{role}</div>
                 </div>
               </div>
             </div>
-            <button className="btn"
-              onClick={() => {
-                Cookies.set('admin_viewer', 2);
-                location.reload();
-              }}
-            >
-              <IoSettingsOutline />
-              {/* <i class="fa-solid fa-gear p-3 rounded btn-sliver"></i> */}
-
-            </button>
+            <div className='fs-4 p-2 pointer text-danger' onClick={() => {
+              Cookies.remove('user-data')
+              location.reload();
+            }}>
+              <IoExitOutline />
+            </div>
           </div>
 
         </div>
@@ -217,19 +245,30 @@ function App() {
       <>
         <div className="app">
           <div className="d-flex">
-            <div className=" px-1 app-menu  d-none d-xxl-flex">
+            <div className="app-menu  d-none d-xxl-flex">
               <Menu />
             </div>
             <div className="content d-block">
-              <div className="app-header mb-3">
+              <div className="app-header mb-2 px-2 mt-2 ps-1">
                 {header()}
               </div>
               <div className="app-page">
                 <Routes>
                   <Route path='/' element={<Dashboard UserName={userName} />} />
+                  <Route path='*' element={<><h1 className="display-1 text-center">Page Not Found</h1></>} />
                   {/* // Categories */}
                   <Route path='/create-category' element={<CategoriesForm />} />
                   <Route path='update-category/:id' element={<CategoriesForm />} />
+
+                  <Route path='/create-vendor' element={<VendorForm />} />
+                  <Route path='/update-vendor/:id' element={<VendorForm />} />
+                  <Route path='/list-vendor' element={<ViewVendor />} />
+
+                  <Route path='/list-branch' element={<Company />} />
+                  <Route path='/create-branch' element={<BranchForm />} />
+                  <Route path='/update-branch/:id' element={<BranchForm />} />
+
+
                   <Route path='/desk' element={<Desk />} />
                   <Route path='/list-item' element={<Item />} />
                   <Route path='/create-item' element={<InsertItem />} />
@@ -251,15 +290,19 @@ function App() {
                   <Route path='/reporting' element={<Report />}>
                     <Route path='' element={<NetIncomeChart />} />
                     <Route path='net-income' element={<NetIncomeChart />} />
+                    <Route path='expense' element={<Expense />} />
+                    <Route path='revenues' element={<Revenues />} />
                     <Route path='payment-method' element={<PaymentMethod />} />
                     <Route path='monthly-sale-report' element={<MonthSaleReport />} />
                     <Route path='best-selling-product' element={<BestSellingMenuItemsChart />} />
+                    <Route path='sale-report' element={<SaleReporting />} />
                   </Route>
                   <Route path='/setting' element={<Setting />} />
                   <Route path='/journal' element={<Journal />} />
                   <Route path='/journal-detail/:id' element={<JournalDetail />} />
                   <Route path='/make-journal' element={<MakeJournal />} />
                   <Route path='/make-bill' element={<MakeBill />} />
+                  <Route path='/make-payroll' element={<OpenSalary />} />
                   <Route path='/make-account' element={<MakeChartOfAccount />} />
                   <Route path='/report-journal' element={<JouranlReport />} />
 

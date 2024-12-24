@@ -1,20 +1,37 @@
 import { useEffect, useState } from "react"
 import { getAllAccount } from "../../../api/Account";
 import { getAllAccountType } from "../../../api/AccountType";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as XLSX from 'xlsx';
 import { Th } from "../../../components/table/DataGrid";
+import { FaFileExcel, FaFilter, FaPlus, FaPrint, FaSearch } from "react-icons/fa";
+import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
+import { exportToExcelFiles, globleRowVariants, perPage, searchData } from "../../../api/AppConfig";
+import ActionHeader from "../../../components/listheader/ActionHeader";
+import { motion } from "framer-motion";
 const Account = () => {
     const [account, setAccount] = useState([]);
     const [accountType, setAccountType] = useState([]);
     useEffect(() => {
+        getData();
+    }, [])
+    function getData() {
         getAllAccount().then((response) => {
             setAccount(response.data);
         })
         getAllAccountType().then((response) => {
             setAccountType(response.data);
         })
-    }, [])
+    }
+    const [searchTerm, setSearchTerm] = useState("");
+    useEffect(() => {
+        if (!searchTerm) {
+            getData();
+            return
+        }
+        setAccount(searchData(account, searchTerm, ["accountName", "id"]));
+
+    }, [searchTerm]);
     function getAccountTypeName(id) {
         try {
             const objAccountType = accountType.find(a => a.id == id);
@@ -23,51 +40,53 @@ const Account = () => {
             return "No Accountype Selected"
         }
     }
-    const ExportExcel = (data, fileName) => {
-        // 1. Convert data to a worksheet
-        const worksheet = XLSX.utils.json_to_sheet(data);
-
-        // 2. Create a workbook and append the worksheet
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-        // 3. Write the workbook to an Excel file
-        XLSX.writeFile(workbook, `${fileName}.xlsx`);
-    };
-    function menu() {
-        return (
-            <>
-                <div className="w-100 ">
-                    <div className="d-flex px-2 py-3 rounded">
-                        <div className='d-flex start w-50'>
-                            <Link className="btn btn-success box-shadow px-3" to='/make-account'>
-                                <span className='pe-2'><i class="fa-solid fa-circle-plus"></i></span>
-                                <span className=''>New</span>
-                            </Link>
-                            <div class="btn-group ms-3" role="group" aria-label="Basic mixed styles example">
-                                <button type="button" class="btn btn-outline-secondary"><span className='pe-2'><i class="fa-solid fa-print"></i></span>Print</button>
-                                <button type="button" class="btn btn-outline-secondary" onClick={() => ExportExcel(account, "account_data")}><span className='pe-2'><i class="fa-solid fa-file-export"></i></span>Export</button>
-                            </div>
-
-                        </div>
-                        <div className='d-flex end w-50'>
-                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                <button type="button" class="btn btn-outline-secondary" ><span className='pe-2'><i class="fa-solid fa-list"></i></span> List</button>
-                                <button type="button" class="btn btn-outline-secondary" > <span className='pe-2'><i class="fa-brands fa-microsoft"></i></span>Card</button>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-            </>
-        )
+    const goto = useNavigate();
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    function selectPerPage(selected) {
+        setRowsPerPage(selected.value);
     }
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    // Slice the categories array to display only the current page's rows
+    const currentData = account.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(account.length / rowsPerPage);
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
+    };
     return (
         <>
 
             <div>
-                {menu()}
+                <ActionHeader
+                    btnAddName='New Account'
+                    title="Chart Of Account"
+                    subtitle="View account of all ."
+                    searchTerm={searchTerm}
+                    onCreate={() => goto('/make-account')}
+                    searchChange={(e) => setSearchTerm(e.target.value)}
+                    // onPrint={() => setIsPrint(true)}
+                    onExport={() => exportToExcelFiles(account, 'journal_data')}
+                    perPage={perPage()}
+                    selectPerPage={selectPerPage}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    handleNext={handleNext}
+                    handlePrevious={handlePrevious}
+                />
                 <div className="row">
                     <div className="col-12">
                         <div className="card border-0">
@@ -86,15 +105,21 @@ const Account = () => {
                                     </thead>
                                     <tbody>
                                         {
-                                            account.map((a, i) =>
-                                                <tr key={i} className="py-3 pointer">
+                                            currentData.map((a, i) =>
+                                                <motion.tr
+                                                    key={a.id}
+                                                    custom={i}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                    variants={globleRowVariants}
+                                                    className="py-3 pointer">
                                                     <td className="py-3">{i + 1}</td>
                                                     <td>{a.code}</td>
                                                     <td>{a.accountName}</td>
                                                     <td>{getAccountTypeName(a.accountTypeId)}</td>
                                                     <td>USD</td>
                                                     <td>Nurak Company's</td>
-                                                </tr>
+                                                </motion.tr>
                                             )
                                         }
                                     </tbody>

@@ -10,6 +10,7 @@ import InputValidation from "../../components/input/InputValidation";
 import { uploadImage } from "../../api/ImageApi";
 import { hostName } from "../../api/host";
 import CustomCommoBox from "../../components/select/CustomCommoBox";
+import Tabs from "../../components/tabs/Tabs";
 
 const CreateEmployee = () => {
     const [employeeData, setEmployeeData] = useState({
@@ -119,13 +120,13 @@ const CreateEmployee = () => {
             ['managerID']: manager.id
         }));
     }
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setEmployeeData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
+    // const handleInputChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setEmployeeData((prevData) => ({
+    //         ...prevData,
+    //         [name]: value
+    //     }));
+    // };
     // using error check if error lenth bigger than zero is error on another field
     const [errors, setErrors] = useState({});
     // validation field
@@ -245,7 +246,7 @@ const CreateEmployee = () => {
 
 
     function saveEmployee(e) {
-        e.preventDefault();
+
         // check validaiton form
         if (!validateEmployeeForm()) {
             return
@@ -336,292 +337,274 @@ const CreateEmployee = () => {
             </div>
         );
     }
+    const handleInputChange = (field, value) => {
+        setEmployeeData((prev) => ({ ...prev, [field]: value }));
+    };
+    const steps = [
+        {
+            label: "Personal Information",
+            content: (errors) => (
+                <>
+                    <InputValidation
+                        fontSize={15}
+                        label="Last Name"
+                        id="lastName"
+                        type="text"
+                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        value={employeeData.lastName}
+                        error={errors.lastName}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="First Name"
+                        id="firstName"
+                        type="text"
+                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                        value={employeeData.firstName}
+                        error={errors.firstName}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Email"
+                        id="email"
+                        type="email"
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        value={employeeData.email}
+                        error={errors.email}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Mobile"
+                        id="mobile"
+                        type="text"
+                        onChange={(e) => handleInputChange("mobile", e.target.value)}
+                        value={employeeData.mobile}
+                        error={errors.mobile}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Gender"
+                        id="gender"
+                        type="text"
+                        onChange={(e) => handleInputChange("gender", e.target.value)}
+                        value={employeeData.gender}
+                        error={errors.gender}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!employeeData.lastName) {
+                    errors.lastName = "Last Name is required.";
+                }
+                if (!employeeData.firstName) {
+                    errors.firstName = "First Name is required.";
+                }
+                if (!employeeData.email) {
+                    errors.email = "Email is required.";
+                }
+                if (!employeeData.mobile) {
+                    errors.mobile = "Mobile is required.";
+                }
+                if (!employeeData.gender) {
+                    errors.gender = "Gender is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Employment Details",
+            content: (errors) => (
+                <>
+                    {/* <CustomCommoBox
+                        fontSize={15}
+                        label="Work Shift"
+                        items={workShifts} // Assuming you have a list of work shifts
+                        searchKey={['name']}
+                        labelKeys={['name']}
+                        onItemSelected={(value) => handleInputChange("workShiftID", value.id)}
+                        error={errors.workShiftID}
+                    /> */}
+                    <CustomCommoBox
+                        fontSize={15}
+                        label="Manager"
+                        items={manager} // Assuming you have a list of managers
+                        searchKey='firstName'
+                        labelKeys={['firstName', 'lastName']}
+                        onItemSelected={(value) => handleInputChange("managerID", value.id)}
+                        error={errors.managerID}
+                    />
+                    <CustomCommoBox
+                        fontSize={14}
+                        label='Select Branch'
+                        items={branch}
+                        searchKey='branchName'
+                        labelKeys={['branchName']}
+                        onItemSelected={(value) => handleInputChange("companyID", value.id)}
+                        error={errors.companyID}
+                    />
+
+                    {/* <CustomCommoBox
+                        fontSize={15}
+                        label="Position"
+                        items={positions} // Assuming you have a list of positions
+                        searchKey={['name']}
+                        labelKeys={['name']}
+                        onItemSelected={(value) => handleInputChange("positionID", value.id)}
+                        error={errors.positionID}
+                    /> */}
+                    <InputValidation
+                        fontSize={15}
+                        label="Salary"
+                        id="salary"
+                        type="number"
+                        onChange={(e) => handleInputChange("salary", e.target.value)}
+                        value={employeeData.salary}
+                        error={errors.salary}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Start Working Date"
+                        id="startWorkingDate"
+                        type="date"
+                        onChange={(e) => handleInputChange("startWorkingDate", e.target.value)}
+                        value={employeeData.startWorkingDate}
+                        error={errors.startWorkingDate}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!employeeData.companyID) {
+                    errors.companyID = "Branch is required.";
+                }
+                // if (!employeeData.positionID) {
+                //     errors.positionID = "Position is required.";
+                // }
+                if (!employeeData.salary) {
+                    errors.salary = "Salary is required.";
+                }
+                if (!employeeData.startWorkingDate) {
+                    errors.startWorkingDate = "Start Working Date is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Bank & Contact Information",
+            content: (errors) => (
+                <>
+                    <InputValidation
+                        fontSize={15}
+                        label="Bank Account"
+                        id="bankAccount"
+                        type="text"
+                        onChange={(e) => handleInputChange("bankAccount", e.target.value)}
+                        value={employeeData.bankAccount}
+                        error={errors.bankAccount}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Contact"
+                        id="contact"
+                        type="text"
+                        onChange={(e) => handleInputChange("contact", e.target.value)}
+                        value={employeeData.contact}
+                        error={errors.contact}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Address"
+                        id="address"
+                        type="text"
+                        onChange={(e) => handleInputChange("address", e.target.value)}
+                        value={employeeData.address}
+                        error={errors.address}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!employeeData.bankAccount) {
+                    errors.bankAccount = "Bank Account is required.";
+                }
+                if (!employeeData.contact) {
+                    errors.contact = "Contact is required.";
+                }
+                if (!employeeData.address) {
+                    errors.address = "Address is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Upload Resume & Image",
+            content: (errors) => (
+                <>
+                    <div className="w-100">
+                        <label
+                            htmlFor="fileImage"
+                            className="rounded py-2 box-shadow center pointer"
+                            style={{ height: "200px", width: "300px", overflow: "hidden" }}
+                        >
+                            <img
+                                src={selectedImage || "default_image_path"}
+                                alt="Profile"
+                                className="h-100"
+                            />
+                        </label>
+                        <span className="validation-error f-12">{errors.image ? errors.image : ""}</span>
+                    </div>
+                    <input
+                        type="file"
+                        id="fileImage"
+                        className="d-none"
+                        onChange={handleFileChange}
+                    />
+
+                    <InputValidation
+                        fontSize={15}
+                        label="Resume URL"
+                        id="resume"
+                        type="text"
+                        onChange={(e) => handleInputChange("resume", e.target.value)}
+                        value={employeeData.resume}
+                        error={errors.resume}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!employeeData.image) {
+                    errors.image = "Profile Image is required.";
+                }
+                if (!employeeData.resume) {
+                    errors.resume = "Resume is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Review & Submit",
+            content: () => (
+                <div>
+                    <h3>Review Employee Information</h3>
+                    <pre>{JSON.stringify(employeeData, null, 2)}</pre>
+                </div>
+            ),
+            validate: () => ({}), // No validation needed for this step
+        },
+    ];
+
     return (
         <>
 
             <form action="" className="p-3">
 
-                <div className="container-fluid box-shadow rounded  d-block p-3">
-                    {formHeader()}
+                <div className="container box-shadow rounded  d-block p-3">
+                    {/* {formHeader()} */}
+                    <Tabs steps={steps} onSave={() => saveEmployee()} />
 
-                    <div className="row ">
-                        <div className="col-12">
-                            <div className="form-heder w-100 bg-white p-3 ps-1">
-                                <div className="row" >
-                                    <div className='col-xl-6 col-md-6 col-12 '>
-                                        <di className="d-flex">
-                                            <div>
-                                                <label htmlFor="fileImage" className=' rounded box-shadow pointer center' style={{ height: '200px', width: '150px', overflow: 'hidden' }}>
-                                                    {/* <img src={`http://localhost:8085/api/images/profile.jpg}`} alt="no image" className="h-100" /> */}
-                                                    <img src={selectedImage ? selectedImage : `${profilePath}${employeeData.image}`} alt="" className="h-100 " />
-                                                    {/* <img src={} alt="" className="w-100 rounded" /> */}
-                                                </label> <br />
-
-                                                <span className='validation-error f-12'>{errors.image ? errors.image : ''}</span>
-                                            </div>
-                                            <div className='w-100 h-100 ps-3'>
-                                                <InputValidation
-                                                    label='First Name'
-                                                    id='firstName'
-                                                    type='text'
-                                                    name='firstName'
-                                                    value={employeeData.firstName}
-                                                    onChange={handleInputChange}
-                                                    error={errors.firstName}
-                                                    fontSize={14}
-                                                    require={'true'}
-                                                />
-                                                <InputValidation
-                                                    label='Last Name'
-                                                    type='text'
-                                                    id='lastName'
-                                                    name='lastName'
-                                                    value={employeeData.lastName}
-                                                    onChange={handleInputChange}
-                                                    error={errors.lastName}
-                                                    fontSize={14}
-                                                    require={'true'}
-                                                />
-
-                                            </div>
-                                        </di>
-                                    </div>
-
-                                    <div className='col-xl-6 col-md-6 col-12 end'>
-                                        <div className='' style={{ height: '100%', width: '180px', overflow: 'hidden' }}>
-                                            <div className='d-none text-center fs-6' style={{ width: '40px' }}>
-                                                <input type="file" name="" className='d-none w-100' id="fileImage"
-                                                    onChange={handleFileChange}
-                                                />
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div className="row">
-                                <div className='col-xl-6 col-12 d-block text-start bg-white'>
-                                    <InputValidation
-                                        label='Full Name'
-                                        type='text'
-                                        id='fullname'
-                                        value={employeeData.firstName + ' ' + employeeData.lastName}
-                                        onChange={handleInputChange}
-                                        // error={errors.contact}
-                                        fontSize={14}
-                                    // require={'true'}
-                                    />
-                                    <CustomCommoBox
-                                        fontSize={14}
-                                        label='Select Manager'
-                                        items={manager}
-                                        searchKey='firstName'
-                                        labelKeys={['firstName', 'lastName']}
-                                        onItemSelected={selectManager}
-                                        error={errors.manager}
-                                    />
-                                    <CustomCommoBox
-                                        fontSize={14}
-                                        label='Select Branch'
-                                        items={branch}
-                                        searchKey='branchName'
-                                        labelKeys={['branchName']}
-                                        onItemSelected={selectBranch}
-                                        error={errors.branch}
-                                    />
-
-                                    <InputValidation
-                                        label='Contact'
-                                        type='text'
-                                        id='contact'
-                                        name='contact'
-                                        value={employeeData.contact}
-                                        onChange={handleInputChange}
-                                        error={errors.contact}
-                                        fontSize={14}
-                                        require={'true'}
-                                    />
-                                </div>
-                                <div className='col-xl-6 col-12  d-block text-start bg-white'>
-                                    <InputValidation
-                                        label='Start Working Date'
-                                        type='date'
-                                        id='startWorkingDate'
-                                        name='startWorkingDate'
-                                        value={employeeData.startWorkingDate}
-                                        onChange={handleInputChange}
-                                        error={errors.startWorkingDate}
-                                        fontSize={14}
-                                        require={'true'}
-                                    />
-                                    <InputValidation
-                                        label='Work Email'
-                                        type='email'
-                                        id='email'
-                                        name='email'
-                                        value={employeeData.email}
-                                        onChange={handleInputChange}
-                                        error={errors.email}
-                                        fontSize={14}
-                                        require={'true'}
-                                    />
-
-
-                                </div>
-                            </div>
-                            {/* // tap */}
-                            <div className='bg-white py-3'>
-                                <ul className="nav nav-tabs" id="myTab" role="tablist">
-                                    <li className="nav-item" role="presentation">
-                                        <button className="text-dark nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Resume</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button class="text-dark nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Work Information</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button class="text-dark nav-link " id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Setting</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button class="text-dark nav-link " id="private-tab" data-bs-toggle="tab" data-bs-target="#private-tab-pane" type="button" role="tab" aria-controls="private-tab-pane" aria-selected="false">Private Information</button>
-                                    </li>
-                                </ul>
-
-                                <div class="tab-content border-0 py-3" id="myTabContent">
-                                    <div class="border-0 tab-pane show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                                        <textarea id="" className='w-100 border-0 p-3'
-                                            name="resume"
-                                            value={employeeData.resume}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                                        <InputValidation
-                                            label='Schedule'
-                                            type='text'
-                                            id='schedule'
-                                            name='schedule'
-                                            value={employeeData.schedule}
-                                            onChange={handleInputChange}
-                                            error={errors.schedule}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-                                        <InputValidation
-                                            label='workShift'
-                                            type='number'
-                                            id='workShiftID'
-                                            name='workShiftID'
-                                            value={employeeData.workShiftID}
-                                            onChange={handleInputChange}
-                                            error={errors.workShiftID}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-                                        {/* <InputValidation
-                                            label='managerID'
-                                            type='number'
-                                            id='managerID'
-                                            name='managerID'
-                                            value={findManager(employeeData.managerID)}
-                                            // onChange={handleInputChange}
-                                            error={errors.workShiftID}
-                                            fontSize={14}
-                                            require={'true'}
-                                        /> */}
-                                        <InputValidation
-                                            label='Cv Photo'
-                                            type='text'
-                                            id='cv'
-                                            name='cv'
-                                            value={employeeData.cv}
-                                            onChange={handleInputChange}
-                                            error={errors.cv}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-                                        <InputValidation
-                                            label='positionID'
-                                            type='number'
-                                            id='positionID'
-                                            name='positionID'
-                                            value={employeeData.positionID}
-                                            onChange={handleInputChange}
-                                            error={errors.positionID}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-
-                                    </div>
-                                    <div class="border-0 tab-pane " id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-                                        <div className="p-3">
-                                            <button className="btn btn-outline-secondary px-3">Create user</button>
-                                        </div>
-
-                                    </div>
-                                    <div class="border-0 tab-pane p-2" id="private-tab-pane" role="tabpanel" aria-labelledby="private-tab" tabindex="0">
-                                        <InputValidation
-                                            label='mobile'
-                                            type='text'
-                                            id='mobile'
-                                            name='mobile'
-                                            value={employeeData.mobile}
-                                            onChange={handleInputChange}
-                                            error={errors.mobile}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-                                        <InputValidation
-                                            label='Gender'
-                                            type='text'
-                                            id='gender'
-                                            name='gender'
-                                            value={employeeData.gender}
-                                            onChange={handleInputChange}
-                                            error={errors.gender}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-                                        <InputValidation
-                                            label='Salary'
-                                            type='number'
-                                            id='salary'
-                                            name='salary'
-                                            value={employeeData.salary}
-                                            onChange={handleInputChange}
-                                            error={errors.salary}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-                                        <InputValidation
-                                            label='Address'
-                                            type='text'
-                                            id='address'
-                                            name='address'
-                                            value={employeeData.address}
-                                            onChange={handleInputChange}
-                                            error={errors.address}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-
-                                        <InputValidation
-                                            label='Bank Account'
-                                            type='text'
-                                            id='bankAccount'
-                                            name='bankAccount'
-                                            value={employeeData.bankAccount}
-                                            onChange={handleInputChange}
-                                            error={errors.bankAccount}
-                                            fontSize={14}
-                                            require={'true'}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </form>
 

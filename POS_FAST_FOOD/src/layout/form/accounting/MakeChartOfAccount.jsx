@@ -18,7 +18,7 @@ const MakeChartOfAccount = () => {
             setAcType(response.data);
         })
     }, [])
-    const [accountData, setAccountData] = useState({
+    const [accountData,] = useState({
         accountTypeId: '',
         branchId: '',
         code: '',

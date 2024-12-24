@@ -7,10 +7,15 @@ import { el } from "date-fns/locale";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { hostName } from "../../../../api/host";
 import Text from "../../../../components/text/Text";
+import { createUser, getUserByEmployeeId } from "../../../../api/UserApi";
+import InputValidation from "../../../../components/input/InputValidation";
+import CustomCommoBox from "../../../../components/select/CustomCommoBox";
+import { userObject } from "../../../../api/AppConfig";
 
 
 
 const EmployeeDetail = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const domainName = hostName();
     const profilePath = `http://${domainName}:8085/api/images/`
@@ -37,7 +42,21 @@ const EmployeeDetail = () => {
         updatedDate: '',
         image: ''
     });
-    const { id } = useParams();
+    const [employeeUser, setEmployeeUser] = useState([]);
+    useEffect(() => {
+        if (id) {
+            getUser();
+        }
+    }, [id])
+    function getUser() {
+        getUserByEmployeeId(id).then((response) => {
+            setEmployeeUser(response.data);
+            console.log(response.data);
+        }).catch(e => {
+
+        })
+    }
+
     useEffect(() => {
         if (id) {
             getEmployee(id).then((reponse) => {
@@ -127,6 +146,84 @@ const EmployeeDetail = () => {
     }
     const navi = useNavigate();
 
+    const userRole = [
+        {
+            "value": 'SELLER',
+        },
+        {
+            "value": 'ADMIN',
+        },
+    ]
+
+    const [user, setUser] = useState(
+        {
+            "employeeId": id,
+            "username": '',
+            "password": '',
+            "role": '',
+        }
+    )
+    function handleChange(e) {
+        e.preventDefault();
+        const { name, value } = e.target;
+        setUser((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    }
+    function saveUser(e) {
+        e.preventDefault();
+        createUser(user).then((response) => {
+            setIsFormOpen(false);
+            getUser();
+        })
+    }
+    function selectRole(role) {
+        setUser((prevData) => ({
+            ...prevData,
+            ['role']: role.value
+        }));
+    }
+    const [isFormOpen, setIsFormOpen] = useState(false)
+    function formCreateUser() {
+        return (
+            <>
+                <form>
+                    <InputValidation
+                        label='Email'
+                        fontSize={14}
+                        id='username'
+                        type='email'
+                        name='username'
+                        value={user.username}
+                        onChange={handleChange}
+                    />
+                    <InputValidation
+                        label='Password'
+                        id='password'
+                        fontSize={14}
+                        type='password'
+                        name='password'
+                        value={user.password}
+                        onChange={handleChange}
+                    />
+                    <CustomCommoBox
+                        label='Select role'
+                        items={userRole}
+                        labelKeys={["value"]}
+                        fontSize={14}
+                        onItemSelected={selectRole}
+                    />
+                    <div className="d-flex">
+                        <button className="button cancel px-5 " onClick={() => setIsFormOpen(false)}>Cancel</button>
+                        <button className="button add px-5 ms-3" onClick={saveUser}>Save</button>
+
+                    </div>
+                </form>
+            </>
+        )
+    }
+
     return (
         <>
 
@@ -185,7 +282,7 @@ const EmployeeDetail = () => {
                                         <button class="text-dark nav-link f-14" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Work Information</button>
                                     </li>
                                     <li className="nav-item" role="presentation">
-                                        <button class="text-dark nav-link f-14" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Setting</button>
+                                        <button class="text-dark nav-link f-14" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">User Management</button>
                                     </li>
                                     <li className="nav-item" role="presentation">
                                         <button class="text-dark nav-link f-14" id="private-tab" data-bs-toggle="tab" data-bs-target="#private-tab-pane" type="button" role="tab" aria-controls="private-tab-pane" aria-selected="false">Private Information</button>
@@ -202,10 +299,44 @@ const EmployeeDetail = () => {
                                         <Text title='Cv ' value={employeeData.cv} fontSize={14} />
                                     </div>
                                     <div class="border-0 tab-pane " id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-                                        {/* <p className="mb-0">Create User</p>
-                                    <p className="mb-0">Day Off / year : 18day</p>
-                                    <p className="mb-0">Work Shift</p>
-                                    <p className="mb-0">Attencden</p> */}
+                                        <div className="py-3">
+                                            {userObject().role == 'ADMIN' ? <button className='button add px-5 my-3 mt-2' onClick={() => setIsFormOpen(true)}>New User</button> : <><span className="text-seondary">Access denied</span></>}
+                                            {employeeUser.length > 0 && isFormOpen == false ? (
+                                                <>
+                                                    {employeeUser.map(user =>
+                                                        <>
+                                                            <h1 className="f-20 ps-3 border-start">User {user.username}</h1>
+                                                            <InputValidation
+                                                                label='User email'
+                                                                fontSize={14}
+                                                                name='user'
+                                                                value={user.username}
+                                                            />
+                                                            <InputValidation
+                                                                label='Password'
+                                                                fontSize={14}
+                                                                name='pass'
+                                                                value={user.password}
+                                                            />
+                                                            <InputValidation
+                                                                label='ROLE'
+                                                                fontSize={14}
+                                                                name='role'
+                                                                value={user.role}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>
+
+                                                    <div className={isFormOpen ? 'd-block' : 'd-none'}>
+                                                        {formCreateUser()}
+                                                    </div>
+                                                </>
+                                            )}
+
+                                        </div>
                                     </div>
                                     <div class="border-0 tab-pane p-2" id="private-tab-pane" role="tabpanel" aria-labelledby="private-tab" tabindex="0">
 

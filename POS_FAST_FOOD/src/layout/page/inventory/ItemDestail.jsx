@@ -110,18 +110,26 @@ const ItemDetail = () => {
                     <Loading />
                 </>
             ) : (
-                <form action='' className='animation-opacity'>
-                    <div className="container-fluid p-0 center">
+                <div className='animation-opacity '>
+                    <div className="container p-0 center ">
                         <div className="row w-100">
                             <div className="col-12">
-                                <div className="d-flex py-3">
-                                    <div className="pe-3">
-                                        <button className="button cancel box-shadow" onClick={() => navi(`/list-item`)}><IoIosArrowRoundBack /> Back</button >
-                                    </div >
-                                    <button className="button add box-shadow" onClick={() => navi(`/update-item/${id}`)}><i class="fa-solid fa-pen"></i><span className='px-2'>Edit</span></button>
+                                <div className="d-flex justify-content-between align-items-center p-4">
+                                    <div>
+                                        <span>Product / {productData.productName}</span>
+                                    </div>
+                                    <div className="d-flex">
+                                        <div className="pe-3">
+                                            <button className="button cancel box-shadow" onClick={() => navi(`/list-item`)}><IoIosArrowRoundBack /> Back</button >
+                                        </div >
+                                        <button className="button add box-shadow" onClick={() => navi(`/update-item/${id}`)}><i class="fa-solid fa-pen"></i><span className='px-2'>Edit</span></button>
+                                    </div>
                                 </div >
+                            </div>
+                            <div className="col-12">
 
-                                <div className="border bg-white w-100 rounded p-4">
+                                <div className=" bg-white w-100 rounded p-4 box-shadow" box-shadow>
+
                                     <div className="d-flex" style={{ height: '200px' }}>
                                         <div className='center rounded box-shadow' style={{ height: '190px', width: '300px', overflow: 'hidden' }}>
                                             <img src={`http://${domainName}:8085/api/images/${productData.image}`} alt="" className="h-100" />
@@ -194,7 +202,7 @@ const ItemDetail = () => {
                         </div >
 
                     </div >
-                </form >
+                </div >
             )
 
             }

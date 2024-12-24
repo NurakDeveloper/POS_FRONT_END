@@ -7,6 +7,7 @@ import { getAllEmployee } from '../../../../api/EmployeeApi'
 import { Th } from '../../../../components/table/DataGrid'
 import { getAllBranch } from '../../../../api/Branch'
 import { format } from 'date-fns';
+import Text from '../../../../components/text/Text'
 const OrderDetail = () => {
     const [invoiceNumber, setInvoiceNumber] = useState(0);
     const [orderType, setOrderType] = useState();
@@ -48,7 +49,7 @@ const OrderDetail = () => {
             setCash(reponse.data.cash);
             setCustomerId(reponse.data.customerId);
             setExchange(reponse.data.exchange);
-            setInvoiceNumber(reponse.data.id);
+            setInvoiceNumber(reponse.data.invoiceNumber);
             setDescription(reponse.data.description);
             setOrderDate(reponse.data.orderDate);
             setTotalAmount(reponse.data.totalAmount);
@@ -97,74 +98,58 @@ const OrderDetail = () => {
             return "No Branch Selected";
         }
     }
-    const formatDate = (dateString) => {
+    const formatDateTime = (dateString) => {
         try {
             const date = new Date(dateString);
             return new Intl.DateTimeFormat('en', {
                 weekday: 'long',   // Full day of the week (e.g., "Monday")
                 day: '2-digit',    // Two-digit day (e.g., "07")
-                month: 'numeric',     // Full month name (e.g., "November")
-                year: 'numeric'    // Full year (e.g., "2024")
+                month: 'numeric',  // Numeric month (e.g., "11")
+                year: 'numeric',   // Full year (e.g., "2024")
+                hour: '2-digit',   // Two-digit hour (e.g., "08")
+                minute: '2-digit', // Two-digit minute (e.g., "30")
+                second: '2-digit', // Two-digit second (e.g., "15")
+                hour12: true       // 12-hour clock (AM/PM)
             }).format(date);
         } catch (e) {
-            return "Error Date"
-        }// 'dd' for day, 'MMMM' for full month, 'yy' for year
+            return "Error Date";
+        }
     };
+
     return (
         <>
 
             <div className=''>
-                <div className="container-fluid p-0 center">
+                <div className="container p-0 center">
                     <div className="row w-100">
                         <div className="col-xl-12">
-                            <div className="border bg-white w-100 rounded">
+                            <div className="box-shadow bg-white w-100 rounded">
                                 <div className="form-heder w-100 px-4 pt-2" style={{ maxHeight: '130px' }}>
-                                    <h1>IV#{invoiceNumber.toString().padStart(5, '0')}</h1>
+                                    <h1>IV#{invoiceNumber}</h1>
                                 </div>
                                 <div className="row">
                                     <div className="col-md-6 col-12">
                                         <div className='d-block text-start fs-6 bg-white px-4 py-2'>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>OrderType ? </p>
-                                                <p className='w-75 text-start text-secondary'>POS</p>
-                                            </div>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>Customer ? </p>
-                                                <p className='w-75 text-start text-secondary'>{customerId}</p>
-                                            </div>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>Branch ? </p>
-                                                <p className='w-75 text-start text-secondary'>{findBranchName(branchName)}</p>
-                                            </div>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>Seller </p>
-                                                <p className='w-75 text-start text-secondary'>{findEmployeeName(acceptedBy)}</p>
-                                            </div>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>Description </p>
-                                                <p className='w-75 text-start text-secondary'>{description}</p>
-                                            </div>
+                                            <Text title='Order Type' value={'POS'} fontSize={14} />
+                                            <Text title='Customer' value={customerId} fontSize={14} />
+                                            <Text title='Company' value={findBranchName(branchName)} fontSize={14} />
+
+                                            <Text title='Seller' value={findEmployeeName(acceptedBy)} fontSize={14} />
+
+                                            <Text title='Description' value={description} fontSize={14} />
 
                                         </div>
                                     </div>
                                     <div className="col-md-6 col-12">
                                         <div className='d-block text-start fs-6 bg-white px-4 py-2'>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
+                                            {/* <div className='group-input center w-100' style={{ fontSize: 14 }}>
                                                 <p className='w-25 text-start'>OrderDate ? </p>
-                                                <p className='w-75 text-start text-secondary'>{formatDate(orderDate)}</p>
-                                            </div>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>Total Amount ?</p>
-                                                <p className='w-75 text-start text-secondary'>{formatCurrency.format(totalAmount)}</p>
-                                            </div>
-                                            <div className='group-input center w-100 ' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>Cash ? </p>
-                                                <p className='w-75 text-start text-secondary'>{formatCurrency.format(cash)}</p>
-                                            </div>
-                                            <div className='group-input center w-100' style={{ fontSize: 14 }}>
-                                                <p className='w-25 text-start'>Exchange ? </p>
-                                                <p className='w-75 text-start text-secondary'>{formatCurrency.format(exchange)}</p>
-                                            </div>
+                                                <p className='w-75 text-start text-secondary'>{ }</p>
+                                            </div> */}
+                                            <Text title='Sale Date' value={formatDateTime(orderDate)} fontSize={14} />
+                                            <Text title='Total Amount' value={formatCurrency.format(totalAmount)} fontSize={14} />
+                                            <Text title='Received' value={formatCurrency.format(cash)} fontSize={14} />
+                                            <Text title='Change' value={formatCurrency.format(exchange)} fontSize={14} />
 
                                         </div>
                                     </div>
@@ -233,26 +218,11 @@ const OrderDetail = () => {
                                         </div>
                                         <div class="border-0 tab-pane p-2" id="payment-tab-pane" role="tabpanel" aria-labelledby="payment-tab" tabindex="0">
                                             <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
-                                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                                    <p className='w-25 text-start'>OrderDate ? </p>
-                                                    <p className='w-75 text-start text-secondary'>{formatDate(orderDate)}</p>
-                                                </div>
-                                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                                    <p className='w-25 text-start'>Total Amount ?</p>
-                                                    <p className='w-75 text-start text-secondary'>{formatCurrency.format(totalAmount)}</p>
-                                                </div>
-                                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                                    <p className='w-25 text-start'>Cash ? </p>
-                                                    <p className='w-75 text-start text-secondary'>{formatCurrency.format(cash)}</p>
-                                                </div>
-                                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                                    <p className='w-25 text-start'>Exchange ? </p>
-                                                    <p className='w-75 text-start text-secondary'>{formatCurrency.format(exchange)}</p>
-                                                </div>
-                                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                                    <p className='w-25 text-start'>Payment method ? </p>
-                                                    <p className='w-75 text-start text-secondary'>{"CASH"}</p>
-                                                </div>
+                                                <Text title='Sale Date' value={formatDateTime(orderDate)} fontSize={14} />
+                                                <Text title='Total Amount' value={formatCurrency.format(totalAmount)} fontSize={14} />
+                                                <Text title='Received' value={formatCurrency.format(cash)} fontSize={14} />
+                                                <Text title='Change' value={formatCurrency.format(exchange)} fontSize={14} />
+                                                <Text title='Payment Status' value={'COMPLETE'} fontSize={14} />
 
                                             </div>
                                         </div>

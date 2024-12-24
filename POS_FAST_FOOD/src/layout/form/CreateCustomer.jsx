@@ -1,123 +1,281 @@
+import React, { useEffect, useState } from 'react';
+import InputValidation from '../../components/input/InputValidation';
+import { hostName } from '../../api/host';
+import { useNavigate, useParams } from 'react-router-dom';
+import { uploadImage } from '../../api/ImageApi';
+import { IoIosArrowBack } from 'react-icons/io';
+import { IoSaveSharp } from 'react-icons/io5';
+import { createCustomer, getCustomer, updateCustomer } from '../../api/Customer';
 
 const CreateCustomer = () => {
+    const [customer, setCustomer] = useState({
+        "firstName": "",
+        "lastName": "",
+        "email": "",
+        "phoneNumber": "",
+        "addressLine1": "",
+        "addressLine2": "",
+        "city": "",
+        "state": "",
+        "postalCode": "",
+        "country": "",
+        "joinDate": "",
+        "membershipStatus": "SL",
+        "status": "ACTIVE",
+        "image": ""
+    });
+
+    const domainName = hostName();
+    const customerImagePath = `http://${domainName}:8085/api/images/`;
+    const { id } = useParams();
+    const [errors, setErrors] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [file, setFile] = useState(null);
+
+    useEffect(() => {
+        if (id) {
+            getCustomer(id).then(response => {
+                setCustomer(response.data);
+            }).catch(e => {
+                console.error('Error fetching customer:', e);
+            });
+        }
+    }, [id]);
+
+    function validateForm() {
+        const newErrors = {};
+        if (!customer.firstName) newErrors.firstName = 'First name is required';
+        if (!customer.lastName) newErrors.lastName = 'Last name is required';
+        if (!customer.email) newErrors.email = 'Email is required';
+        if (!customer.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
+
+    function handleInputChange(e) {
+        const { name, value } = e.target;
+        setCustomer(prevData => ({ ...prevData, [name]: value }));
+    }
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const imageURL = URL.createObjectURL(file);
+        setSelectedImage(imageURL);
+        setFile(file);
+        setCustomer(prevData => ({ ...prevData, image: file.name }));
+    };
+
+    function clearForm() {
+        setFile(null);
+        setSelectedImage(null);
+        setCustomer({
+            "firstName": "",
+            "lastName": "",
+            "email": "",
+            "phoneNumber": "",
+            "addressLine1": "",
+            "addressLine2": "",
+            "city": "",
+            "state": "",
+            "postalCode": "",
+            "country": "",
+            "joinDate": "",
+            "membershipStatus": "SL",
+            "status": "ACTIVE",
+            "image": ""
+        });
+    }
+
+    function saveCustomer(e) {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+
+
+        const apiCall = id ? updateCustomer(id, customer) : createCustomer(customer);
+        apiCall.then(() => {
+            console.log(`${id ? 'Customer updated' : 'Customer created'} successfully`);
+            if (file) {
+                const formData = new FormData();
+                formData.append("file", file);
+                uploadImage(formData).then(() => {
+                    console.log('Image uploaded successfully');
+                }).catch(e => {
+                    console.error('Error uploading image:', e);
+                });
+            }
+            clearForm();
+        }).catch(e => {
+            console.error('Error saving customer:', e);
+        });
+    }
+
+    function previewCustomer(e) {
+        e.preventDefault();
+        alert(JSON.stringify(customer, null, 2));
+    }
+
+    const navigate = useNavigate();
+
     return (
-        <>
-
-            <div>
-                <div className="row">
-                    <div className="col-12">
-                        <div className="form-heder w-100 bg-white border" style={{ maxHeight: '130px' }}>
-                            <form className="d-flex h-100" >
-                                <div className='start w-50 p-2'>
-                                    <div className='w-100 px-4'>
-                                        <div className="fs-2">
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder="eng. Employee name" />
-                                        </div>
-                                        <div className="fs-6 text-secondary">
-                                            <input type="text" className='w-75 text-start text-secondary input-box' placeholder="Position" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='end p-2 w-50 d-flex'>
-                                    <div className='d-flex' style={{ height: '120px', width: '170px', overflow: 'hidden' }}>
-                                        <div className='d-block text-center fs-6' style={{ width: '40px' }}>
-                                            <div className=' pointer'>
-                                                <i class="fa-solid fa-pen font-12"></i>
-                                            </div>
-                                            <div className=' pointer mt-2'>
-                                                <i class="fa-solid fa-trash font-12 text-danger"></i>
-                                            </div>
-
-                                        </div>
-                                        <div className='center box-shadow rounded' style={{ height: '120px', width: '130px', overflow: 'hidden' }}>
-                                            <img src="https://thumbs.dreamstime.com/b/woman-sit-sofa-laptop-laughing-look-camera-happy-indian-feel-overjoyed-leisure-internet-enjoy-modern-wireless-330121579.jpg" alt="" className="h-100" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-
+        <div>
+            <div className="container d-block box-shadow">
+                <div className='form-header-content px-0 py-3 pt-2'>
+                    <div className='d-flex'>
+                        <button type="button" className="button cancel box-shadow" onClick={() => navigate('/list-customer')}>
+                            <IoIosArrowBack /><span className='px-2'>Cancel</span>
+                        </button>
+                        <div className="button text-dark">
+                            <span className="f-20 border-start ps-3 h-100 w-100 text-secondary">
+                                {id ? 'Update Customer' : 'Create Customer'}
+                            </span>
                         </div>
-                        <div className="d-flex">
-                            <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
-                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                    <p className='w-25 text-start'>Address  </p>
-                                    <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" Street . . ." />
+                    </div>
+                    <div className='d-flex'>
+                        <button type="button" className="button preview box-shadow" onClick={previewCustomer}>
+                            <i className="fa-solid fa-circle-info px-2"></i>Preview
+                        </button>
+                        <div className='px-3 pe-0'>
+                            <button type="button" className="button add box-shadow px-4" onClick={saveCustomer}>
+                                <IoSaveSharp /><span className='px-2'>Save</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <form>
+                    <div>
+                        <div className="row">
+                            <div className="col-12">
+                                <div className='col-xl-6 col-md-6 col-12'>
+                                    <div className="d-flex">
+                                        <div className='w-100'>
+                                            <label htmlFor="fileImage" className='rounded py-2 box-shadow center pointer' style={{ height: '150px', width: '150px', overflow: 'hidden' }}>
+                                                <img src={selectedImage ? selectedImage : `${customerImagePath}${customer.image}`} alt="Customer" className="h-100" />
+                                            </label>
+                                            <span className='validation-error f-12'>{errors.image || ''}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                    <p className='w-25 text-start opacity-0'>AddressLine2  </p>
-                                    <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" City . . . " />
+                                <div className='col-6 pb-3'>
+                                    <div className='d-none'>
+                                        <input type="file" id="fileImage" className='d-none w-100' onChange={handleFileChange} />
+                                    </div>
                                 </div>
-                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                    <p className='w-25 text-start opacity-0'>Email ? </p>
-                                    <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" Country . . ." />
-                                </div>
+                            </div>
+
+                            <div className="col-md-6 col-12">
+                                <InputValidation
+                                    label='First Name'
+                                    id='firstName'
+                                    type='text'
+                                    name='firstName'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.firstName}
+                                    error={errors.firstName}
+                                />
+                                <InputValidation
+                                    label='Last Name'
+                                    id='lastName'
+                                    type='text'
+                                    name='lastName'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.lastName}
+                                    error={errors.lastName}
+                                />
+                                <InputValidation
+                                    label='Phone Number'
+                                    id='phoneNumber'
+                                    type='text'
+                                    name='phoneNumber'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.phoneNumber}
+                                    error={errors.phoneNumber}
+                                />
+                                <InputValidation
+                                    label='Email'
+                                    id='email'
+                                    type='email'
+                                    name='email'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.email}
+                                    error={errors.email}
+                                />
+
+                                <InputValidation
+                                    label='Country'
+                                    id='country'
+                                    type='text'
+                                    name='country'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.country}
+                                    error={errors.country}
+                                />
 
                             </div>
-                            <div className='d-block text-start fs-6 bg-white px-4 py-2 w-50'>
-                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                    <p className='w-25 text-start'>RegisterDate ? </p>
-                                    <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" . . ." />
-                                </div>
-                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                    <p className='w-25 text-start'>Mobile  </p>
-                                    <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" . . ." />
-                                </div>
-                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                    <p className='w-25 text-start'>Email  </p>
-                                    <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" . . ." />
-                                </div>
-                                <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                    <p className='w-25 text-start'>Zip </p>
-                                    <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" . . ." />
-                                </div>
+                            <div className="col-md-6 col-12">
 
-                            </div>
-                        </div>
-                        <div className='bg-white py-3'>
-                            <ul className="nav nav-tabs" id="myTab" role="tablist">
-                                <li className="nav-item" role="presentation">
-                                    <button className="text-dark nav-link  border-bottom active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Contact & Address</button>
-                                </li>
-                                <li className="nav-item" role="presentation">
-                                    <button class="text-dark nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Membership</button>
-                                </li>
-
-                            </ul>
-
-                            <div class="tab-content border-0" id="myTabContent">
-                                <div class="border-0 tab-pane show active p-2" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                                    <button className="btn bg-green box-shadow rounded px-4 text-white">New</button>
-                                </div>
-                                <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>Member Level ? </p>
-                                        <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" . . ." />
-                                    </div>
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>Discount ? </p>
-                                        <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" . . ." />
-                                    </div>
-                                    <div className='group-input center w-100 py-1' style={{ fontSize: 16 }}>
-                                        <p className='w-25 text-start'>PhoneNumber ? </p>
-                                        <input type="text" className='w-75 text-start text-secondary input-box' placeholder=" . . ." />
-                                    </div>
-
-                                </div>
-
+                                <InputValidation
+                                    label='Address Line 1'
+                                    id='addressLine1'
+                                    type='text'
+                                    name='addressLine1'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.addressLine1}
+                                />
+                                <InputValidation
+                                    label='Address Line 2'
+                                    id='addressLine2'
+                                    type='text'
+                                    name='addressLine2'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.addressLine2}
+                                />
+                                <InputValidation
+                                    label='Postal Code'
+                                    id='postalCode'
+                                    type='text'
+                                    name='postalCode'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.postalCode}
+                                    error={errors.postalCode}
+                                />
+                                <InputValidation
+                                    label='City'
+                                    id='city'
+                                    type='text'
+                                    name='city'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.city}
+                                    error={errors.city}
+                                />
+                                <InputValidation
+                                    label='State'
+                                    id='state'
+                                    type='text'
+                                    name='state'
+                                    fontSize={14}
+                                    onChange={handleInputChange}
+                                    value={customer.state}
+                                    error={errors.state}
+                                />
                             </div>
                         </div>
                     </div>
-
-                </div>
+                </form>
             </div>
+        </div>
+    );
+};
 
-        </>
-    )
-}
-
-
-
-
-
-export default CreateCustomer
+export default CreateCustomer;

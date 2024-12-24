@@ -8,6 +8,10 @@
 }
 
 .t-value {
-    padding: 10px 0px;
+    padding: 3px 0px;
     color: #252525;
+}
+
+p {
+    padding: 0;
 }

@@ -1,7 +1,8 @@
 .product-card {
     background-color: white;
-    border-radius: 4px;
+    /* border-radius: 4px; */
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border: 1px solid rgb(229, 229, 229);
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;

@@ -4,7 +4,7 @@ import { getToken } from "./AppConfig";
 
 // Configure API base URL and token
 const domainName = hostName();
-const BASE_URL_BRANCH = `http://${domainName}:8085/api/branch`;
+const BASE_URL_BRANCH = `http://${domainName}:8085/api/branches`;
 
 const token = getToken();
 const headers = token ? { "Authorization": `nurak ${token}` } : {};
@@ -44,7 +44,7 @@ export const getBranchId = () => {
         }
         return JSON.parse(branchId); // Parse if it exists
     } catch (error) {
-        console.error("Error parsing branchId cookie:", error);
+        // console.error("Error parsing branchId cookie:", error);
         return 0; // Fallback to default value in case of error
     }
 };

@@ -1,8 +1,9 @@
 .data-grid {
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
-    border: 1px solid #dbdbdb;
-    padding: 30px 0px;
+    /* border: 1px solid #dbdbdb; */
+    /* padding: 30px 0px; */
     padding-top: 0px;
 }
 
@@ -10,6 +11,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+    overflow-x: auto;
 }
 
 th {
@@ -17,8 +19,11 @@ th {
     padding: 15px;
     text-align: left;
     border: none;
-    border-bottom: 1px solid #ddd;
-    overflow: hidden;
+    border-bottom: 1px solid #c1c1c1;
+    /* overflow: hidden; */
+    font-size: 14px;
+    color: #636363;
+    font-weight: 400;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -28,15 +33,17 @@ td {
     padding: 15px;
     text-align: left;
     border: none;
-    border-bottom: 0.5px solid #a2a2a2;
+    border-bottom: 0.2px solid #dddddd;
     overflow: hidden;
+    font-weight: 400;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 14px;
 }
 
+
 th {
-    background-color: #f3f3f3;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
     position: relative;
 }
@@ -67,6 +74,12 @@ th:hover .resizer {
     background-color: #dddddd;
 }
 
+tr {
+    cursor: pointer;
+    background: white;
+    transition-duration: 0.1s;
+}
+
 tr:hover {
-    background-color: #f9f9f9;
+    background: #f9f9f9;
 }

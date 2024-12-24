@@ -9,6 +9,11 @@ import { SlArrowLeft, SlArrowRight } from 'react-icons/sl'
 import { RiEditFill } from 'react-icons/ri'
 import RemoveMessage from '../../../components/alert/RemoveMessage'
 import { hostName } from '../../../api/host'
+import DataList from '../../../components/datalist/DataList'
+import { motion } from 'framer-motion'
+import ActionHeader from '../../../components/listheader/ActionHeader'
+import { exportToExcelFiles, perPage, searchData } from '../../../api/AppConfig'
+
 const Category = () => {
 
     const [categories, setCategories] = useState([]);
@@ -17,6 +22,16 @@ const Category = () => {
     useEffect(() => {
         getCategory();
     }, [])
+    const rowVariants = {
+        hidden: { opacity: 0, X: 20 },
+        visible: (i) => ({
+            opacity: 1,
+            y: 0,
+            transition: {
+                delay: i * 0.05, // Stagger animation by 0.1 seconds per row
+            },
+        }),
+    };
     function getCategory() {
         getAllCategory().then((response) => {
             setCategories(response.data);
@@ -76,7 +91,10 @@ const Category = () => {
             </div>
         )
     }
-    const rowsPerPage = 15; // Define how many rows to display per page
+    const [rowsPerPage, setRowsPerPage] = useState(15);
+    function selectPerPage(selected) {
+        setRowsPerPage(selected.value);
+    }
     const [currentPage, setCurrentPage] = useState(1);
 
     // Calculate the index of the first and last item on the current page
@@ -101,6 +119,19 @@ const Category = () => {
             setCurrentPage((prevPage) => prevPage - 1);
         }
     };
+    const formatCurrency = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    });
+    const [searchTerm, setSearchTerm] = useState("");
+    useEffect(() => {
+        if (!searchTerm) {
+            getCategory();
+            return
+        }
+        setCategories(searchData(categories, searchTerm, ["name", "description"]));
+
+    }, [searchTerm]);
     const [isRemoveCategories, setIsRemoveCategories] = useState(false);
     const [categoryId, setCategoryId] = useState();
     function removeCategroy(id) {
@@ -152,10 +183,13 @@ const Category = () => {
                         </Thead>
                         <Tbody>
                             {currentData.map((f, i) => (
-                                <Tr
+                                <motion.tr
                                     key={f.id}
-                                    className="pointer"
-                                    onClick={() => goto(`/item-detail`)}
+                                    className='pointer'
+                                    custom={i} // Pass index for staggered delay
+                                    variants={rowVariants}
+                                    initial="hidden"
+                                    animate="visible"
                                 >
                                     <Td>
                                         <input
@@ -191,7 +225,7 @@ const Category = () => {
 
                                         </div>
                                     </td>
-                                </Tr>
+                                </motion.tr>
                             ))}
                         </Tbody>
                     </table>
@@ -202,105 +236,31 @@ const Category = () => {
         );
     }
 
-
-    const [itemView, setItemView] = useState();
-    useEffect(() => {
-        setView(1);
-    }, [])
-    function setView(index) {
-        if (index == 1) {
-            setItemView(() => listCard())
-        } else {
-            setItemView(() => listTable())
-        }
-    }
     const navigate = useNavigate();
-    function menu() {
-        return (
-            <div className="list-header-container">
-                {/* Left Section */}
-                <div className="list-header-left">
-                    {/* Add New Button */}
-                    <button className="list-header-button add-new box-shadow" onClick={() => navigate('/create-category')}>
-                        <FaPlus className="list-header-icon" />
-                        Add New
-                    </button>
-                    <button className="list-header-button print box-shadow">
-                        <FaPrint className="list-header-icon" />
-                        Print
-                    </button>
 
-                    {/* Export Button */}
-                    <button className="list-header-button export box-shadow">
-                        <FaFileExport className="list-header-icon" />
-                        Export
-                    </button>
 
-                    {/* Search Input */}
-
-                </div>
-                <div className="list-header-right">
-                    <div className="list-header-search">
-                        <FaSearch className="list-header-icon search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="list-header-input"
-                        />
-                    </div>
-                </div>
-
-                {/* Right Section */}
-                <div className="list-header-right">
-                    <span className="page-info f-14 text-secondary">
-                        {currentPage} / {totalPages}
-                    </span>
-                    <div className="pagination">
-                        <div className='pe-2'>
-                            <button
-                                className="button previous"
-                                onClick={handlePrevious}
-                                disabled={currentPage === 1}
-                            >
-                                <SlArrowLeft />
-                            </button>
-                        </div>
-
-                        <button
-                            className="button next"
-                            onClick={handleNext}
-                            disabled={currentPage === totalPages}
-                        >
-                            <SlArrowRight />
-                        </button>
-                    </div>
-                    {/* Print Button */}
-
-                    <button className="list-header-button list box-shadow" onClick={() => setView(2)}>
-                        <FaThList className="list-header-icon" />
-                        List
-                    </button>
-
-                    {/* Export Button */}
-                    <button className="list-header-button list box-shadow" onClick={() => setView(1)}>
-                        <FaThLarge className="list-header-icon" />
-                        Card
-                    </button>
-                    {/* Filter Button */}
-                    <button className="list-header-button filter box-shadow">
-                        <FaFilter className="list-header-icon" />
-                        Filter
-                    </button>
-                </div>
-            </div>
-        );
-    }
     return (
         <>
             <div className='container-fluid p-0 center'>
                 <div className="row">
                     <div className=''>
-                        {menu()}
+                        <ActionHeader
+                            btnAddName='New Categories'
+                            title="Category"
+                            subtitle="Manage your categories inventory"
+                            searchTerm={searchTerm}
+                            searchChange={(e) => setSearchTerm(e.target.value)}
+                            onCreate={() => navigate('/create-category')}
+                            onPrint={() => setIsPrint(true)}
+                            onExport={() => exportToExcelFiles(categories, 'category_data')}
+                            perPage={perPage()}
+                            selectPerPage={selectPerPage}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            handleNext={handleNext}
+                            handlePrevious={handlePrevious}
+                        // isTableAction={() => isTable ? setIsTable(false) : setIsTable(true)}
+                        />
                     </div>
                     <div className=" col-12">
                         {listTable()}
@@ -323,3 +283,5 @@ const Category = () => {
 }
 
 export default Category
+
+

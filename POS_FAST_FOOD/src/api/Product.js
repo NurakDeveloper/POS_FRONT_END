@@ -1,35 +1,4 @@
-// import axios from "axios";
-// import { hostName } from "./host";
 
-// // Configure API base URL and token
-// const domainName = hostName();
-// const URL_PRODUCT_API = `http://${domainName}:8085/api/seller/product`;
-
-
-// // API functions
-// export const getAllProduct = () => {
-//     return axios.get(`${URL_PRODUCT_API}/list-product`);
-// };
-
-// export const createProduct = (obj) => {
-//     return axios.post(`${URL_PRODUCT_API}/create`, obj);
-// };
-
-// export const getProductById = (id) => {
-//     if (token) {
-//         return axios.get(`${URL_PRODUCT_API}/get/${id}`);
-//     } else {
-//         return Promise.reject(new Error("Authorization token is missing."));
-//     }
-// };
-
-// export const updateProduct = (id, data) => {
-//     return axios.put(`${URL_PRODUCT_API}/update/${id}`, data);
-// };
-
-// export const removeProductById = (id) => {
-//     return axios.delete(`${URL_PRODUCT_API}/remove/${id}`);
-// }
 
 import axios from "axios";
 import { hostName } from "./host";

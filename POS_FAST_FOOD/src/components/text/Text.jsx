@@ -4,8 +4,8 @@ const Text = ({ title, value, fontSize, classTitle, classValue, click }) => {
     return (
         <>
             <div className='text-container' onClick={click}>
-                <p className={`${classTitle} t-title `} style={{ fontSize: `${fontSize - 2}px` }}>{title} </p>
-                <p className={`${classValue} t-value `} style={{ fontSize: `${fontSize}px` }}>{value}</p>
+                <p className={`${classTitle} t-title `} style={{ fontSize: `${fontSize + 2 - 2}px` }}>{title} </p>
+                <p className={`${classValue} t-value `} style={{ fontSize: `${fontSize + 2}px` }}>{value}</p>
             </div>
         </>
     )

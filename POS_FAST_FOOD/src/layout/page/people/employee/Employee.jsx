@@ -9,12 +9,15 @@ import { FaPlus, FaSearch, FaPrint, FaFileExport, FaFilter, FaThList, FaThLarge,
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { hostName } from '../../../../api/host';
 import RemoveMessage from '../../../../components/alert/RemoveMessage';
+import { exportToExcelFiles, perPage, searchData } from '../../../../api/AppConfig';
+import { motion } from 'framer-motion';
+import { X } from '@mui/icons-material';
+import ActionHeader from '../../../../components/listheader/ActionHeader';
 const Employee = () => {
     const [employee, setEmployee] = useState([]);
     const [branch, setBranch] = useState([]);
     const [employeeId, setEmployeeId] = useState();
     const [isRemoveOpen, setIsRemoveOpen] = useState(false);
-
     const generateRandomColor = () => {
         const r = Math.floor(Math.random() * 256);
         const g = Math.floor(Math.random() * 256);
@@ -23,6 +26,7 @@ const Employee = () => {
     };
     const domainName = hostName();
     const imageUrl = `http://${domainName}:8085/api/images/`
+    // get all employee
     function getEmployee() {
         getAllEmployee().then((response) => {
             setEmployee(response.data);
@@ -43,6 +47,20 @@ const Employee = () => {
             alert(e);
         })
     }
+
+    // Search
+    const [searchTerm, setSearchTerm] = useState("");
+    useEffect(() => {
+        if (!searchTerm) {
+            getEmployee();
+            return
+        }
+        setEmployee(searchData(employee, searchTerm, ["firstName", "lastName", "email"]));
+
+    }, [searchTerm]);
+
+
+
     function getBranch() {
         getAllBranch().then((response) => {
             setBranch(response.data);
@@ -89,7 +107,11 @@ const Employee = () => {
         setSortConfig({ key, direction });
         setEmployee(sortedData);
     };
-    const rowsPerPage = 10; // Define how many rows to display per page
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    function selectPerPage(selected) {
+        setRowsPerPage(selected.value);
+    }
+    // Define how many rows to display per page
     const [currentPage, setCurrentPage] = useState(1);
 
     // Calculate the index of the first and last item on the current page
@@ -112,6 +134,18 @@ const Employee = () => {
             setCurrentPage((prevPage) => prevPage - 1);
         }
     };
+    const cardVariants = {
+        hidden: { opacity: 0, Y: 10 },
+        visible: (index) => ({
+            opacity: 1,
+            y: 0,
+            transition: {
+                delay: index * 0.06,
+                duration: 0.5,
+                ease: 'easeOut',
+            },
+        }),
+    };
 
     const goto = useNavigate();
     function listCard() {
@@ -119,18 +153,25 @@ const Employee = () => {
             <div className="row w-100">
 
                 {
-                    currentData.map(o =>
-                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-1">
-                            <div className="card bg-white p-0 pointer border"
+                    currentData.map((o, index) =>
+                        <div className="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-2 tranform-hover ">
+                            <motion.div
+                                className="bg-white p-0 pointer border"
+                                key={o.id}
+                                custom={index}
+                                initial="hidden"
+                                animate="visible"
+                                variants={cardVariants}
                                 onClick={() => goto(`/employee-detail/${o.id}`)}
+                                style={{ boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px' }}
                             >
-                                <div className="card-body p-0 rounded">
+                                <div className="card-body p-0">
                                     <div className="d-flex">
                                         <div className="center p-1" style={{ width: '40%' }}>
-                                            <div className="center rounded" style={{ height: '150px', width: '100%', overflow: 'hidden' }}>
+                                            <div className="center" style={{ height: '180px', width: '100%', overflow: 'hidden' }}>
                                                 {
                                                     o.image ?
-                                                        (<img src={`${imageUrl}${o.image}`} alt="" className='h-100 rounded' />)
+                                                        (<img src={`${imageUrl}${o.image}`} alt="" className='w-100' />)
                                                         : (
                                                             // if no image
                                                             <div className="h-100 text-white w-100 fs-1 center" style={{ backgroundColor: generateRandomColor() }}>
@@ -141,14 +182,14 @@ const Employee = () => {
 
                                             </div>
                                         </div>
-                                        <div className='f-12 ps-4 py-3' style={{ width: '60%' }}>
+                                        <div className='f-12 ps-2 py-3' style={{ width: '60%' }}>
                                             <div className='f-16'>{o.firstName} {o.lastName}</div>
                                             <div className='text-secondary f-14'>{findBranchName(o.companyID)}.</div>
 
-                                            <div className='text-secondary f-12'>
+                                            <p className='text-secondary f-10'>
                                                 <i class="fa-solid fa-phone px-1 ps-0"></i>{o.mobile}
-                                            </div>
-                                            <div className='py-2 f-12'><span className='text-badges-warning'><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email} </span></div>
+                                            </p>
+                                            <div className='py-2 f-10'><span className='text-badges-warning p-1'><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email} </span></div>
 
 
                                         </div>
@@ -156,7 +197,7 @@ const Employee = () => {
 
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                     )
                 }
@@ -269,7 +310,14 @@ const Employee = () => {
                             <tbody>
                                 {
                                     currentData.map((f, i) =>
-                                        <tr className="pointer">
+                                        <motion.tr className="pointer"
+                                            key={f.id}
+                                            custom={i}
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={cardVariants}
+                                            onClick={() => goto(`/employee-detail/${o.id}`)}
+                                        >
                                             <td>
                                                 <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
                                             </td>
@@ -300,7 +348,7 @@ const Employee = () => {
 
 
 
-                                        </tr>
+                                        </motion.tr>
                                     )
                                 }
                             </tbody>
@@ -316,94 +364,28 @@ const Employee = () => {
     const [isTable, setIsTable] = useState(false);
 
 
-
-
-    function menu() {
-        return (
-            <div className="list-header-container">
-                {/* Left Section */}
-                <div className="list-header-left">
-                    {/* Add New Button */}
-                    <button className="list-header-button add-new box-shadow" onClick={() => goto('/create-employee')}>
-                        <FaPlus className="list-header-icon" />
-                        Add New
-                    </button>
-                    <button className="list-header-button print box-shadow">
-                        <FaPrint className="list-header-icon" />
-                        Print
-                    </button>
-
-                    {/* Export Button */}
-                    <button className="list-header-button export box-shadow" onClick={() => ExportExcel(employee, "emloyee-data")}>
-                        <FaFileExport className="list-header-icon" />
-                        Export
-                    </button>
-
-                    {/* Search Input */}
-
-                </div>
-                <div className="list-header-right">
-                    <div className="list-header-search">
-                        <FaSearch className="list-header-icon search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="list-header-input"
-                        />
-                    </div>
-                </div>
-
-                {/* Right Section */}
-                <div className="list-header-right">
-                    {/* Print Button */}
-                    <span className="page-info f-14 text-secondary">
-                        {currentPage} / {totalPages}
-                    </span>
-                    <div className="pagination">
-                        <div className='pe-2'>
-                            <button
-                                className="button previous"
-                                onClick={handlePrevious}
-                                disabled={currentPage === 1}
-                            >
-                                <SlArrowLeft />
-                            </button>
-                        </div>
-
-                        <button
-                            className="button next"
-                            onClick={handleNext}
-                            disabled={currentPage === totalPages}
-                        >
-                            <SlArrowRight />
-                        </button>
-                    </div>
-
-                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(true)}>
-                        <FaThList className="list-header-icon" />
-                        List
-                    </button>
-
-                    {/* Export Button */}
-                    <button className="list-header-button list box-shadow" onClick={() => setIsTable(false)}>
-                        <FaThLarge className="list-header-icon" />
-                        Card
-                    </button>
-                    {/* Filter Button */}
-                    <button className="list-header-button filter box-shadow">
-                        <FaFilter className="list-header-icon" />
-                        Filter
-                    </button>
-                </div>
-            </div>
-        );
-    }
     return (
         <>
             <div className='w-100'>
                 <div className="container-fluid p-0 ">
                     <div className='container-fluid p-0'>
-                        {menu()}
+                        <ActionHeader
+                            btnAddName='New Employee'
+                            title="Employee"
+                            subtitle="Manage your employee inventory"
+                            searchTerm={searchTerm}
+                            searchChange={(e) => setSearchTerm(e.target.value)}
+                            onCreate={() => goto('/create-employee')}
+                            // onPrint={() => setIsPrint(true)}
+                            onExport={() => exportToExcelFiles(employee, 'employee_data')}
+                            perPage={perPage()}
+                            selectPerPage={selectPerPage}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            handleNext={handleNext}
+                            handlePrevious={handlePrevious}
+                            isTableAction={() => isTable ? setIsTable(false) : setIsTable(true)}
+                        />
                     </div>
 
                 </div>

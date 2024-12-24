@@ -1,28 +1,46 @@
 import React from "react";
+import TextField from "@mui/material/TextField";
 import "./inputvalidation.css";
 
-const InputValidation = ({ label, id, name, type, value, onChange, error, fontSize, require, placeHolder }) => {
+const InputValidation = ({
+    label,
+    id,
+    name,
+    type,
+    value,
+    onChange,
+    error,
+    fontSize,
+    require,
+    placeHolder
+}) => {
     return (
         <div className="input-wrapper">
-            <label htmlFor={id} className="input-label"
-                style={{ fontSize: `${fontSize - 1}px` }}
-            >
-                <span>{label}</span>
-                <span className="text-danger ps-3">{require ? '*' : ''}</span>
-            </label>
-            <input
+            <TextField
+                variant="standard"
+                color="secondary"
                 type={type}
                 id={id}
-                style={{ fontSize: `${fontSize}px` }}
-                className={`input-box ${error ? "border-danger" : ""}`}
                 name={name}
                 value={value}
                 onChange={onChange}
                 placeholder={placeHolder}
+                label={
+                    <span style={{ fontSize: `${fontSize - 1}px` }}>
+                        {label}
+                        {require && <span className="text-danger ps-3">*</span>}
+                    </span>
+                }
+                error={Boolean(error)}
+                helperText={error}
+                InputProps={{
+                    style: { fontSize: `${fontSize}px` }
+                }}
+                FormHelperTextProps={{
+                    style: { fontSize: `${fontSize - 2}px` }
+                }}
+                fullWidth
             />
-            {error ? <span className="validation-error"
-                style={{ fontSize: `${fontSize - 2}px` }}
-            >{error}</span> : ''}
         </div>
     );
 };

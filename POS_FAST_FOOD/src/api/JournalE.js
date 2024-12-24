@@ -2,6 +2,7 @@ import axios from "axios";
 import { hostName } from "./host";
 import { getToken } from "./AppConfig";
 
+
 // Configure API base URLs and token
 const host = hostName();
 const BASE_URL_JOURNAL = `http://${host}:8085/api/journal`;

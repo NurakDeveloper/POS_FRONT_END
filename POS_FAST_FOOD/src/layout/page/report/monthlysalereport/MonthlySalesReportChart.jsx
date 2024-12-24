@@ -1,93 +1,68 @@
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-// import { ChartZoom } from 'chartjs-plugin-zoom';
+import React from "react";
+import { Line } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
 
-// Register the necessary components for Chart.js
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    // ChartZoom // Register zoom functionality
-);
+// Register Chart.js modules
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
 const MonthlySalesReportChart = ({ data }) => {
-    // Prepare the sales data (assuming each data point has `month` and `sales`)
-    const months = data.map(item => item.month);
-    const sales = data.map(item => item.sales);
-
+    // Prepare data for the chart
     const chartData = {
-        labels: months, // X-axis: months
+        labels: data.map((entry) => entry.date), // Dates as x-axis labels
         datasets: [
             {
-                label: 'Monthly Sales',
-                data: sales,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
+                label: "Units Sold",
+                data: data.map((entry) => entry.sold),
+                borderColor: "rgba(75, 192, 192, 1)",
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                yAxisID: "y1",
+            },
+            {
+                label: "Revenues ($)",
+                data: data.map((entry) => entry.revenues),
+                borderColor: "rgba(153, 102, 255, 1)",
+                backgroundColor: "rgba(153, 102, 255, 0.2)",
+                yAxisID: "y2",
             },
         ],
     };
 
+    // Chart options
     const options = {
         responsive: true,
-        maintainAspectRatio: false, // Ensure the chart adjusts to container size
         plugins: {
+            legend: {
+                position: "top",
+            },
             title: {
                 display: true,
-                text: 'Monthly Sales Report',
+                text: "Monthly Sale Report",
             },
-            tooltip: {
-                mode: 'index',
-                intersect: false,
-            },
-
         },
         scales: {
-            x: {
-                type: 'category',
+            y1: {
+                type: "linear",
+                position: "left",
                 title: {
                     display: true,
-                    text: 'Month',
+                    text: "Units Sold",
                 },
             },
-            y: {
+            y2: {
+                type: "linear",
+                position: "right",
                 title: {
                     display: true,
-                    text: 'Sales Amount (USD)',
+                    text: "Revenues ($)",
                 },
-                beginAtZero: true,
-            },
-        },
-        // Enable zoom functionality
-        plugins: {
-            zoom: {
-                pan: {
-                    enabled: true, // Enable panning
-                    mode: "x", // Pan along the X-axis
-                },
-                zoom: {
-                    wheel: {
-                        enabled: true, // Enable zooming with mouse wheel
-                    },
-                    pinch: {
-                        enabled: true, // Enable zooming with pinch gestures on touch devices
-                    },
-                    mode: "x", // Zoom along the X-axis
+                grid: {
+                    drawOnChartArea: false, // Prevent overlapping grid lines
                 },
             },
         },
     };
 
-    return (
-        <div style={{ width: '100%', height: '500px' }}> {/* Make chart container 100% width */}
-            <Line data={chartData} options={options} />
-        </div>
-    );
+    return <Line data={chartData} options={options} />;
 };
 
 export default MonthlySalesReportChart;

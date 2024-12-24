@@ -16,10 +16,10 @@ export const getExpenseReport = () => {
     return axios.get(`${BASE_URL_REPORTING}/expense`, { headers });
 };
 
-// Get monthly sale report
-export const getMonthlySaleReport = () => {
-    return axios.get(`${BASE_URL_REPORTING}/monthly-sale`, { headers });
-};
+// // Get monthly sale report
+// export const getMonthlySaleReport = () => {
+//     return axios.get(`${BASE_URL_REPORTING}/monthly-sale`, { headers });
+// };
 
 // Get net income report
 export const getNetIncomeReport = () => {
@@ -29,4 +29,13 @@ export const getNetIncomeReport = () => {
 // Get revenues report
 export const getRevenuesReport = () => {
     return axios.get(`${BASE_URL_REPORTING}/revenues`, { headers });
+};
+export const getSaleReport = () => {
+    return axios.get(`${BASE_URL_REPORTING}/daily-seller-product`, { headers });
+};
+export const monthlySaleReporting = () => {
+    return axios.get(`${BASE_URL_REPORTING}/monthly-sale`, { headers });
+};
+export const dailyDaleReporting = () => {
+    return axios.get(`${BASE_URL_REPORTING}/daily-sale`, { headers });
 };

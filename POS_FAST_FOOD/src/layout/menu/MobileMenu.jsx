@@ -5,7 +5,7 @@ const MobileMenu = () => {
     const goto = useNavigate();
     return (
         <>
-            <div className=' rounded h-100 bg-white menu' style={{
+            <div className=' rounded h-100 box-shadow menu' style={{
                 overflow: 'scroll', scrollbarWidth: 'none', // For Firefox
                 msOverflowStyle: 'none',
             }}>

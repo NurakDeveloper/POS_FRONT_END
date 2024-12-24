@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './postest.css'
-import PrinInvoice from './PrintIvoice';
+import PrinInvoice from './PrintInvoice';
 import Cookies from 'js-cookie';
 import { decryptData } from '../../../cryptoJs/Crypto';
 const PosDark = () => {

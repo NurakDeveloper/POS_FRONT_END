@@ -4,6 +4,9 @@ import { getExpenseReport } from "../../../../api/Reporting";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, Filler } from "chart.js";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
+import { IoPrintOutline } from "react-icons/io5";
+import { printDoc, userObject } from "../../../../api/AppConfig";
+import InputValidation from "../../../../components/input/InputValidation";
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, Tooltip, Legend, PointElement, Filler);
 
@@ -126,7 +129,7 @@ const Expense = () => {
     const listTable = () => {
         return (
             <DataGrid>
-                <table className="table table-striped">
+                <table className="">
                     <Thead>
                         <Th columnWidth={50}>No</Th>
                         <Th columnWidth={70} onClick={() => handleSort("month")}>Date (Month)</Th>
@@ -149,13 +152,117 @@ const Expense = () => {
             </DataGrid>
         );
     };
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('en', {
+            weekday: 'long',   // Full day of the week (e.g., "Monday")
+            day: '2-digit',    // Two-digit day (e.g., "07")
+            month: 'numeric',     // Full month name (e.g., "November")
+            year: 'numeric'    // Full year (e.g., "2024")
+        }).format(date); // 'dd' for day, 'MMMM' for full month, 'yy' for year
+    };
+    const [isPrint, setIsPrint] = useState(false);
+    function report() {
+
+        return (
+            <>
+                <div className='fixed-top bg-white p-3 h-100 w-100'>
+                    <div className="start" style={{ height: '7%' }}>
+                        <button className="button pay px-5 big-shadow py-2" onClick={() => printDoc('revenues', 'revenues_date')}><IoPrintOutline /> <span className='ps-2'>Print</span></button>
+                        <div className='ps-3'>
+                            <button className="button pay px-5 py-2" onClick={() => setIsPrint(false)}>Cancel</button>
+                        </div>
+                    </div>
+                    <div className='p-2 border bg-silver' style={{ height: '93%', overflow: 'scroll' }} >
+                        <div className='animation-opacity bg-white p-2' id='revenues'>
+                            <h1 className='display-2 fw-bold text-end' style={{ opacity: 0.2 }}>EXPENSE REPORT</h1>
+                            <div className="report-header py-3" >
+                                <div className="row">
+                                    <div className="col-md-6 col-12">
+                                        <InputValidation
+                                            label='Company name :'
+                                            value='NFF Group'
+
+                                            fontSize={16}
+                                        />
+                                        <InputValidation
+                                            label='Date :'
+                                            fontSize={16}
+                                            value={formatDate(new Date())}
+                                        />
+                                    </div>
+                                    <div className="col-md-6 col-12">
+                                        <InputValidation
+                                            fontSize={16}
+                                            label='Report By :'
+                                            value={userObject().userName}
+                                        />
+                                        <InputValidation
+                                            fontSize={16}
+                                            label='Descriptions : '
+                                            value=''
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className=''>
+                                <Line data={data} options={options} />
+                                <DataGrid>
+                                    <table>
+                                        <Thead>
+                                            <Th bg='d' columnWidth={50}>No</Th>
+                                            <Th bg='d' columnWidth={70} onClick={() => handleSort("month")}>Date (Month)</Th>
+                                            <Th bg='d' columnWidth={100} onClick={() => handleSort("expenseAccount")}>Expense Account</Th>
+                                            <Th bg='d' columnWidth={80} onClick={() => handleSort("totalExpense")}>Total Expense</Th>
+                                            <Th bg='d' resizable onClick={() => handleSort("description")}>Description</Th>
+                                        </Thead>
+                                        <Tbody>
+                                            {currentData.map((e, i) => (
+                                                <Tr key={i}>
+                                                    <Td>{i + 1}</Td>
+                                                    <Td>{e.month}</Td>
+                                                    <Td>{e.expenseAccount}</Td>
+                                                    <Td>${e.totalExpense.toFixed(2)}</Td>
+                                                    <Td>{e.description}</Td>
+                                                </Tr>
+                                            ))}
+                                        </Tbody>
+                                    </table>
+                                </DataGrid>
+                            </div>
+                            <div className="row col-md-6 col-12 py-4">
+                                <InputValidation
+                                    label='Manager Signature : '
+                                    value=''
+                                />
+                                <InputValidation
+                                    label='Date : '
+                                    value=''
+                                />
+                                <InputValidation
+                                    label='Comment : '
+                                    value=''
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </>
+        )
+    }
 
     return (
         <div>
             <div style={{ width: "100%", }}>
-                <p className="f-16 ps-3 border-start">
-                    Expense Chart
-                </p>
+                <div className="d-flex justify-content-between align-items-center">
+                    <h1 className="fs-4 ps-3 border-start fw-bold" style={{ opacity: 0.3 }}>
+                        EXPENSE
+                    </h1>
+                    <button className="btn-silver" onClick={() => setIsPrint(true)}>
+                        <IoPrintOutline />
+                    </button>
+                </div>
                 <Line data={data} options={options} />
             </div>
             <div className="py-3 d-flex justify-content-between align-items-start">
@@ -188,6 +295,7 @@ const Expense = () => {
                 </div>
             </div>
             {listTable()}
+            {isPrint ? report() : ''}
         </div>
     );
 };

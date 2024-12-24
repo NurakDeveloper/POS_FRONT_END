@@ -18,6 +18,7 @@ import SelectBox from '../../../components/select/SelectBox'
 import { getDefualtUserId } from '../../../api/AppConfig'
 import { hostName } from '../../../api/host'
 import CustomCommoBox from '../../../components/select/CustomCommoBox'
+import Tabs from '../../../components/tabs/Tabs'
 const InsertItem = () => {
     const [categories, setCategories] = useState([]);
 
@@ -65,63 +66,10 @@ const InsertItem = () => {
         })
     }, [])
     const [selectedImage, setSelectedImage] = useState(null);
-    function selectCategory(category) {
-        setProductData((prevData) => ({
-            ...prevData,
-            ["categoryId"]: category.id
-        }));
-    }
-    function selectBranch(branch) {
-        setProductData((prevData) => ({
-            ...prevData,
-            ["branchId"]: branch.id
-        }));
-    }
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-
-        setProductData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
-    const [errors, setErrors] = useState({});
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!productData.productName) {
-            newErrors.productName = 'Product Name is required.';
-        }
-
-        if (!productData.price) {
-            newErrors.price = 'Price is required.';
-        } else if (isNaN(productData.price) || productData.price <= 0) {
-            newErrors.price = 'Price must be a valid positive number.';
-        }
 
 
-        if (!file) {
-            if (!productData.image) {
-                newErrors.image = 'No Image Please select Image first.'
-            }
-        }
-        if (!productData.categoryId) {
-            newErrors.category = 'Please Celect Category ! Category is null.'
-        }
-        if (!productData.branchId) {
-            newErrors.branch = 'Please Select Branch ! Branch is null.'
-        }
+    function submitProduct() {
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0; // Returns true if no errors
-    };
-
-    function submitProduct(e) {
-        e.preventDefault();
-
-        if (!validateForm()) {
-            return
-        }
         if (!user) {
             return
         }
@@ -138,12 +86,15 @@ const InsertItem = () => {
             // const response = await uploadImage(formData);
             uploadImage(formData).then((response) => {
                 setMessage("Create Product Successfull");
+                alert('Success');
             })
         } catch (error) {
             // Handle errors and display appropriate messages
             setMessage(
                 error.response?.data || "Error uploading file. Please try again."
+
             );
+
         }
 
         if (id) {
@@ -175,11 +126,12 @@ const InsertItem = () => {
             })
             return
         }
+
         createProduct(productData).then((response) => {
-            console.log(response.data);
+            alert('Success');
             setProductData({
-                createdBy: '',
-                updatedBy: '',
+                createdBy: user,
+                updatedBy: user,
                 categoryId: '',
                 branchId: '',
                 productCode: '',
@@ -230,7 +182,6 @@ const InsertItem = () => {
                     ["minOrderQty"]: reponse.data.minOrderQty,
                     ["createdDate"]: reponse.data.createdDate,
                     ["updatedDate"]: reponse.data.updatedDate,
-                    ["updatedBy"]: reponse.data.updatedBy,
                     ["createdBy"]: reponse.data.createdBy,
                     ["categoryId"]: reponse.data.categoryId,
                     ["branchId"]: reponse.data.branchId,
@@ -278,15 +229,225 @@ const InsertItem = () => {
             </div>
         );
     }
+    const handleInputChange = (field, value) => {
+        setProductData((prev) => ({ ...prev, [field]: value }));
+    };
+    const steps = [
+        {
+            label: "Product Basics",
+            content: (errors) => (
+                <>
+                    <InputValidation
+                        fontSize={15}
+                        label="Product Name"
+                        id="productName"
+                        type="text"
+                        onChange={(e) => handleInputChange("productName", e.target.value)}
+                        value={productData.productName}
+                        error={errors.productName}
+                    />
+                    <CustomCommoBox
+                        fontSize={15}
+                        label="Category"
+                        items={categories} // Assuming you have a list of categories
+                        searchKey={['name']}
+                        labelKeys={['name']}
+                        onItemSelected={(value) => handleInputChange("categoryId", value.id)}
+                        error={errors.categoryId}
+                    />
+                    <CustomCommoBox
+                        fontSize={15}
+                        label="Company"
+                        items={branch} // Assuming you have a list of categories
+                        searchKey={['branchName']}
+                        labelKeys={['branchName', 'addressLine1']}
+                        onItemSelected={(value) => handleInputChange("branchId", value.id)}
+                        error={errors.branchId}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!productData.productName) {
+                    errors.productName = "Product Name is required.";
+                }
+                if (!productData.categoryId) {
+                    errors.categoryId = "Category is required.";
+                }
+                if (!productData.branchId) {
+                    errors.branchId = "Company is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Product Details",
+            content: (errors) => (
+                <>
+                    <InputValidation
+                        fontSize={15}
+                        label="Price"
+                        id="price"
+                        type="number"
+                        onChange={(e) => handleInputChange("price", e.target.value)}
+                        value={productData.price}
+                        error={errors.price}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Prepare Time"
+                        id="prepareTime"
+                        type="number"
+                        onChange={(e) => handleInputChange("prepareTime", e.target.value)}
+                        value={productData.prepareTime}
+                        error={errors.prepareTime}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Calories"
+                        id="calories"
+                        type="number"
+                        onChange={(e) => handleInputChange("calories", e.target.value)}
+                        value={productData.calories}
+                        error={errors.calories}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!productData.price) {
+                    errors.price = "Price is required.";
+                }
+                if (!productData.prepareTime) {
+                    errors.prepareTime = "Prepare Time is required.";
+                }
+                if (!productData.calories) {
+                    errors.calories = "Calories is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Stock & Ordering",
+            content: (errors) => (
+                <>
+                    <InputValidation
+                        fontSize={15}
+                        label="Max Order Quantity"
+                        id="maxOrderQty"
+                        type="number"
+                        onChange={(e) => handleInputChange("maxOrderQty", e.target.value)}
+                        value={productData.maxOrderQty}
+                        error={errors.maxOrderQty}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Min Order Quantity"
+                        id="minOrderQty"
+                        type="number"
+                        onChange={(e) => handleInputChange("minOrderQty", e.target.value)}
+                        value={productData.minOrderQty}
+                        error={errors.minOrderQty}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Product Origin"
+                        id="productOrigin"
+                        type="text"
+                        onChange={(e) => handleInputChange("productOrigin", e.target.value)}
+                        value={productData.productOrigin}
+                        error={errors.productOrigin}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!productData.maxOrderQty) {
+                    errors.maxOrderQty = "Max Order Quantity is required.";
+                }
+                if (!productData.minOrderQty) {
+                    errors.minOrderQty = "Min Order Quantity is required.";
+                }
+                if (!productData.productOrigin) {
+                    errors.productOrigin = "Product Origin is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Upload Image",
+            content: (errors) => (
+                <>
+                    <div className='w-100'>
+                        <label htmlFor="fileImage" className=' rounded py-2 box-shadow center pointer' style={{ height: '200px', width: '300px', overflow: 'hidden' }}>
+                            <img src={selectedImage ? selectedImage : `${productImage}${productData.image}`} alt="" className="h-100 " />
+                        </label> <br />
+                        <span className='validation-error f-12'>{errors.image ? errors.image : ''}</span>
+                    </div>
+                    <input type="file" name="" className='d-none w-100' id="fileImage"
+                        // onChange={(e) => {
+                        //     setProductData((prevData) => ({
+                        //         ...prevData,
+                        //         ["image"]: e.target.files[0].name
+                        //     }));
+                        // }}
+                        onChange={handleFileChange}
+                    />
+
+                    <InputValidation
+                        fontSize={15}
+                        label="Image URL"
+                        id="image"
+                        type="text"
+                        onChange={(e) => handleInputChange("image", e.target.value)}
+                        value={productData.image}
+                        error={errors.image}
+                    />
+                    <InputValidation
+                        fontSize={15}
+                        label="Description"
+                        id="description"
+                        type="textarea"
+                        onChange={(e) => handleInputChange("description", e.target.value)}
+                        value={productData.description}
+                    />
+                </>
+            ),
+            validate: () => {
+                const errors = {};
+                if (!productData.image) {
+                    errors.image = "Product Image is required.";
+                }
+                if (!productData.description) {
+                    errors.description = "Product Description is required.";
+                }
+                return errors;
+            },
+        },
+        {
+            label: "Review & Submit",
+            content: () => (
+                <div>
+                    <h3>Review the Product</h3>
+                    <pre>{JSON.stringify(productData, null, 2)}</pre>
+
+                </div>
+            ),
+            validate: () => ({}), // No validation needed for this step
+        },
+    ];
+
     return (
         <>
 
-            <form action='' className='p-3'>
+            <div className='p-3'>
 
 
-                <div className="container-fluid d-block center p-3 box-shadow">
-                    {formHeader()}
-                    <div className="row w-100">
+                <div className="container d-block center box-shadow bg-white">
+                    {/* {formHeader()} */}
+
+
+                    {/* <div className="row w-100">
                         <div className="col-xl-12">
                             <div className="bg-white w-100 rounded">
                                 <div className='row'>
@@ -303,15 +464,7 @@ const InsertItem = () => {
                                     </div>
                                     <div className='col-6 pb-3'>
                                         <div className='d-none'>
-                                            <input type="file" name="" className='d-none w-100' id="fileImage"
-                                                // onChange={(e) => {
-                                                //     setProductData((prevData) => ({
-                                                //         ...prevData,
-                                                //         ["image"]: e.target.files[0].name
-                                                //     }));
-                                                // }}
-                                                onChange={handleFileChange}
-                                            />
+
                                         </div>
 
                                     </div>
@@ -476,10 +629,11 @@ const InsertItem = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
+                    <Tabs steps={steps} onSave={() => submitProduct()} />
 
                 </div>
-            </form >
+            </div >
 
         </>
     )

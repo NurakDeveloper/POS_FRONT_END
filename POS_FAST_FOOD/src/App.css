@@ -1,6 +1,6 @@
 body {
   box-sizing: border-box;
-  /* background: #f8f7f7; */
+  background: #ffffff;
 }
 
 .bgso {
@@ -19,8 +19,9 @@ p {
 }
 
 .app-menu {
-  width: 290px;
+  width: 350px;
   height: 100vh;
+  padding-right: 15px;
   display: block;
 
 }
@@ -35,7 +36,7 @@ p {
   justify-content: start;
   align-items: center;
   width: 100%;
-  height: 70px;
+  height: 100px;
   overflow: hidden;
 }
 
@@ -346,4 +347,46 @@ p {
   /* border: 0.3px solid #7ba97d; */
   border-radius: 6px;
 
+}
+
+.tranform-hover {
+  transition: 0.2s;
+}
+
+.tranform-hover:hover {
+  transform: translateY(-5px);
+}
+
+.expand {
+  animation: expand 0.3s forwards ease-in-out;
+}
+
+.collapse {
+  animation: collapse 0.3s forwards ease-in-out;
+}
+
+@keyframes expand {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  to {
+    max-height: 100%;
+    /* Adjust based on content */
+    opacity: 1;
+  }
+}
+
+/* Keyframe for collapsing */
+@keyframes collapse {
+  from {
+    max-height: 500px;
+    opacity: 1;
+  }
+
+  to {
+    max-height: 0;
+    opacity: 0;
+  }
 }

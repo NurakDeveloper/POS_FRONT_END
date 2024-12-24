@@ -3,7 +3,13 @@ import "./DataGrid.css";
 
 // DataGrid Wrapper
 export const DataGrid = ({ children }) => {
-    return <div className="data-grid">{children}</div>;
+    return (
+        <>
+            <div className="container-fluid p-0">
+                <div className="data-grid">{children}</div>
+            </div>
+        </>
+    );
 };
 
 // Table Header Wrapper
@@ -16,7 +22,7 @@ export const Thead = ({ children }) => {
 };
 
 // Table Header Cell with Sorting and Resizing
-export const Th = ({ children, onSort, sortDirection, resizable = false, columnWidth = 150 }) => {
+export const Th = ({ children, onSort, sortDirection, resizable = false, columnWidth = 150, bg }) => {
     const [width, setWidth] = useState(columnWidth); // Default column width passed as prop
     const [isResizing, setIsResizing] = useState(false);
 
@@ -40,7 +46,7 @@ export const Th = ({ children, onSort, sortDirection, resizable = false, columnW
     };
 
     return (
-        <th style={{ width: `${width}px` }}>
+        <th style={{ width: `${width}px`, background: bg ? '#05285d' : 'white', color: bg ? 'white' : '#636363' }}>
             <div className="header-cell" onClick={onSort}>
                 {children}
                 {sortDirection && (

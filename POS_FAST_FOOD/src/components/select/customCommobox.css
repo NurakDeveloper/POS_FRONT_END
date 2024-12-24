@@ -19,8 +19,12 @@
     transition: border-color 0.3s;
 }
 
+li {
+    list-style-type: none;
+}
+
 .custom-combobox-input:focus {
-    border-bottom: 1px solid #007bff;
+    border-bottom: 1px solid #e84aa6;
 }
 
 .custom-combobox-dropdown {
@@ -30,12 +34,24 @@
     right: 0;
     width: 100%;
     background-color: #fff;
-    border: 1px solid #ccc;
+    border: 1px solid #f6f6f6;
     border-top: none;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
     z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 8px 0px;
+    animation: opacity 0.4s;
+    /* box-shadow: 0 2px 4px #007bff; */
+}
+
+@keyframes opacity {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .custom-combobox-item {

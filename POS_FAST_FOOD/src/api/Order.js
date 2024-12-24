@@ -16,6 +16,9 @@ const headers = token ? { "Authorization": `nurak ${token}` } : {};
 export const createOrder = (order) => {
     return axios.post(`${BASE_URL_ORDER}/post-multiple-items`, order, { headers });
 };
+export const saleItem = (order) => {
+    return axios.post(`${BASE_URL_ORDER}/sale`, order, { headers });
+};
 
 // List all orders
 export const listOrder = () => {

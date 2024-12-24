@@ -1,40 +1,41 @@
-import React from 'react'
-import './message.css'
-import { RiDeleteBin5Line } from 'react-icons/ri'
+import React from 'react';
+import './message.css';
+import { RiDeleteBin5Line } from 'react-icons/ri';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, IconButton } from '@mui/material';
+
 const RemoveMessage = ({ description, iCon, cancelClcik, acceptedClick, message, isOpen }) => {
     return (
-        <>
-            {isOpen ? (
-                <>
-                    <div>
+        <Dialog
+            open={isOpen}
+            onClose={cancelClcik}
+            aria-labelledby="remove-message-dialog-title"
+            aria-describedby="remove-message-dialog-description"
+        >
+            <DialogTitle id="remove-message-dialog-title" className="d-flex align-items-center">
+                <IconButton className="message-icon" edge="start" disableRipple>
+                    <RiDeleteBin5Line />
+                </IconButton>
+                <Typography variant="h6" color="error" className="ps-3">
+                    {message}
+                </Typography>
+            </DialogTitle>
 
-                        <div className="message-overlay">
-                            <div className="message-content">
-                                <div className="message-header">
-                                    <div className='d-flex start'>
-                                        <div className='message-icon'>
-                                            <RiDeleteBin5Line />
-                                        </div>
-                                        <span className='ps-3 text-danger'>{message}</span>
-                                    </div>
-                                </div>
-                                <p className="message-description py-2">{description}</p>
-                                <div className="message-action">
-                                    <button className="button no" onClick={cancelClcik}>
-                                        No
-                                    </button>
-                                    <button className="button yes" onClick={acceptedClick}>
-                                        Yes
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+            <DialogContent>
+                <Typography id="remove-message-dialog-description" className="py-2">
+                    {description}
+                </Typography>
+            </DialogContent>
 
-                    </div>
-                </>
-            ) : (<></>)}
-        </>
-    )
-}
+            <DialogActions>
+                <Button onClick={cancelClcik} color="error" variant="outlined">
+                    No
+                </Button>
+                <Button onClick={acceptedClick} color="primary" variant="contained">
+                    Yes
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
 
-export default RemoveMessage
+export default RemoveMessage;

@@ -45,7 +45,7 @@ const PosMenu = () => {
                         <NavLink
                             to="/"
                             className={({ isActive }) =>
-                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                isActive ? "button-pos-menu active-button " : "button-pos-menu menu-button"
                             }
                         >
                             <SlGrid />
@@ -57,7 +57,7 @@ const PosMenu = () => {
                         <NavLink
                             to="/notification"
                             className={({ isActive }) =>
-                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                isActive ? "button-pos-menu active-button" : "button-pos-menu menu-button"
                             }
                         >
                             <IoMdNotificationsOutline />
@@ -69,7 +69,7 @@ const PosMenu = () => {
                         <NavLink
                             to="/setting"
                             className={({ isActive }) =>
-                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                isActive ? "button-pos-menu active-button " : "button-pos-menu menu-button"
                             }
                         >
                             <IoSettingsOutline />
@@ -80,7 +80,7 @@ const PosMenu = () => {
                         <NavLink
                             to="/order-history"
                             className={({ isActive }) =>
-                                isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                isActive ? "button-pos-menu active-button " : "button-pos-menu menu-button"
                             }
                         >
                             <div class="position-relative w-100">
@@ -100,7 +100,7 @@ const PosMenu = () => {
                             <NavLink
                                 to='/list-product'
                                 className={({ isActive }) =>
-                                    isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                    isActive ? "button-pos-menu active-button" : "button-pos-menu menu-button"
                                 }
                                 onClick={() => {
                                     Cookies.remove('user-data');
@@ -114,7 +114,7 @@ const PosMenu = () => {
                             <NavLink
                                 to='/list-product'
                                 className={({ isActive }) =>
-                                    isActive ? "button-pos-menu active-button h-100" : "button-pos-menu menu-button h-100"
+                                    isActive ? "button-pos-menu active-button" : "button-pos-menu menu-button "
                                 }
                                 onClick={() => {
                                     Cookies.set("admin_viewer", 1);

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import './postest.css'
-import PrinInvoice from './PrintIvoice';
+import PrinInvoice from './PrintInvoice';
 import Cookies from 'js-cookie';
-import { createOrder } from '../../../api/Order';
+import { createOrder, saleItem } from '../../../api/Order';
 import { getAllProduct } from '../../../api/Product';
 import { format } from 'date-fns';
 import { createJournal, createTransaction } from '../../../api/JournalE';
@@ -12,13 +12,13 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import ComboBox from '../../../components/select/ComboBox';
 import OptionButton from '../../../components/option/OptionButton';
-import { useParams } from 'react-router-dom';
+import { json, useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { getBranchId } from '../../../api/Branch';
 import { hostName } from '../../../api/host';
-import { getDefualtUserId } from '../../../api/AppConfig';
+import { getDefualtUserId, globleRowVariants, searchData, userObject } from '../../../api/AppConfig';
 import { LiaSearchSolid } from 'react-icons/lia';
-import { IoIosAdd } from 'react-icons/io';
+import { IoIosAdd, IoIosArrowRoundBack } from 'react-icons/io';
 import { LuMinus } from 'react-icons/lu';
 import { BsPlus } from 'react-icons/bs';
 import { HiShoppingCart } from 'react-icons/hi2';
@@ -27,7 +27,14 @@ import ProductCard from '../../../components/card/ProductCard';
 import InputValidation from '../../../components/input/InputValidation';
 import { TbShoppingCartX } from 'react-icons/tb';
 import Modal from '../../../components/modal/Modal';
-
+import CustomCommoBox from '../../../components/select/CustomCommoBox';
+import { motion } from 'framer-motion';
+import { Button, duration, Paper } from '@mui/material';
+import Calculator from '../../../components/calculator/Calculator';
+import { PiCheckCircleLight } from "react-icons/pi";
+import { IoMdPersonAdd } from "react-icons/io";
+import { getAllBranch } from '../../../api/Branch';
+import { findCompanyName } from '../../../api/FindData';
 
 const PosLight = () => {
     const { id } = useParams();
@@ -45,9 +52,21 @@ const PosLight = () => {
     const [customerId, setCustomerId] = useState();
     const [paymentSD, setPaymentUSD] = useState();
     const [discounts, setDiscount] = useState();
+    const [profile, setProfile] = useState('');
+    const [employeeName, setEmployeeName] = useState('No name');
+    const [role, setRole] = useState('No role');
+    const [branch, setbranch] = useState([]);
     const imageUrl = `http://${domainName}:8085/api/images/`
     const categoryPathImage = `http://${domainName}:8085/api/images/`;
+    useEffect(() => {
+        try {
+            setProfile(userObject().image);
+            setRole(userObject().role);
+            setEmployeeName(userObject().userName);
+        } catch (e) {
 
+        }
+    }, [])
     function resetPayment() {
         setPaymentMethod();
         setDiscount();
@@ -58,11 +77,15 @@ const PosLight = () => {
 
     // implement data api
     useEffect(() => {
+
         getAllProduct().then((respnse) => {
             setProduct(respnse.data);
             console.log(respnse.data);
         }).catch(error => {
             console.error(error);
+        })
+        getAllBranch().then((response) => {
+            setbranch(response.data);
         })
         getAllCustomer().then((respnse) => {
             setCustomer(respnse.data);
@@ -70,8 +93,16 @@ const PosLight = () => {
         }).catch(error => {
             console.error(error);
         })
-
     }, [id])
+
+    function refrestProduct() {
+        getAllProduct().then((respnse) => {
+            setProduct(respnse.data);
+            console.log(respnse.data);
+        }).catch(error => {
+            console.error(error);
+        })
+    }
 
     function findLengthOfProductByCategory(id) {
         const numberOfProduct = product.filter(p => p.categoryId == id);
@@ -89,6 +120,7 @@ const PosLight = () => {
         })
     }, [id])
 
+
     // find product name by id
     function findProductName(id) {
         const p = product.find(p => p.id == id);
@@ -97,6 +129,10 @@ const PosLight = () => {
         } else {
             return "Error"
         }
+    }
+    function findImageProduct(id) {
+        const p = product.find(p => p.id == id);
+        return p ? imageUrl + p.image : '';
     }
     function setCId(id) {
         setCategoryId(id);
@@ -213,20 +249,20 @@ const PosLight = () => {
     const [errorOrder, setErrorsOrder] = useState([]);
     function orderValidation() {
         const newErrors = {};
-        if (!received) {
-            newErrors.received = 'Enter Cash received from customer first !'
-        }
+
         if (discounts) {
             if (!(received >= paymentSD)) {
-                newErrors.payment = 'Cash received is small than Total payment ! after discount' + discounts + '%'
+                newErrors.received = 'Cash received is small than Total payment ! after discount' + discounts + '%'
             }
 
         }
         if (!discounts) {
             if (!(received >= totalPay)) {
-                newErrors.payment = 'Cash received is small than Total payment !'
+                newErrors.received = 'Cash received is small than Total payment !'
             }
-
+        }
+        if (!received) {
+            newErrors.received = 'Enter Cash received from customer first !'
         }
         const user = getDefualtUserId();
         if (!user) {
@@ -234,177 +270,117 @@ const PosLight = () => {
             window.location.reload();
             newErrors.user = 'Enter Cash received from customer first !'
         }
+        if (!userObject().branch) {
+            newErrors.branch = 'Branch Is Can not null'
+        }
         setErrorsOrder(newErrors);
         return Object.keys(newErrors).length === 0;
     }
     // order item or hold order
+    const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+    const [transactionData, setTransactionData] = useState(null);
     function order() {
-        if (!orderValidation()) {
-            return
-        }
-        const branchId = getBranchId();
-        const user = getDefualtUserId();
-        if (id) {
-            try {
-                const orderTables = JSON.parse(Cookies.get("table-order") || '[]'); // Default to empty array
-                if (!orderTables) return
-
-                // Check if `orderTables` is an array
-                if (Array.isArray(orderTables)) {
-                    const objOrderTable = orderTables.find(o => o.id == id);
-                    const item = objOrderTable.data;
-                    const totalAmount = discounts ? paymentSD : totalPay;
-                    const objOrder = {
-                        "orderType": 1,
-                        "customerId": 1,
-                        "branchId": branchId,
-                        "acceptedBy": user,
-                        "tableNumber": 5,
-                        "status": 1,
-                        "numberOfPeople": 4,
-                        "totalAmount": totalAmount,
-                        "cash": received,
-                        "exchange": received - totalAmount,
-                        "orderDate": new Date(),
-                        "description": "Order for table 5, including fast food items.",
-                        "orderLines": item
-                    }
-                    createOrder(objOrder).then((response) => {
-                        console.log(response.data);
-
-                        const objJournal = {
-                            "journalId": null,
-                            "branchId": branchId,
-                            "partnerId": null,
-                            "date": new Date(),
-                            "total": totalAmount,
-                            "reference": "POS SALE INV-00" + response.data.id,
-                            "status": "1"
-                        }
-                        createJournal(objJournal).then((reponseJ) => {
-                            console.log(reponseJ.data);
-                            const objTransaction = {
-                                "journalEntriesId": reponseJ.data.id,
-                                "accountId": 21, // updated more time
-                                "label": "POS Sale Revenues",
-                                "debit": totalAmount,
-                                "credit": null,
-                            }
-
-                            createTransaction(objTransaction).then((responseT) => {
-                                console.log(responseT.data);
-                            }).catch(error => {
-                                console.error(error);
-                            })
-                            const objTransaction2 = {
-                                "journalEntriesId": reponseJ.data.id,
-                                "accountId": 12, // updated more time 
-                                "label": "POS Sale Revenues",
-                                "debit": null,
-                                "credit": totalAmount
-                            }
-                            createTransaction(objTransaction2).then((responseT) => {
-                                console.log(responseT.data);
-                            }).catch(error => {
-                                console.error(error);
-                            })
-                            removeTableOrderById(id);
-                            setIsPayment(false);
-                            Cookies.remove("order");
-                            resetPayment()
-                            refrestItem();
-                            navigate('/order-history');
-
-                        }).catch(error => {
-                            console.error(error);
-                        })
-                        refrestItem();
-                    }).catch(error => {
-                        console.error(error);
-                    })
-                } else {
-                    console.error("table-order is not an array:", orderTables);
-                }
-
-            } catch (error) {
-                alert("Order Fail")
+        try {
+            if (!orderValidation()) {
+                return
             }
-        } else {
-            try {
-                const item = JSON.parse(Cookies.get("order") || '[]');
-                const totalAmount = discounts ? paymentSD : totalPay;
-                const objOrder = {
-                    "branchId": branchId,
-                    "orderType": 1,
-                    "customerId": 1,
-                    "acceptedBy": user,
-                    "tableNumber": 5,
-                    "status": 1,
-                    "numberOfPeople": 4,
-                    "totalAmount": totalAmount,
-                    "cash": received,
-                    "exchange": received - totalAmount,
-                    "orderDate": new Date(),
-                    "description": "Order for table 5, including fast food items.",
-                    "orderLines": item
+            const branchId = userObject().branch;
+            const user = getDefualtUserId();
+            let item = [];
+            if (id) {
+                const orderTables = JSON.parse(Cookies.get("table-order") || '[]');
+                if (!Array.isArray(orderTables)) return;
+                const objOrderTable = orderTables.find(o => o.id == id);
+                item = objOrderTable.data;
+                if (!item) return
+            } else {
+                item = JSON.parse(Cookies.get("order") || '[]');
+                if (!item) return
+            }
+
+
+
+            const totalAmount = discounts ? paymentSD : totalPay;
+            const objOrder = {
+                "branchId": branchId ? branchId : 0,
+                "orderType": 1,
+                "customerId": customerId ? customerId : 0,
+                "acceptedBy": user ? user : 0,
+                "tableNumber": null,
+                "status": 1,
+                "numberOfPeople": 4,
+                "totalAmount": totalAmount,
+                "cash": received,
+                "exchange": received - totalAmount,
+                "orderDate": new Date(),
+                "description": "Order for table 5, including fast food items.",
+                "orderLines": item
+            }
+            saleItem(objOrder).then((response) => {
+                console.log(response.data);
+
+                const objJournal = {
+                    "journal": 'POS',
+                    "branchId": branchId ? branchId : 0,
+                    "partnerId": null,
+                    "date": new Date(),
+                    "total": totalAmount,
+                    "reference": "POS SALE INV-" + response.data.invoiceNumber,
+                    "status": "1"
                 }
-                createOrder(objOrder).then((response) => {
-                    console.log(response.data);
-
-                    const objJournal = {
-                        "journalId": null,
-                        "branchId": branchId,
-                        "partnerId": null,
-                        "date": new Date(),
-                        "total": totalAmount,
-                        "reference": "POS SALE INV-00" + response.data.id,
-                        "status": "1"
+                createJournal(objJournal).then((reponseJ) => {
+                    console.log(reponseJ.data);
+                    const objTransaction = {
+                        "journalEntriesId": reponseJ.data.id,
+                        "accountId": 21,
+                        "label": "POS Sale Revenues",
+                        "debit": totalAmount,
+                        "credit": null,
                     }
-                    createJournal(objJournal).then((reponseJ) => {
-                        console.log(reponseJ.data);
-                        const objTransaction = {
-                            "journalEntriesId": reponseJ.data.id,
-                            "accountId": 21,
-                            "label": "POS Sale Revenues",
-                            "debit": totalAmount,
-                            "credit": null,
-                        }
 
-                        createTransaction(objTransaction).then((responseT) => {
-                            console.log(responseT.data);
-                        }).catch(error => {
-                            console.error(error);
-                        })
-                        const objTransaction2 = {
-                            "journalEntriesId": reponseJ.data.id,
-                            "accountId": 12,
-                            "label": "POS Sale Revenues",
-                            "debit": null,
-                            "credit": totalAmount
-                        }
-                        createTransaction(objTransaction2).then((responseT) => {
-                            console.log(responseT.data);
-                        }).catch(error => {
-                            console.error(error);
-                        })
-                        setIsPayment(false);
-                        Cookies.remove("order");
-                        resetPayment()
-                        refrestItem();
+                    createTransaction(objTransaction).then((responseT) => {
+                        console.log(responseT.data);
                     }).catch(error => {
                         console.error(error);
                     })
+                    const objTransaction2 = {
+                        "journalEntriesId": reponseJ.data.id,
+                        "accountId": 12,
+                        "label": "POS Sale Revenues",
+                        "debit": null,
+                        "credit": totalAmount
+                    }
+                    createTransaction(objTransaction2).then((responseT) => {
+                        console.log(responseT.data);
+                    }).catch(error => {
+                        console.error(error);
+                    })
+                    setReceived('');
+                    setIsPayment(false);
+                    setIsPaymentSuccess(true);
+                    // complete transaction
+                    completeTransaction(response.data);
+                    Cookies.remove("order");
+                    resetPayment()
                     refrestItem();
                 }).catch(error => {
                     console.error(error);
                 })
+                refrestItem();
+            }).catch(error => {
+                Cookies.remove('user-data');
+                window.location.href = '/'
+            })
 
 
-            } catch (error) {
-                alert("Order Fail")
-            }
+        } catch (error) {
+
         }
     }
+    const completeTransaction = (data) => {
+        setTransactionData(data);
+    };
+    // save table order on memmory web browser
     function saveTableOrder() {
         if (!validation()) return
         if (!id) {
@@ -433,7 +409,8 @@ const PosLight = () => {
                 const obj = {
                     id: numberRememberCustomer.trim(), // Ensure clean input
                     date: new Date(),
-                    data: orderData
+                    data: orderData,
+                    branch: userObject().branch
                 };
 
                 if (!obj) {
@@ -444,6 +421,8 @@ const PosLight = () => {
 
                 // Save the updated 'table-order' back to cookies
                 Cookies.set('table-order', JSON.stringify(orderTables));
+                alert(JSON.stringify(orderTables, null, 2))
+                console.log(orderTables);
 
                 // Cleanup after saving
                 Cookies.remove("order"); // Remove the 'order' cookie
@@ -459,55 +438,38 @@ const PosLight = () => {
 
     }
 
+    // find total payment using array object of customer order
     function totalPayment() {
+        let item;
+
         if (id) {
-            try {
-                const orderTables = JSON.parse(Cookies.get("table-order") || '[]'); // Default to empty array
-                console.log(orderTables);
-
-                // Check if `orderTables` is an array
-                if (Array.isArray(orderTables)) {
-                    const objOrderTable = orderTables.find(o => o.id == id);
-                    const item = objOrderTable.data;
-                    let total = 0;
-                    if (item) {
-                        for (let i = 0; i < item.length; i++) {
-                            total += item[i].price * item[i].qty; // Calculate item total
-                        }
-                    }
-                    setTotalPay(total);
-                    if (discounts) {
-                        const totalPay = total - total * discounts / 100;
-                        setPaymentUSD(totalPay);
-                    }
-                } else {
-                    console.error("table-order is not an array:", orderTables);
-                }
-            } catch (error) {
-                console.error("Error parsing 'table-order' cookie:", error);
-            }
+            const orderTables = JSON.parse(Cookies.get("table-order") || '[]');
+            if (!Array.isArray(orderTables)) return
+            const objOrderTable = orderTables.find(o => o.id == id);
+            item = objOrderTable.data;
+            if (!item) return
         } else {
-            try {
-                const item = JSON.parse(Cookies.get("order") || '[]');
-                setItemOrder(item);
-
-                let total = 0;
-                if (item) {
-                    for (let i = 0; i < item.length; i++) {
-                        total += item[i].price * item[i].qty; // Calculate item total
-                    }
-                }
-                setTotalPay(total);
-                if (discounts) {
-                    const totalPay = total - total * discounts / 100;
-                    setPaymentUSD(totalPay);
-                }
-
-            } catch (error) {
-                console.error("Error calculating total payment:", error);
+            item = JSON.parse(Cookies.get("order") || '[]');
+        }
+        setItemOrder(item);
+        if (item.length == 0) {
+            setPaymentUSD(0);
+            setTotalPay(0)
+            return;
+        }
+        let total = 0;
+        if (item) {
+            for (let i = 0; i < item.length; i++) {
+                total += item[i].price * item[i].qty; // Calculate item total
             }
         }
+        setTotalPay(total);
+        if (discounts) {
+            const totalPay = total - total * discounts / 100;
+            setPaymentUSD(totalPay);
+        }
     }
+    // if id is change refrest new total payment
     useEffect(() => {
         totalPayment();
     }, [id])
@@ -520,22 +482,19 @@ const PosLight = () => {
     const [itemOrder, setItemOrder] = useState([])
     function refrestItem() {
         try {
-            if (id) {
-                try {
-                    const orderTables = JSON.parse(Cookies.get("table-order") || '[]'); // Default to empty array
-                    console.log(orderTables);
+            // user use check on hold order we need to get order-data to sale item
 
-                    // Check if `orderTables` is an array
-                    if (Array.isArray(orderTables)) {
-                        const objOrderTable = orderTables.find(o => o.id == id);
-                        setItemOrder(objOrderTable.data);
-                        setNumberRememberCustomer(objOrderTable.id)
-                    } else {
-                        console.error("table-order is not an array:", orderTables);
-                    }
-                } catch (error) {
-                    console.error("Error parsing 'table-order' cookie:", error);
-                }
+            if (id) {
+                const orderTables = JSON.parse(Cookies.get("table-order") || '[]'); // Default to empty array
+                // check if this object not array
+                if (!Array.isArray(orderTables)) return
+
+                const objOrderTable = orderTables.find(o => o.id == id);
+                setItemOrder(objOrderTable.data);
+
+                // if we need display number of table order
+                setNumberRememberCustomer(objOrderTable.id)
+
             } else {
                 const item = JSON.parse(Cookies.get("order") || '[]');
                 if (item) {
@@ -556,6 +515,7 @@ const PosLight = () => {
 
     function updateQty(btn, pid) {
         if (id) {
+            // user click on button plus + item
             if (btn === 1) {
                 try {
                     const tableOrders = JSON.parse(Cookies.get("table-order") || '[]'); // Parse as array
@@ -656,7 +616,7 @@ const PosLight = () => {
                             <tr className='border-secondary border-bottom'>
 
                                 <td className='py-3'>No</td>
-                                <td>Item</td>
+                                <td style={{ width: '250px' }}>Item</td>
                                 <td>Price</td>
                                 <td>Qty</td>
                                 <td>Amount</td>
@@ -669,10 +629,25 @@ const PosLight = () => {
                         <tbody>
                             {
                                 itemOrder.map((f, i) =>
-                                    <tr className="pointer" onClick={() => goto(`/item-detail`)}>
+                                    <motion.tr
+                                        key={i}
+                                        custom={i} // Pass index for staggered animation
+                                        variants={globleRowVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        className="pointer" onClick={() => goto(`/item-detail`)}>
 
                                         <td className='py-3'>{i + 1}</td>
-                                        <td>{findProductName(f.productId)}</td>
+                                        <td>
+                                            <div className="start">
+                                                <div className="center" style={{ height: '70px' }}>
+                                                    <img src={findImageProduct(f.productId)} className='h-100 rounded ' alt="" />
+                                                </div>
+                                                <div className='ps-2'>
+                                                    {findProductName(f.productId)}
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td>{formatCurrency.format(f.price)}</td>
                                         <td>{f.qty}</td>
                                         <td>{formatCurrency.format(f.amounts)}</td>
@@ -687,7 +662,7 @@ const PosLight = () => {
 
 
 
-                                    </tr>
+                                    </motion.tr>
                                 )
                             }
                         </tbody>
@@ -697,59 +672,15 @@ const PosLight = () => {
             </div>
         )
     }
-
-    const handleClick = (value) => {
-        // if (id) {
-        //     if (isPayment == true) {
-        //         setInput((prevInput) => prevInput + value);
-        //     } else {
-        //         alert('Can not change table number');
-        //     }
-
-        // } else {
-        //     setInput((prevInput) => prevInput + value);
-        // }
+    function setValueFromCalculae(value) {
         if (isPayment) {
-            setReceived((prevInput) => prevInput + value);
-        } else {
-            if (!id) {
-                setNumberRememberCustomer((prevInput) => prevInput + value)
-            }
+            setReceived(value);
+            return
         }
-
-
-    };
-
-    const handleBackspace = () => {
-        if (isPayment) {
-            setReceived((prevInput) => prevInput.slice(0, -1));
-        } else {
-            if (!id) {
-                setNumberRememberCustomer((prevInput) => prevInput.slice(0, -1))
-            }
-        }
-
-    };
-    function calculator() {
-        return (
-            <div style={{ maxWidth: '100%', width: '100%', textAlign: 'center' }}>
-                <div className='f-20 w-100' style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
-                    <button className='button calculator' onClick={() => handleClick('1')}>1</button>
-                    <button className='button calculator' onClick={() => handleClick('2')}>2</button>
-                    <button className='button calculator' onClick={() => handleClick('3')}>3</button>
-                    <button className='button calculator' onClick={() => handleClick('4')}>4</button>
-                    <button className='button calculator' onClick={() => handleClick('5')}>5</button>
-                    <button className='button calculator' onClick={() => handleClick('6')}>6</button>
-                    <button className='button calculator' onClick={() => handleClick('7')}>7</button>
-                    <button className='button calculator' onClick={() => handleClick('8')}>8</button>
-                    <button className='button calculator' onClick={() => handleClick('9')}>9</button>
-                    <button className='button calculator' onClick={() => handleClick('0')}>0</button>
-                    <button className='button calculator' onClick={() => handleClick('.')}>.</button>
-                    <button className='bg-danger btn-calculator text-light' onClick={handleBackspace}>&larr;</button>
-                </div>
-            </div>
-        );
+        setNumberRememberCustomer(value);
     }
+
+
     function removeTableOrderById(id) {
         try {
             // Parse existing `table-order` cookie, defaulting to an empty array
@@ -779,14 +710,16 @@ const PosLight = () => {
         try {
             const holdOrderObject = JSON.parse(Cookies.get('table-order') || '[]');
             if (Array.isArray(holdOrderObject)) {
-                const isDubplicate = holdOrderObject.find(i => i.id == numberRememberCustomer);
+                const filterHolderBranch = holdOrderObject.filter(f => f.branch == userObject().branch);
+                const isDubplicate = filterHolderBranch.find(i => i.id == numberRememberCustomer);
                 if ((isDubplicate)) {
-                    newErrors.numberRememberCustomer = 'Table number is already exists'
+                    newErrors.numberRememberCustomer = 'Table number is already exists in this branch'
                 }
             }
         } catch (e) {
 
         }
+        if (!userObject().branch) newErrors.branch = 'Branch number is require'
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     }
@@ -798,115 +731,104 @@ const PosLight = () => {
                 <div className="">
                     <div className="row">
                         <div className="col-xl-8 col-lg-6 col-12 col-md-6 col-12 d-block">
-                            <div className='container-fluid w-100 mt-5' style={{ maxWidth: '800px' }}>
+                            <div className='container-fluid w-100 mt-5' style={{ maxWidth: '900px' }}>
                                 <div className='display-6 text-badges-green text-center'>Total Payment :  {paymentSD ? formatCurrency.format(paymentSD) : formatCurrency.format(totalPay)}</div>
                                 {listTable()}
-                                {/* <p className="f-16 txt-label">Customer :</p>
 
-                                <div className='display-6'>PAYMENTS</div>
-                                <p className="f-16 py-2">PaymentMethod :</p>
-                                <OptionButton options={orderType} onClick={getValuePayMethod} customClass="custom-container-class mb-2" />
-                                <div className='mb-1'>
-                                    <InputValidation
-                                        label='Received Form Customer'
-                                        id='received'
-                                        type='number'
-
-                                        value={received}
-                                        error={errorOrder.received}
-
-                                    />
-                                    <span className='text-danger'>{errorOrder.payment ? errorOrder.payment : ''}</span>
-                                </div>
-
-                                <div className='mb-1'>
-                                    <Box sx={{ minWidth: 120 }}>
-                                        <label htmlFor="exchange" className='f-16 txt-label'>Exchange :</label> <br />
-                                        <input type="number" id='exchange' className='bg-none  py-3 px-3 text-dark w-100 px-0  text-box' placeholder='enter cash received' value={(received - totalPay) > 0 ? (received - totalPay) : 0} />
-                                    </Box>
-                                </div> */}
 
                             </div>
                         </div>
                         <div className="col-xl-4 col-lg-6 col-12">
-                            <div className='ps-0 bg-none p-3' style={{ height: '100vh' }}>
+                            <div className='bg-none p-3' style={{ height: '100vh' }}>
                                 <div className="bg-none rounded h-100 box-shadow" style={{ position: 'relative', overflow: 'scroll' }}>
 
-                                    <div className="h-50 px-3">
-                                        <ComboBox
+                                    <div className="h-50 p-3">
+                                        {/* <ComboBox
                                             options={customer}
                                             className='border-0 border-bottom mb-2'
                                             onSelect={selectCustomer}
                                             labelKeys={["firstName", "lastName"]}
                                             inputClassName='border-0 bg-none ps-0'
                                             optionClassName='hover-line'
-                                        />
-                                        <ComboBox
-                                            options={paymentmethod}
-                                            className='border-0 border-bottom mb-2'
-                                            onSelect={selectPaymentMethod}
+                                        /> */}
+                                        {/* <CustomCommoBox
+                                            fontSize={16}
+                                            label='Select customer'
+                                            items={customer}
+                                            onItemSelected={selectCustomer}
+                                            labelKeys={["firstName", "lastName"]}
+                                            searchKey={"firstName"}
+                                        /> */}
+                                        <Button startIcon={<IoMdPersonAdd />} variant='contained' color='primary' className='py-3 mb-3 w-100 fs-5'>
+                                            Customer
+                                        </Button>
+                                        <CustomCommoBox
+                                            fontSize={16}
+                                            label='Select payment method'
+                                            items={paymentmethod}
+                                            onItemSelected={selectPaymentMethod}
                                             labelKeys={["text"]}
-                                            inputClassName='border-0 bg-none ps-0'
-                                            optionClassName='hover-line'
+                                            searchKey={"text"}
                                         />
-                                        <ComboBox
-                                            className='border-0 border-bottom mb-2'
-                                            options={discount}
-                                            onSelect={selectDiscount}
+                                        <CustomCommoBox
+                                            fontSize={16}
+                                            label='Select discount'
+                                            items={discount}
+                                            onItemSelected={selectDiscount}
                                             labelKeys={["label"]}
-                                            inputClassName='border-0 bg-none ps-0'
-                                            optionClassName='hover-line'
+                                            searchKey={"label"}
                                         />
+
                                     </div>
 
                                     <div className="h-50 ">
                                         <div className="position-absolute bottom-0 w-100 px-3 pb-3">
                                             <InputValidation
-                                                label='Discount USD'
+                                                label='DISCOUNT USD'
                                                 id='discount'
                                                 type='number'
+                                                fontSize={16}
 
                                                 value={discounts ? totalPay * discounts / 100 : 0}
 
                                             />
                                             <InputValidation
-                                                label='Exchnage USD'
+                                                label='EXCHANGE USD'
                                                 id='exchange'
+
                                                 type='number'
+                                                fontSize={16}
 
                                                 value={discounts ? (received - paymentSD > 0 ? received - paymentSD : 0) : received - totalPay > 0 ? received - totalPay : 0}
 
                                             />
-                                            <InputValidation
-                                                label='Received USD'
-                                                id='received'
-                                                type='number'
-
-                                                value={received}
-                                                error={errorOrder.received}
-
-                                            />
-                                            <span className='text-danger'>{errorOrder.payment ? errorOrder.payment : ''}</span>
+                                            {/* <span className='text-danger'>{errorOrder.payment ? errorOrder.payment : ''}</span> */}
 
                                             <div className=''>
-                                                {calculator()}
+                                                <Calculator onInputChange={(value) => setReceived(value)} value={received} placeholder='Enter Received' />
                                             </div>
-                                            <div className="d-flex">
-                                                <div className='w-25'>
-                                                    <button className="btn bg-red text-white rounded-0 py-4  box-shadow w-100"
-                                                        data-bs-dismiss="offcanvas" aria-label="Close"
-                                                        onClick={() => {
-                                                            setIsPayment(false)
-                                                        }}
-                                                    ><i class="fa-solid fa-arrow-left pe-3"></i> Cancel</button>
+                                            <div className="row py-2">
+                                                <div className='col-4 pe-1'>
+
+                                                    <Button variant='contained' color='error' className='h-100 w-100 py-4' onClick={() => {
+                                                        setIsPayment(false)
+                                                    }} >
+                                                        Back
+                                                    </Button>
                                                 </div>
-                                                <div className="w-75">
-                                                    <button className="btn bg-green text-white rounded-0 py-4 box-shadow w-100"
-                                                        onClick={() => {
-                                                            order();
-                                                        }}
-                                                    // data-bs-dismiss="offcanvas" aria-label="Close"
-                                                    >DONE</button>
+                                                <div className="col-8">
+
+                                                    {/* {received >= totalPay ? <Button variant='contained' startIcon={<PiCheckCircleLight />} color='success' className='h-100 w-100 py-4' onClick={() => order()}>
+                                                        Complete
+                                                    </Button> : ''} */}
+                                                    {received >= (discounts ? paymentSD : totalPay) && itemOrder.length > 0 ?
+                                                        <Button variant='contained' startIcon={<PiCheckCircleLight />} color='success' className='h-100 w-100 py-4' onClick={() => order()}>
+                                                            Complete
+                                                        </Button> :
+                                                        <Button variant='contained' startIcon={<PiCheckCircleLight />} color='success' className='h-100 w-100 py-4' disabled>
+                                                            Complete
+                                                        </Button>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
@@ -956,61 +878,47 @@ const PosLight = () => {
 
                         </div>
 
-
-                        <InputValidation
-                            placeHolder='Enter table number'
-                            value={numberRememberCustomer}
-                            fontSize={14}
-                            error={errors.numberRememberCustomer}
-                        />
                         {errors.numberRememberCustomer ? <div className='f-12'></div> : ''}
 
                         <div className='row mt-1 p-2 rounded px-0'>
-                            <div className='col-7 pe-0'>
-                                {calculator()}
+
+                            <div className='col-12 pe-0'>
+                                <Calculator onInputChange={(e) => setNumberRememberCustomer(e)} value={numberRememberCustomer} />
                             </div>
-                            <div className="col-5 pe-0">
-                                <div className="row h-100 w-100">
-                                    <div className="col-12 pe-0">
+                            <div className="col-6 pe-0 py-2 pb-1">
 
-                                        <div className="p-1 pt-0 h-100 w-100 px-0">
-                                            <button className="button hold-order h-100 w-100 rounded-0 box-shadow"
-                                                onClick={() => saveTableOrder()}
-                                            >
-                                                <i class="fa-solid fa-utensils"></i>
-                                                <span className='ps-2'>Hold Order</span>
-                                            </button>
-                                        </div>
+                                {numberRememberCustomer != '' ?
+                                    <Button variant='contained' color='success' className="h-100 w-100 py-3"
+                                        onClick={() => saveTableOrder()}
+                                    >
+                                        <i class="fa-solid fa-utensils"></i>
+                                        <span className='ps-2'>Hold Order</span>
+                                    </Button> :
+                                    <Button variant='contained' color='success' className="h-100 w-100 py-3" disabled >
+                                        <i class="fa-solid fa-utensils"></i>
+                                        <span className='ps-2'>Hold Order</span>
+                                    </Button>
+                                }
 
-                                    </div>
-                                    <div className="col-12 pe-0 ">
-
-                                        <div className='p-1 pb-0 h-100 w-100 px-0'>
-                                            {itemOrder.length ? (
-                                                <>
-                                                    <button className="button hold-order h-100 w-100 rounded-0 box-shadow"
-                                                        data-bs-toggle="offcanvas" data-bs-target="#payment" aria-controls="payment"
-                                                        onClick={() => {
-                                                            setIsPayment(true);
-                                                        }}
-                                                    >
-                                                        <i class="fa-solid fa-arrow-right pe-2"></i> Payment
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button className="button hold-order h-100 w-100 rounded-0 box-shadow"
-                                                    >
-                                                        <i class="fa-solid fa-arrow-right pe-2"></i> Payment
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
+                            </div>
+                            <div className="col-6 pe-0  py-2 pb-1">
+                                {itemOrder.length ? (
+                                    <>
+                                        <Button variant='contained' color='success' className=" w-100 h-100 p-3"
+                                            onClick={() => {
+                                                setIsPayment(true);
+                                            }}
+                                        >
+                                            <i class="fa-solid fa-arrow-right pe-2"></i> Payment
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button variant='contained' color='success' className="w-100 h-100 py-3" disabled>
+                                            <i class="fa-solid fa-arrow-right pe-2"></i> Payment
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1021,6 +929,28 @@ const PosLight = () => {
 
     const getValuePayMethod = (value) => {
         console.log(`Option selected: ${value}`);
+    };
+    const [searchTerm, setSearchTerm] = useState("");
+    useEffect(() => {
+        if (!searchTerm) {
+            refrestProduct();
+            return
+        }
+        setProduct(searchData(product, searchTerm, ["productName", "productOrigin"]));
+
+    }, [searchTerm]);
+
+    const rowVariants = {
+        hidden: { opacity: 0, Y: 10 },
+        visible: (index) => ({
+            opacity: 1,
+            y: 0,
+            transition: {
+                delay: index * 0.03,
+                duration: 0.5,
+                ease: 'easeOut',
+            },
+        }),
     };
 
     return (
@@ -1033,22 +963,30 @@ const PosLight = () => {
                     msOverflowStyle: 'none',
                 }}>
                     <div className='w-100 px-2 h-100'>
-                        <div className='d-flex justify-content-between align-items-center my-2 px-2 py-3 box-shadow rounded bg-white'>
+                        <div
+                            className='d-flex justify-content-between align-items-center my-2 px-2 py-2 rounded box-shadow border'
+                            style={{
+                                backgroundColor: 'rgb(255, 255, 255)',
+                                // boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px'
+                            }}
+                        >
                             {/* <div className='w-100 d-flex justify-content-between align-items-center px-3 pe-1' style={{ maxWidth: '400px' }}>
                                 <LiaSearchSolid className='f-20 pointer' /><input type="text" className='ms-2 w-100 border rounded p-2 px-3' placeholder='search' />
                             </div> */}
-                            <div className='d-flex text-start'>
-                                <p className="text-start d-block center" style={{ height: '40px' }}>
-                                    <img src="https://cdn-icons-png.flaticon.com/512/219/219983.png" alt="" className='h-100' />
+
+                            <div>
+                                <p className='f-16 px-3 border-3 border-start'>Company's {findCompanyName(branch, userObject().branch)} </p>
+                            </div>
+                            <div className='start text-start pe-3'>
+
+                                <p className="center rounded-circle box-shadow p-1 border borde-success" style={{ height: '60px', width: '60px', overflow: 'hidden' }}>
+                                    <img src={`${imageUrl}${profile}`} alt="" className='h-100 rounded-circle' />
                                 </p>
-                                <p className='f-14 ps-2 d-block'>
-                                    <p>Nurak Oerun</p>
-                                    <p className='f-10 text-secondary'>Sale admin</p>
+                                <p className='f-14 ps-2 d-block mt-1'>
+                                    <p className='text-dark'>{employeeName}</p>
+                                    <p className='f-10 text-secondary' style={{ opacity: '0.8' }}>{role}</p>
                                 </p>
 
-                            </div>
-                            <div>
-                                <button className="button pay" style={{ fontSize: '14px' }}><HiShoppingCart /><span className='ps-2'>View Order</span></button>
                             </div>
 
 
@@ -1063,7 +1001,9 @@ const PosLight = () => {
                                 </p>
 
                                 <div className='w-100 d-flex justify-content-between align-items-center px-3 pe-0' style={{ maxWidth: '400px' }}>
-                                    <LiaSearchSolid className='f-20 pointer' /><input type="text" className='ms-2 w-100 border rounded p-2 px-3' placeholder='search' />
+                                    <LiaSearchSolid className='f-20 pointer' />
+                                    <input type="text" className='ms-2 w-100 border rounded p-2 px-3' placeholder='search'
+                                        onChange={(e) => setSearchTerm(e.target.value)} />
                                 </div>
                             </div>
                             <div className="w-100 mt-1 d-flex py-1 pt-0" style={{
@@ -1072,9 +1012,10 @@ const PosLight = () => {
                                 msOverflowStyle: 'none',
                             }}>
                                 <div className="center">
-                                    <button
+                                    <Paper
+
                                         // style={{ color: `${colorChange}`, background: `${bgChange}` }}
-                                        className={`button-pos-category category me-1 ${activeIndex === 0 ? "button-pos-category active-category" : ""
+                                        className={`pointer button-pos-category category me-1 ${activeIndex === 0 ? "button-pos-category active-category" : ""
                                             }`}
 
                                         onClick={() => {
@@ -1094,15 +1035,22 @@ const PosLight = () => {
                                             </div>
                                         </div>
 
-                                    </button>
+                                    </Paper>
                                 </div>
                                 {
                                     categories.map((c, index) =>
-                                        <div className="center">
-                                            <button
+                                        <motion.div
+                                            key={c.id}
+                                            custom={index} // Pass index for staggered animation
+                                            variants={rowVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            className="center">
+                                            <Paper
+                                                elevation={1}
                                                 key={c.id}
                                                 // style={{ color: `${colorChange}`, background: `${bgChange}` }}
-                                                className={`button-pos-category category me-1 ${activeIndex === index + 1 ? "button-pos-category active-category" : ""
+                                                className={`pointer button-pos-category category  me-1 ${activeIndex === index + 1 ? "button-pos-category active-category" : ""
                                                     }`}
 
                                                 onClick={() => {
@@ -1123,8 +1071,8 @@ const PosLight = () => {
                                                     </div>
                                                 </div>
 
-                                            </button>
-                                        </div>
+                                            </Paper>
+                                        </motion.div>
                                     )
                                 }
 
@@ -1132,31 +1080,55 @@ const PosLight = () => {
                             </div>
                             <div className='row py-2'>
                                 {
-                                    product.map(p => {
+                                    product.map((p, index) => {
                                         if (p.categoryId == categoryId) {
                                             return (
                                                 <>
-                                                    <div className="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6 col-12 pb-3">
-                                                        <ProductCard
-                                                            image={p.image}
-                                                            price={p.price}
-                                                            name={p.productName}
-                                                            onClick={() => addToCart(p.id, 1, p.price, p.image)}
-                                                        />
-                                                    </div>
+                                                    <motion.div
+                                                        key={p.id}
+                                                        custom={index} // Pass index for staggered animation
+                                                        variants={rowVariants}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        className="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6 col-12 p-2">
+                                                        <div
+
+                                                        >
+                                                            <ProductCard
+                                                                image={p.image}
+                                                                price={p.price}
+                                                                name={p.productName}
+                                                                onClick={() => addToCart(p.id, 1, p.price, p.image)}
+                                                            />
+
+                                                        </div>
+
+                                                    </motion.div>
                                                 </>
                                             )
                                         } else if (categoryId == null) {
                                             return (
                                                 <>
-                                                    <div className="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6 col-12 pb-3">
-                                                        <ProductCard
-                                                            image={p.image}
-                                                            price={p.price}
-                                                            name={p.productName}
-                                                            onClick={() => addToCart(p.id, 1, p.price, p.image)}
-                                                        />
-                                                    </div>
+                                                    <motion.div
+                                                        key={p.id}
+                                                        custom={index} // Pass index for staggered animation
+                                                        variants={rowVariants}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        className="col-xxl-2 col-xl-3 col-lg-3 col-md-4 col-sm-6 col-12 p-2">
+                                                        <div
+
+                                                        >
+                                                            <ProductCard
+                                                                image={p.image}
+                                                                price={p.price}
+                                                                name={p.productName}
+                                                                onClick={() => addToCart(p.id, 1, p.price, p.image)}
+                                                            />
+
+                                                        </div>
+
+                                                    </motion.div>
                                                 </>
                                             )
                                         }
@@ -1191,31 +1163,62 @@ const PosLight = () => {
                             {
                                 itemOrder.length > 0 ? itemOrder.map((i, index) =>
                                     <>
-                                        <div className="w-100 border-0 border-bottom border-secondary" style={{ height: '110px' }}>
-                                            <div className="between border-0 w-100">
-                                                <div className='rounded img-pos-order center p-2 pb-2 ' style={{ height: '100px' }}>
-                                                    <img src={`${imageUrl}${i.image}`} alt="" className="h-100 srounded" />
-                                                </div>
-                                                <div className='d-block ps-2 w-100'>
-                                                    <div className='between' style={{ height: '50px' }}>
-                                                        <span className='font-14 w-100'>{findProductName(i.productId)}</span>
-                                                        {/* <i class="fa-solid fa-trash pointer"></i> */}
+                                        <motion.div
+                                            key={index}
+                                            custom={index} // Pass index for staggered animation
+                                            variants={globleRowVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            className="w-100 border-0 border-bottom border-secondary"
+                                            style={{ height: '110px' }}
+                                        >
+                                            <div className="d-flex justify-content-between align-items-center border-0 w-100">
+                                                <div className="w-25 center">
+                                                    <div
+                                                        className="rounded-circle center  shadow"
+                                                        style={{ height: '90px', width: '90px', overflow: 'hidden' }}
+                                                    >
+                                                        <img
+                                                            src={`${imageUrl}${i.image}`}
+                                                            alt=""
+                                                            className="h-100 "
+                                                            style={{ objectFit: 'cover' }}
+                                                        />
                                                     </div>
-                                                    <div className='fs-6 between' style={{ height: '50px' }}>
-                                                        <div className='w-100'>
-                                                            <span className=' fs-5 text-badges-red'>{formatCurrency.format(i.price)}</span>
-                                                            <span className=' font-12 ps-2'> / unit</span>
+                                                </div>
+                                                <div className="ps-2 w-75" style={{ maxWidth: '100%' }}>
+                                                    <div className="w-100">
+                                                        <div className="d-flex justify-content-between align-items-center" style={{ height: '50px' }}>
+                                                            <span className="font-14 text-truncate w-100">{findProductName(i.productId)}</span>
+                                                            {/* Uncomment and style if needed */}
+                                                            {/* <i className="fa-solid fa-trash pointer"></i> */}
                                                         </div>
-                                                        <div className='font-12 text-danger d-flex'>
-                                                            <span className='small-i text-badges-danger box-shadow' onClick={() => updateQty(2, i.productId)}><LuMinus /></span>
-                                                            <span className='bg-none text-dark text-badges-danger'>{i.qty}</span>
-                                                            <span className='small-i text-badges-green box-shadow' onClick={() => updateQty(1, i.productId)}><IoIosAdd /></span>
-
+                                                        <div className="d-flex justify-content-between align-items-center" style={{ height: '50px' }}>
+                                                            <div className="w-100">
+                                                                <span className="fs-5 text-badges-red">{formatCurrency.format(i.price)}</span>
+                                                                <span className="font-12 ps-2"> / unit</span>
+                                                            </div>
+                                                            <div className="d-flex align-items-center">
+                                                                <span
+                                                                    className="small-i text-badges-danger box-shadow me-2 pointer"
+                                                                    onClick={() => updateQty(2, i.productId)}
+                                                                >
+                                                                    <LuMinus />
+                                                                </span>
+                                                                <span className="bg-none text-dark text-badges-danger mx-2">{i.qty}</span>
+                                                                <span
+                                                                    className="small-i text-badges-green box-shadow ms-2 pointer"
+                                                                    onClick={() => updateQty(1, i.productId)}
+                                                                >
+                                                                    <IoIosAdd />
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </motion.div>
+
                                     </>
                                 ) : (
                                     <>
@@ -1235,7 +1238,7 @@ const PosLight = () => {
                         {id ? (
                             <>
                                 <div className='h-10'>
-                                    <div className='position-absolute bottom-0 w-100 px-3'>
+                                    <div className='position-absolute bottom-0 w-100 px-3 pb-3'>
                                         <button className='button pay w-100 py-3 h-100' onClick={() => setIsPayment(true)}>Payment</button>
                                     </div>
                                 </div>
@@ -1253,7 +1256,7 @@ const PosLight = () => {
 
 
             {/* </div > */}
-            {/* {shopingCard()} */}
+            {/* Invoice  */}
             <div className="modal fade " id="printer" tabindex="-1" aria-labelledby="printer" aria-hidden="true" >
                 <div class="modal-dialog bg-none">
                     <div class="modal-content bg-none">
@@ -1326,6 +1329,15 @@ const PosLight = () => {
 
             {/* // Payment  */}
             <Modal isOpen={isPayment} children={payment()} />
+            {/* <Modal isOpen={isPayment} children={receivedData ? <PrinInvoice invoiceData={receivedData} /> : ''} /> */}
+            {/* {transactionData && transactionData.paymentStatus == 'COMPLETED' && (
+                
+            )} */}
+            <Modal isOpen={isPaymentSuccess} children={<PrinInvoice invoiceData={transactionData} onClick={() => {
+                setTransactionData(null)
+                setIsPaymentSuccess(false)
+            }} />} />
+
             {/* <div className="offcanvas offcanvas-start w-100" tabindex="-1" id="payment" aria-labelledby="payment">
                 <div className="offcanvas-body p-0">
 
@@ -1352,7 +1364,7 @@ const PosLight = () => {
 
                     <div className='d-flex mt-1'>
                         <div style={{ height: '100%' }}>
-                            {calculator()}
+                            <Calculator onInputChange={setValueFromCalculae} value={numberRememberCustomer} />
                         </div>
                         <div className="d-block w-100">
                             <button className="btn-silver rounded-0 h-25 border box-shadow w-100 d-block fs-6"

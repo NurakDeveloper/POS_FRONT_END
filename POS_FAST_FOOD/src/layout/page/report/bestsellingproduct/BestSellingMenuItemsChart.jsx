@@ -3,6 +3,10 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import 'chartjs-plugin-zoom'; // Ensure this plugin is installed
 import { getAllProductSoldReport } from '../../../../api/Procedure';
+import { getSaleReport } from '../../../../api/Reporting';
+import SalesChart from './SalesChart';
+import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../../components/table/DataGrid';
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -16,93 +20,97 @@ const generateRandomColor = () => {
 };
 
 const BestSellingMenuItemsChart = () => {
-    const [data, setRowData] = useState([]);
 
+    const [saleReport, setSaleReport] = useState([]);
     useEffect(() => {
-        // Fetch data from your API
-        getAllProductSoldReport().then((response) => {
-            setRowData(response.data);
-        }).catch(error => {
-            console.error('Error fetching data: ', error);
-        });
-    }, []);
+        getSaleReport().then((reponse) => {
+            setSaleReport(reponse.data);
+        })
+    }, [])
+    const rowsPerPage = 10; // Define how many rows to display per page
+    const [currentPage, setCurrentPage] = useState(1);
 
-    // Aggregate the sales by month and product
-    const aggregatedData = {};
+    // Calculate the index of the first and last item on the current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
 
-    data.forEach(item => {
-        const { orderDate, product, sold } = item;
-        if (!aggregatedData[orderDate]) {
-            aggregatedData[orderDate] = {};
+    // Slice the categories array to display only the current page's rows
+    const currentData = saleReport.slice(startIndex, endIndex);
+
+    // Total number of pages
+    const totalPages = Math.ceil(saleReport.length / rowsPerPage);
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
         }
-        if (!aggregatedData[orderDate][product]) {
-            aggregatedData[orderDate][product] = 0;
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
         }
-        aggregatedData[orderDate][product] += sold;
+    };
+    const formatCurrency = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
     });
 
-    // Prepare the data for the chart
-    const months = Object.keys(aggregatedData);
-    const products = Array.from(new Set(data.map(item => item.product)));
-
-    const chartData = {
-        labels: months,
-        datasets: products.map((product) => ({
-            label: product,
-            data: months.map(month => aggregatedData[month][product] || 0),
-            backgroundColor: generateRandomColor(), // Assign random color
-            borderColor: 'rgba(75,192,192,1)', // Border color for bars
-            borderWidth: 1,
-        })),
+    const listTable = () => {
+        return (
+            <DataGrid>
+                <table className="">
+                    <Thead>
+                        <Th resizable>No</Th>
+                        <Th resizable >Date (Month)</Th>
+                        <Th resizable >Product</Th>
+                        <Th resizable >Total Sold</Th>
+                        <Th resizable >Revenues</Th>
+                    </Thead>
+                    <Tbody>
+                        {currentData.map((e, i) => (
+                            <Tr key={i}>
+                                <Td>{i + 1}</Td>
+                                <Td>{e.date}</Td>
+                                <Td>{e.productName}</Td>
+                                <Td>{e.totalSold}</Td>
+                                <Td>${formatCurrency.format(e.revenues)}</Td>
+                            </Tr>
+                        ))}
+                    </Tbody>
+                </table>
+            </DataGrid>
+        );
     };
-
-    const options = {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'Best Selling Products by Month (Bar Chart)',
-            },
-            tooltip: {
-                callbacks: {
-                    label: function (tooltipItem) {
-                        return tooltipItem.raw + ' units sold';
-                    },
-                },
-            },
-        },
-        scales: {
-            x: {
-                beginAtZero: true,
-            },
-            y: {
-                beginAtZero: true,
-            },
-        },
-        zoom: {
-            pan: {
-                enabled: true,
-                mode: 'xy',
-            },
-            zoom: {
-                enabled: true,
-                mode: 'xy',
-                speed: 0.1,
-            },
-        },
-    };
-
     return (
-        <div style={{ width: '100%', height: '100%' }}>
-            {/* <h2>Best Selling Products by Month</h2> */}
-            {data.length === 0 ? (
-                <p>Loading data...</p>
-            ) : (
-                <div style={{ width: '100%', height: '100%' }}>
-                    <Bar data={chartData} options={options} style={{ height: '100%', width: '100%' }} />
+        <>
+            <SalesChart data={saleReport} />
+            <div className="d-flex end mb-2">
+                <span className="page-info f-14 text-secondary px-1">
+                    {currentPage} / {totalPages}
+                </span>
+                <div className="pagination">
+                    <div className='pe-2'>
+                        <button
+                            className="button previous"
+                            onClick={handlePrevious}
+                            disabled={currentPage === 1}
+                        >
+                            <SlArrowLeft />
+                        </button>
+                    </div>
+
+                    <button
+                        className="button next"
+                        onClick={handleNext}
+                        disabled={currentPage === totalPages}
+                    >
+                        <SlArrowRight />
+                    </button>
                 </div>
-            )}
-        </div>
+            </div>
+            {listTable()}
+
+        </>
     );
 };
 
