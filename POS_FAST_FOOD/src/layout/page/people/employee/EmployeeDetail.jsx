@@ -4,13 +4,18 @@ import { getEmployee } from "../../../../api/EmployeeApi";
 import { getAllBranch } from "../../../../api/Branch";
 import { getAllEmployee } from "../../../../api/EmployeeApi";
 import { el } from "date-fns/locale";
-import { IoIosArrowRoundBack } from "react-icons/io";
+import { IoIosArrowRoundBack, IoIosPersonAdd } from "react-icons/io";
 import { hostName } from "../../../../api/host";
 import Text from "../../../../components/text/Text";
 import { createUser, getUserByEmployeeId } from "../../../../api/UserApi";
 import InputValidation from "../../../../components/input/InputValidation";
 import CustomCommoBox from "../../../../components/select/CustomCommoBox";
 import { userObject } from "../../../../api/AppConfig";
+import { Accordion, AccordionDetails, AccordionSummary, Paper, Typography } from "@mui/material";
+import List from "../../../../components/list/List";
+import { MdOutlineKeyboardArrowUp } from "react-icons/md";
+import DetailED from "../../../../components/editRemoveAction/DetailED";
+
 
 
 
@@ -97,7 +102,7 @@ const EmployeeDetail = () => {
         getAllEmployee().then((response) => {
             setEmployee(response.data);
         })
-    }, []);
+    }, [id]);
     const formatDate = (dateString) => {
         try {
             const date = new Date(dateString);
@@ -144,7 +149,6 @@ const EmployeeDetail = () => {
             )
         }
     }
-    const navi = useNavigate();
 
     const userRole = [
         {
@@ -181,7 +185,7 @@ const EmployeeDetail = () => {
     function selectRole(role) {
         setUser((prevData) => ({
             ...prevData,
-            ['role']: role.value
+            ['role']: role ? value.value : ''
         }));
     }
     const [isFormOpen, setIsFormOpen] = useState(false)
@@ -227,78 +231,150 @@ const EmployeeDetail = () => {
     return (
         <>
 
-            <div className="container center">
+            <div className="container-fluid center">
 
                 <div className="row w-100 ">
-                    <div className="col-12 p-0">
-                        <div className="d-flex justify-content-between align-items-center py-3">
-                            <div className="d-flex">
-                                <p>
-                                    <span className="f-14 text-secondary">Employee / profile / </span>{employeeData.firstName} {employeeData.lastName}
-                                </p>
-                                {/* <p></p> */}
-                            </div>
-                            <div className="d-flex">
-                                <div className="pe-3">
-                                    <button className="button cancel box-shadow" onClick={() => navi(`/employees`)}><IoIosArrowRoundBack /> Back</button>
-                                </div>
-                                <button className="button add box-shadow" onClick={() => navi(`/update-employee/${id}`)}><i class="fa-solid fa-pen"></i><span className='px-2'>Edit</span></button>
-                            </div>
-                        </div>
-                        <div className="rounded p-4 box-shadow w-100">
+                    <div className="col-9 p-0">
+                        <Paper className="rounded p-4 w-100">
                             <div className="form-heder w-100 bg-white" style={{ maxHeight: '100%' }}>
-                                <form className="d-flex h-100" >
-                                    <div className='start'>
-                                        <div className='center rounded box-shadow' style={{ height: '150px', width: '200px', overflow: 'hidden' }}>
-                                            <img src={`${profilePath}${employeeData.image}`} alt="" className="h-100 rounded" />
-                                        </div>
-                                        <div className='w-100 ps-4'>
-                                            <div className="fs-4">{employeeData.firstName} {employeeData.lastName}</div>
-                                            <div className="f-14 text-secondary">position / softwere engineer</div>
-                                        </div>
+                                <div className='d-flex justify-content-between align-items-center py-3 border-bottom border-2'>
+                                    <div>
+                                        <Paper elevation={0} className=''>
+                                            <div className="display-4 display-name">{employeeData.firstName} {employeeData.lastName}</div>
+                                            <div className="f-14 text-secondary">{employeeData.address} , {employeeData.mobile}</div>
+                                            <div className="f-14 text-secondary text-success">Email : {employeeData.email}</div>
+                                        </Paper>
                                     </div>
-                                </form>
+                                    <div>
+                                        <Paper elevation={5} className='center rounded box-shadow' sx={{ height: '200px', width: '150px', overflow: 'hidden' }}>
+                                            <img src={`${profilePath}${employeeData.image}`} alt="" className="h-100 rounded" />
+                                        </Paper>
+                                        <div className="pt-3">
+                                            <DetailED updateClick={() => navigate(`/update-employee/${id}`)} />
+                                        </div>
+
+                                    </div>
+                                </div>
 
                             </div>
                             <div className="row">
-                                <div className="col-md-6 col-12">
-                                    <Text title='Compnay' value={getCompanyName(employeeData.companyID)} fontSize={14} />
-                                    <Text title='Employee Address' value={employeeData.address} fontSize={14} />
-                                    <Text classValue={'pointer'} title='Manager ? ' value={getManagerName(employeeData.managerID)} fontSize={14} click={() => navigate(`/employee-detail/${employeeData.managerID}`)} />
-                                    <Text title='Work Email' value={employeeData.email} fontSize={14} />
-                                </div>
-                                <div className="col-md-6 col-12">
-                                    <Text title='Stat Working' value={formatDate(employeeData.startWorkingDate)} fontSize={14} />
-                                    <Text title='Contac phone ' value={employeeData.contact} fontSize={14} />
+                                {/* resume  */}
+                                <Accordion
+                                    sx={{
+                                        boxShadow: "none", // Remove box-shadow
+                                        border: "none",
+                                        borderBottom: '1px solid silver',    // Remove border
+                                        "&:before": {
+                                            display: "none", // Remove the default divider line
+                                        },
+                                    }}
+                                >
 
-                                </div>
-                            </div>
-                            <div className='bg-white py-3'>
-                                <ul className="nav nav-tabs" id="myTab" role="tablist">
-                                    <li className="nav-item" role="presentation">
-                                        <button className="text-dark nav-link active f-14" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Resume</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button class="text-dark nav-link f-14" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Work Information</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button class="text-dark nav-link f-14" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">User Management</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button class="text-dark nav-link f-14" id="private-tab" data-bs-toggle="tab" data-bs-target="#private-tab-pane" type="button" role="tab" aria-controls="private-tab-pane" aria-selected="false">Private Information</button>
-                                    </li>
-                                </ul>
+                                    <AccordionSummary
+                                        expandIcon={<MdOutlineKeyboardArrowUp />}
+                                        aria-controls="panel1-content"
+                                        id="panel1-header"
+                                    >
+                                        <p className="f-20 py-2 display-name">Resume</p>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <p className="f-16">
+                                            {employeeData.resume}
+                                        </p>
+                                    </AccordionDetails>
+                                </Accordion>
+                                {/* general information  */}
+                                <Accordion
+                                    sx={{
+                                        boxShadow: "none", // Remove box-shadow
+                                        border: "none",
+                                        borderBottom: '1px solid silver',    // Remove border
+                                        "&:before": {
+                                            display: "none", // Remove the default divider line
+                                        },
+                                    }}
+                                >
 
-                                <div class="tab-content border-0" id="myTabContent">
-                                    <div class="border-0 tab-pane show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                                    <AccordionSummary
+                                        expandIcon={<MdOutlineKeyboardArrowUp />}
+                                        aria-controls="panel1-content"
+                                        id="panel1-header"
+                                    >
+                                        <p className="f-20 py-2 display-name">General Information</p>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div className="row">
+                                            <div className="col-md-6 col-12">
+                                                <Text title='Compnay' value={getCompanyName(employeeData.companyID)} fontSize={14} />
+                                                <Text title='Employee Address' value={employeeData.address} fontSize={14} />
+                                                <Text classValue={'pointer'} title='Manager ? ' value={getManagerName(employeeData.managerID)} fontSize={14} click={() => navigate(`/employee-detail/${employeeData.managerID}`)} />
+                                                <Text title='Work Email' value={employeeData.email} fontSize={14} />
+                                            </div>
+                                            <div className="col-md-6 col-12">
+                                                <Text title='Stat Working' value={formatDate(employeeData.startWorkingDate)} fontSize={14} />
+                                                <Text title='Contac phone ' value={employeeData.contact} fontSize={14} />
+                                                <Text title='Schedule work ' value={employeeData.schedule} fontSize={14} />
+                                                <Text title='Work Shift ' value={employeeData.workShiftID} fontSize={14} />
+                                                <Text title='Cv ' value={employeeData.cv} fontSize={14} />
+                                            </div>
+                                        </div>
+                                    </AccordionDetails>
+                                </Accordion>
+                                {/* private information  */}
+                                <Accordion
+                                    sx={{
+                                        boxShadow: "none", // Remove box-shadow
+                                        border: "none",
+                                        borderBottom: '1px solid silver',    // Remove border
+                                        "&:before": {
+                                            display: "none", // Remove the default divider line
+                                        },
+                                    }}
+                                >
 
-                                    </div>
-                                    <div class="border-0 tab-pane p-2" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                                        <Text title='Schedule work ' value={employeeData.schedule} fontSize={14} />
-                                        <Text title='Work Shift ' value={employeeData.workShiftID} fontSize={14} />
-                                        <Text title='Cv ' value={employeeData.cv} fontSize={14} />
-                                    </div>
-                                    <div class="border-0 tab-pane " id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+                                    <AccordionSummary
+                                        expandIcon={<MdOutlineKeyboardArrowUp />}
+                                        aria-controls="panel1-content"
+                                        id="panel1-header"
+                                    >
+                                        <p className="f-20 py-2 display-name">Private Information</p>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div className="row">
+                                            <div className="col-md-6 col-12">
+                                                <Text title='Employee Email' value={employeeData.email} fontSize={14} />
+                                                <Text title='Phone Number' value={employeeData.mobile} fontSize={14} />
+                                                <Text title='Gender' value={employeeData.gender} fontSize={14} />
+                                            </div>
+                                            <div className="col-md-6 col-12">
+                                                <Text title='Salary' value={' $ ' + employeeData.salary} fontSize={14} />
+                                                <Text title='Address' value={employeeData.address} fontSize={14} />
+                                                <Text title='Day Off' value={employeeData.dayOff + ' day '} fontSize={14} />
+                                                <Text title='Bank' value={employeeData.bankAccount} fontSize={14} />
+                                            </div>
+                                        </div>
+                                    </AccordionDetails>
+                                </Accordion>
+                                {/* user  */}
+                                <Accordion
+                                    sx={{
+                                        boxShadow: "none", // Remove box-shadow
+                                        border: "none",
+                                        borderBottom: '1px solid silver',    // Remove border
+                                        "&:before": {
+                                            display: "none", // Remove the default divider line
+                                        },
+                                    }}
+                                >
+
+                                    <AccordionSummary
+                                        expandIcon={<MdOutlineKeyboardArrowUp />}
+                                        aria-controls="panel1-content"
+                                        id="panel1-header"
+                                    >
+                                        <p className="f-20 py-2 display-name">User </p>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
                                         <div className="py-3">
                                             {userObject().role == 'ADMIN' ? <button className='button add px-5 my-3 mt-2' onClick={() => setIsFormOpen(true)}>New User</button> : <><span className="text-seondary">Access denied</span></>}
                                             {employeeUser.length > 0 && isFormOpen == false ? (
@@ -312,12 +388,12 @@ const EmployeeDetail = () => {
                                                                 name='user'
                                                                 value={user.username}
                                                             />
-                                                            <InputValidation
+                                                            {/* <InputValidation
                                                                 label='Password'
                                                                 fontSize={14}
                                                                 name='pass'
                                                                 value={user.password}
-                                                            />
+                                                            /> */}
                                                             <InputValidation
                                                                 label='ROLE'
                                                                 fontSize={14}
@@ -337,27 +413,32 @@ const EmployeeDetail = () => {
                                             )}
 
                                         </div>
-                                    </div>
-                                    <div class="border-0 tab-pane p-2" id="private-tab-pane" role="tabpanel" aria-labelledby="private-tab" tabindex="0">
+                                    </AccordionDetails>
+                                </Accordion>
 
-                                        <div className="row">
-                                            <div className="col-md-6 col-12">
-                                                <Text title='Employee Email' value={employeeData.email} fontSize={14} />
-                                                <Text title='Phone Number' value={employeeData.mobile} fontSize={14} />
-                                                <Text title='Gender' value={employeeData.gender} fontSize={14} />
-                                            </div>
-                                            <div className="col-md-6 col-12">
-                                                <Text title='Salary' value={' $ ' + employeeData.salary} fontSize={14} />
-                                                <Text title='Address' value={employeeData.address} fontSize={14} />
-                                                <Text title='Day Off' value={employeeData.dayOff + ' day '} fontSize={14} />
-                                                <Text title='Bank' value={employeeData.bankAccount} fontSize={14} />
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
                             </div>
-                        </div>
+
+                        </Paper>
+                    </div>
+                    <div className="col-3">
+
+                        <Paper
+                            sx={{
+                                position: 'sticky',
+                                top: 0
+                            }}>
+                            <h1 className="fs-5 text-center py-3">More Employee</h1>
+                            {
+
+                                employee.map(e =>
+                                    <div className="d-block px-2" style={{ background: e.id == id ? `rgb(241, 241, 241)` : 'white' }} key={e.id} onClick={() => navigate(`/employee-detail/${e.id}`)}>
+                                        <List title={e.firstName + ' ' + e.lastName} subTitle={e.email} imgUrl={e.image} />
+                                    </div>
+                                )
+                            }
+
+
+                        </Paper>
                     </div>
 
                 </div>

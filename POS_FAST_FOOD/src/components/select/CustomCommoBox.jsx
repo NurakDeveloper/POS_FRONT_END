@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Autocomplete, TextField } from "@mui/material";
 import "./customCommobox.css";
 
@@ -16,14 +16,24 @@ const CustomCommoBox = ({
     bottom,
     left,
     right,
+    manager,
+    defaultValueIndex // Add this prop to specify the default item by index
 }) => {
     const [searchTerm, setSearchTerm] = useState("");
+    const [defaultValue, setDefaultValue] = useState(null);
 
     // Generate label from multiple keys
     const generateLabel = (item) => {
         if (!labelKeys || labelKeys.length === 0) return "Unnamed Item";
         return labelKeys.map((key) => item[key]).filter(Boolean).join("  ");
     };
+
+    // Set the default value based on the defaultValueIndex prop when the component loads
+    useEffect(() => {
+        if (defaultValueIndex !== undefined && items[defaultValueIndex]) {
+            setDefaultValue(items[defaultValueIndex]);
+        }
+    }, [defaultValueIndex, items]);
 
     // Filter items based on search term
     const filteredItems = searchKey
@@ -68,6 +78,7 @@ const CustomCommoBox = ({
                 onChange={(event, value) => {
                     if (onItemSelected) onItemSelected(value);
                 }}
+                value={defaultValue} // Set the default value when available
                 renderInput={(params) => (
                     <TextField
                         {...params}

@@ -18,7 +18,7 @@ import { getBranchId } from '../../../api/Branch';
 import { hostName } from '../../../api/host';
 import { getDefualtUserId, globleRowVariants, searchData, userObject } from '../../../api/AppConfig';
 import { LiaSearchSolid } from 'react-icons/lia';
-import { IoIosAdd, IoIosArrowRoundBack } from 'react-icons/io';
+import { IoIosAdd, IoIosArrowRoundBack, IoIosPersonAdd } from 'react-icons/io';
 import { LuMinus } from 'react-icons/lu';
 import { BsPlus } from 'react-icons/bs';
 import { HiShoppingCart } from 'react-icons/hi2';
@@ -35,6 +35,8 @@ import { PiCheckCircleLight } from "react-icons/pi";
 import { IoMdPersonAdd } from "react-icons/io";
 import { getAllBranch } from '../../../api/Branch';
 import { findCompanyName } from '../../../api/FindData';
+import { IoArrowForwardCircleOutline } from 'react-icons/io5';
+import List from '../../../components/list/List';
 
 const PosLight = () => {
     const { id } = useParams();
@@ -69,7 +71,6 @@ const PosLight = () => {
     }, [])
     function resetPayment() {
         setPaymentMethod();
-        setDiscount();
         setReceived();
         setCustomerId();
         setPaymentUSD();
@@ -310,6 +311,7 @@ const PosLight = () => {
                 "status": 1,
                 "numberOfPeople": 4,
                 "totalAmount": totalAmount,
+                "totalDiscount": discounts ? (discounts / 100) * totalPay : 0,
                 "cash": received,
                 "exchange": received - totalAmount,
                 "orderDate": new Date(),
@@ -759,7 +761,8 @@ const PosLight = () => {
                                             labelKeys={["firstName", "lastName"]}
                                             searchKey={"firstName"}
                                         /> */}
-                                        <Button startIcon={<IoMdPersonAdd />} variant='contained' color='primary' className='py-3 mb-3 w-100 fs-5'>
+                                        {customerId ? <p className='fs-5 display-name py-3 text-success'>Customer {customerId ? customer.find(c => c.id == customerId).firstName + ' ' + customer.find(c => c.id == customerId).lastName : 'No Customer'}</p> : null}
+                                        <Button variant='contained' startIcon={<IoIosPersonAdd className='fs-3' />} className='py-3 mb-3 w-100 fs-5 center' data-bs-toggle="modal" data-bs-target="#modalCustomer">
                                             Customer
                                         </Button>
                                         <CustomCommoBox
@@ -873,8 +876,8 @@ const PosLight = () => {
                 <div className='h-40'>
                     <div className='position-absolute bottom-0 w-100 px-3'>
                         <div className="d-flex justify-content-between align-items-center text-dark   w-100">
-                            <div className='w-100 start text-secondary f-16'>Total USD :</div>
-                            <div className='bold text-badges-green'>{formatCurrency.format(totalPay)}</div>
+                            <div className='w-100 start text-secondary f-16 display-name'>Total USD :</div>
+                            <div className='bold text-badges-green display-name'>{formatCurrency.format(totalPay)}</div>
 
                         </div>
 
@@ -919,6 +922,39 @@ const PosLight = () => {
                                         </Button>
                                     </>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        )
+    }
+
+    function customerModal() {
+        return (
+            <>
+                <div className="modal animation-opacity" id="modalCustomer" tabindex="-1" aria-labelledby="modalCustomerModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-xl">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">{customerId ? customer.find(c => c.id == customerId).firstName + ' ' + customer.find(c => c.id == customerId).lastName : 'No Customer Selected'}</h5>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <Paper className="modal-body" sx={{ width: '100%', maxHeight: '600px', overflowY: 'scroll' }}>
+                                {
+                                    customer.map(c =>
+                                        <div onClick={() => setCustomerId(c.id)}
+                                            style={{
+                                                background: c.id == customerId ? 'rgb(246, 246, 246)' : ''
+                                            }}>
+                                            <List imgUrl={c.image} title={c.firstName + ' ' + c.lastName} subTitle={c.phoneNumber} />
+                                        </div>
+                                    )
+                                }
+                            </Paper>
+                            <div class="modal-footer">
+                                <Button variant='contained' color='error' data-bs-dismiss="modal" className='py-2' onClick={() => setCustomerId()}>discard</Button>
+                                <Button variant='contained' color='primary' className='ms-1 py-2' data-bs-dismiss="modal">Save changes</Button>
                             </div>
                         </div>
                     </div>
@@ -1239,7 +1275,8 @@ const PosLight = () => {
                             <>
                                 <div className='h-10'>
                                     <div className='position-absolute bottom-0 w-100 px-3 pb-3'>
-                                        <button className='button pay w-100 py-3 h-100' onClick={() => setIsPayment(true)}>Payment</button>
+                                        <p className="fs-3 display-name text-center py-3">TOTAL : {formatCurrency.format(totalPay)}</p>
+                                        <Button variant='contained' color='success' className='w-100 py-3 h-100' onClick={() => setIsPayment(true)}><span className='pe-2'>Payment</span> <IoArrowForwardCircleOutline className='fs-5' /></Button>
                                     </div>
                                 </div>
                             </>
@@ -1253,9 +1290,8 @@ const PosLight = () => {
 
 
 
-
-
-            {/* </div > */}
+            {/* Customer modal selected  */}
+            {customerModal()}
             {/* Invoice  */}
             <div className="modal fade " id="printer" tabindex="-1" aria-labelledby="printer" aria-hidden="true" >
                 <div class="modal-dialog bg-none">

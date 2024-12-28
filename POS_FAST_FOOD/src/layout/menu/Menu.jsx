@@ -1,7 +1,7 @@
 import './menu.css';
 import { useNavigate } from 'react-router-dom';
 import { FaGlobe, FaBolt, FaFileAlt, FaWikipediaW, FaInfoCircle, FaUsers, FaUserCircle, FaUserTie, FaBook, FaAsterisk, FaCog, FaRegistered, FaChevronUp, FaChevronDown, FaAmazonPay } from 'react-icons/fa';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { IoIosAlarm, IoIosArrowRoundForward } from 'react-icons/io';
 import { HiOutlineBuildingLibrary, HiOutlineMinus, HiOutlinePlus } from 'react-icons/hi2';
@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { CiMoneyBill } from 'react-icons/ci';
 import { RiBillFill } from 'react-icons/ri';
 import { TbDashboard } from 'react-icons/tb';
+import Cookies from 'js-cookie'
 
 
 // MenuItem Component
@@ -124,12 +125,26 @@ const Menu = () => {
             },
         }),
     };
+    const [bgColor, setBgColor] = useState(); // Default color if cookie is missing
+
+    useEffect(() => {
+        try {
+            const cookieValue = Cookies.get("bg-color");
+            console.log("Cookie Value:", cookieValue); // Debugging
+            if (cookieValue) {
+                setBgColor(cookieValue.startsWith("{") ? JSON.parse(cookieValue) : cookieValue);
+            }
+        } catch (error) {
+            console.error("Error parsing bg-color cookie:", error);
+        }
+    }, []);
     return (
         <div
             className='h-100 menu box-shadow'
             style={{
+                background: bgColor ? bgColor : '#5E6C58',
                 overflow: 'scroll',
-                scrollbarWidth: 'none', // For Firefox
+                scrollbarWidth: 'none', // Firefox
                 msOverflowStyle: 'none', // For Internet Explorer
             }}
         >

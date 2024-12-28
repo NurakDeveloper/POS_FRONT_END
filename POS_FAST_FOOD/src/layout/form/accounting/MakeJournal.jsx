@@ -13,6 +13,7 @@ import Cookies from "js-cookie";
 import CustomCommoBox from "../../../components/select/CustomCommoBox";
 import { getVendor } from "../../../api/Vendor";
 import { getAllEmployee } from "../../../api/EmployeeApi";
+import { userObject } from "../../../api/AppConfig";
 const MakeJournal = () => {
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
@@ -23,7 +24,7 @@ const MakeJournal = () => {
     const [journalData, setJournalData] = useState({
         "journal": 'POS',
         "branchId": '',
-        "partnerId": '',
+        "partnerId": userObject().branch,
         "date": '',
         "total": 0,
         "reference": '',
@@ -159,7 +160,7 @@ const MakeJournal = () => {
             }
             setJournalData({
                 "journal": '',
-                "branchId": '',
+                "branchId": userObject().branch,
                 "partnerId": '',
                 "date": '',
                 "total": 0,

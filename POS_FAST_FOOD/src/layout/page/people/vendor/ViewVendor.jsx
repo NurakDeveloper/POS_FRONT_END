@@ -13,6 +13,7 @@ import { exportToExcelFiles, globleCardVariants, globleRowVariants, perPage, sea
 import { deleteVendor, getAllVendor } from '../../../../api/Vendor';
 import ActionHeader from '../../../../components/listheader/ActionHeader';
 import { motion } from 'framer-motion';
+import ED from '../../../../components/editRemoveAction/ED';
 const ViewVendor = () => {
     const [vendor, setVendor] = useState([]);
     const [branch, setBranch] = useState([]);
@@ -149,7 +150,7 @@ const ViewVendor = () => {
                             variants={globleCardVariants}
                         >
                             <div className="tranform-hover bg-white p-0 pointer border"
-                                onClick={() => goto(`/employee-detail/${o.id}`)}
+                                onClick={() => goto(`/vendor-detail/${o.id}`)}
                                 style={{ boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px' }}
                             >
                                 <div className="card-body p-0">
@@ -277,26 +278,21 @@ const ViewVendor = () => {
                                             <td>
                                                 <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
                                             </td>
-                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} className='py-3'>{i + 1}</td>
-                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.displayName}</td>
-                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.phone}</td>
-                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.email}</td>
-                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.address}</td>
-                                            <td onClick={() => goto(`/employee-detail/${f.id}`)} > <span className='text-badges-warning'>{f.companyName}</span></td>
+                                            <td onClick={() => goto(`/vendor-detail/${f.id}`)} className='py-3'>{i + 1}</td>
+                                            <td onClick={() => goto(`/vendor-detail/${f.id}`)} >{f.displayName}</td>
+                                            <td onClick={() => goto(`/vendor-detail/${f.id}`)} >{f.phone}</td>
+                                            <td onClick={() => goto(`/vendor-detail/${f.id}`)} >{f.email}</td>
+                                            <td onClick={() => goto(`/vendor-detail/${f.id}`)} >{f.address}</td>
+                                            <td onClick={() => goto(`/vendor-detail/${f.id}`)} > <span className='text-badges-warning'>{f.companyName}</span></td>
                                             <td>
-                                                <div className="between">
-                                                    <span className='text-badges-danger' onClick={() => {
+                                                <ED
+                                                    deleteClick={() => {
                                                         setIsRemoveOpen(true)
                                                         setVendorId(f.id)
-                                                    }}>
-                                                        <i class="fa-solid fa-trash-can"></i>
-                                                    </span>
-                                                    <span className='text-badges-green' onClick={() => goto(`/update-vendor/${f.id}`)}>
-                                                        <FaUserEdit />
-                                                    </span>
+                                                    }}
+                                                    updateClick={() => goto(`/update-vendor/${f.id}`)}
+                                                />
 
-
-                                                </div>
                                             </td>
 
 

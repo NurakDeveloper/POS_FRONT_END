@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getAllCustomer } from '../../../../api/Customer';
+import { getAllCustomer, removeCustomerById } from '../../../../api/Customer';
 import * as XLSX from 'xlsx';
 import { el } from 'date-fns/locale';
 import { DataGrid, Tbody, Td, Th, Thead, Tr } from '../../../../components/table/DataGrid'
@@ -10,6 +10,8 @@ import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { motion } from 'framer-motion';
 import { exportToExcelFiles, globleCardVariants, globleRowVariants, perPage, searchData } from '../../../../api/AppConfig';
 import ActionHeader from '../../../../components/listheader/ActionHeader';
+import ED from '../../../../components/editRemoveAction/ED';
+import RemoveMessage from '../../../../components/alert/RemoveMessage';
 const Customer = () => {
 
     const [customer, setCustomer] = useState([]);
@@ -114,7 +116,7 @@ const Customer = () => {
                                 initial="hidden"
                                 animate="visible"
                                 variants={globleCardVariants}
-                                onClick={() => goto(`/employee-detail/${o.id}`)}
+                                onClick={() => goto(`/customer-detail/${o.id}`)}
                             >
                                 <div className="card-body p-0">
                                     <div className="d-flex">
@@ -250,6 +252,7 @@ const Customer = () => {
                                     JoinDate
                                 </Th>
                                 <Th columnWidth={100}>Membership</Th>
+                                <Th columnWidth={100}>Action</Th>
                             </Thead>
                             <tbody>
                                 {
@@ -260,19 +263,25 @@ const Customer = () => {
                                             initial="hidden"
                                             animate="visible"
                                             variants={globleRowVariants}
-                                            className="pointer" onClick={() => goto(`/item-detail`)}>
+                                            className="pointer" >
                                             <td>
                                                 <input type="checkbox" name="" className='rounded-0 border px-3' id="" />
                                             </td>
                                             <td className='py-3'>{f.id}</td>
-                                            <td>{f.firstName} {f.lastName}</td>
-                                            <td>{f.phoneNumber}</td>
-                                            <td>{f.email}</td>
-                                            <td>{f.city}</td>
-                                            <td>{f.city}{"'s "}{f.country}</td>
-                                            <td>{f.state}</td>
-                                            <td>{f.joinDate}</td>
-                                            <td>{f.membershipStatus}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.firstName} {f.lastName}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.phoneNumber}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.email}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.city}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.city}{"'s "}{f.country}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.state}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.joinDate}</td>
+                                            <td onClick={() => goto(`/customer-detail/${f.id}`)}>{f.membershipStatus}</td>
+                                            <td>
+                                                <ED deleteClick={() => {
+                                                    setCustomerId(f.id)
+                                                    setIsRemoveOpen(true);
+                                                }} />
+                                            </td>
 
 
                                         </motion.tr>
@@ -289,6 +298,8 @@ const Customer = () => {
 
     }
 
+    const [customerId, setCustomerId] = useState();
+    const [isRemoveOpen, setIsRemoveOpen] = useState(false);
 
     function menu() {
         return (
@@ -370,6 +381,13 @@ const Customer = () => {
             </div>
         );
     }
+    function removeCustomer(id) {
+        removeCustomerById(id).then((response) => {
+            getCustomer();
+        }).catch(e => {
+
+        })
+    }
     const [isTable, setIsTable] = useState(false);
     return (
         <>
@@ -402,6 +420,17 @@ const Customer = () => {
                 </div>
 
             </div>
+            <RemoveMessage
+                isOpen={isRemoveOpen}
+                description='A confirmation message is intended to prompt users before proceeding with a delete action. It clearly informs them of the irreversible nature of the deletion to prevent accidental loss of data or content.'
+                message='Are you sure ?'
+                cancelClcik={() => setIsRemoveOpen(false)}
+                acceptedClick={() => {
+                    customerId ? removeCustomer(customerId) : alert('Employee id is null')
+                    setCustomerId()
+                    setIsRemoveOpen(false);
+                }}
+            />
         </>
     )
 }

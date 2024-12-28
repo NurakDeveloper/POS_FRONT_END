@@ -30,6 +30,7 @@ import { Box, Button, Paper } from '@mui/material'
 import { getAllEmployee, getEmployee } from '../../../api/EmployeeApi'
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { CiEdit } from 'react-icons/ci'
+import ED from '../../../components/editRemoveAction/ED'
 const Item = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingRemove, setIsLoadingRemove] = useState(false);
@@ -204,18 +205,15 @@ const Item = () => {
                                             />
                                         </div>
                                         <div className="f-14 p-2" style={{ overflow: 'hidden', width: '53%' }}>
-                                            <div className="f-16 text-title">{o.productName}</div>
+                                            <div className="f-20 display-name">{o.productName}</div>
                                             <div className="text-secondary f-14">{findCategoryName(o.categoryId)}</div>
                                             <div className="py-2">
                                                 <span className="f-14 text-badges-red">Price : ${o.price}</span>
                                             </div>
-                                            <textarea
-                                                name=""
-                                                className="border-0 text-secondary w-100 py-2 h-100 f-10"
-                                                id=""
-                                                value={o.description}
-                                                readOnly
-                                            ></textarea>
+                                            <p className="f-14">
+                                                {o.description}
+                                            </p>
+
                                         </div>
                                     </div>
                                 </div>
@@ -396,18 +394,13 @@ const Item = () => {
                                     <td onClick={() => navigate(`/item-detail/${item.id}`)}>{item.productOrigin}</td>
                                     <td onClick={() => navigate(`/item-detail/${item.id}`)}>{item.sugar} <span className='text-secondary'>G</span></td>
                                     <td >
-                                        <div className="between">
-                                            <span className='pointer' onClick={() => {
+                                        <ED
+                                            deleteClick={() => {
                                                 setProductId(item.id);
                                                 setIsLoadingRemove(true);
-                                            }}>
-                                                < RiDeleteBin6Line />
-                                            </span>
-                                            <span className='pointer' onClick={() => navigate(`/update-item/${item.id}`)}>
-                                                <CiEdit />
-                                            </span>
-
-                                        </div>
+                                            }}
+                                            updateClick={() => navigate(`/update-item/${item.id}`)}
+                                        />
                                     </td>
 
                                 </tr>

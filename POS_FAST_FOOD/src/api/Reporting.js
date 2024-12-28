@@ -39,3 +39,16 @@ export const monthlySaleReporting = () => {
 export const dailyDaleReporting = () => {
     return axios.get(`${BASE_URL_REPORTING}/daily-sale`, { headers });
 };
+
+
+// branch reporting
+export const ExpenseByBranches = (id) => {
+    return axios.get(`${BASE_URL_REPORTING}/expense-branches/` + id, { headers });
+};
+export const RevenuesByBranches = (id) => {
+    return axios.get(`${BASE_URL_REPORTING}/revenues-branches/` + id, { headers });
+};
+export const IncomeByBranches = (id) => {
+    return axios.get(`${BASE_URL_REPORTING}/income-branches/` + id, { headers });
+};
+

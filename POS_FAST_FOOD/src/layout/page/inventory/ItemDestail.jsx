@@ -9,6 +9,8 @@ import { getAllCategory } from '../../../api/Category';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import Loading from '../loading/Loading';
 import Text from '../../../components/text/Text';
+import DetailED from '../../../components/editRemoveAction/DetailED';
+import { Paper } from '@mui/material';
 
 const ItemDetail = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -114,35 +116,27 @@ const ItemDetail = () => {
                     <div className="container p-0 center ">
                         <div className="row w-100">
                             <div className="col-12">
-                                <div className="d-flex justify-content-between align-items-center p-4">
-                                    <div>
-                                        <span>Product / {productData.productName}</span>
-                                    </div>
-                                    <div className="d-flex">
-                                        <div className="pe-3">
-                                            <button className="button cancel box-shadow" onClick={() => navi(`/list-item`)}><IoIosArrowRoundBack /> Back</button >
-                                        </div >
-                                        <button className="button add box-shadow" onClick={() => navi(`/update-item/${id}`)}><i class="fa-solid fa-pen"></i><span className='px-2'>Edit</span></button>
-                                    </div>
-                                </div >
+                                <Paper className='text-center mb-3 py-3'>
+                                    <p className="display-5">Product Information</p>
+                                    <p className="f-16">display information detail of all product</p>
+                                </Paper>
                             </div>
-                            <div className="col-12">
-
-                                <div className=" bg-white w-100 rounded p-4 box-shadow" box-shadow>
-
-                                    <div className="d-flex" style={{ height: '200px' }}>
-                                        <div className='center rounded box-shadow' style={{ height: '190px', width: '300px', overflow: 'hidden' }}>
-                                            <img src={`http://${domainName}:8085/api/images/${productData.image}`} alt="" className="h-100" />
-                                        </div>
-                                        <div className='ps-4'>
-                                            <div className="fs-2">
-                                                <p>{productData.productName}</p>
-                                                {/* <p className='fs-4 text-secondary'>{findCategoryName(productData.categoryId)}</p> */}
-                                            </div>
-                                        </div>
-
-
+                            <div className="col-md-3">
+                                <div className='center rounded box-shadow' style={{ height: '190px', overflow: 'hidden' }}>
+                                    <img src={`http://${domainName}:8085/api/images/${productData.image}`} alt="" className="h-100" />
+                                </div>
+                                <div className='ps-4'>
+                                    <div className="fs-5">
+                                        <p className='text-center p-3'>{productData.productName}</p>
+                                        {/* <p className='fs-4 text-secondary'>{findCategoryName(productData.categoryId)}</p> */}
                                     </div>
+                                </div>
+                                <div className="d flex">
+                                    <DetailED updateClick={() => navi(`/update-item/${id}`)} />
+                                </div>
+                            </div>
+                            <div className="col-md-9">
+                                <div className=" bg-white w-100 rounded p-4 box-shadow" box-shadow>
                                     <div className="row">
                                         <div className="col-md-6 col-12">
                                             <div className='d-block text-start bg-white py-2'>

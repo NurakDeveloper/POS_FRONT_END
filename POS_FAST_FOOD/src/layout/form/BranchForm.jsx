@@ -15,8 +15,10 @@ const BranchForm = () => {
         managerId: '',
         branchCode: '',
         addressLine1: '',
+        addressLine2: '',
         city: '',
         state: '',
+        postalCode: '',
         country: 'Cambodia',
         phoneNumber: '',
         email: '',
@@ -30,6 +32,10 @@ const BranchForm = () => {
             setEmployee(response.data);
         })
     }, [])
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // Converts to 'YYYY-MM-DD'
+    };
     useEffect(() => {
         if (id) {
             getBranchById(id).then(response => {
@@ -45,7 +51,7 @@ const BranchForm = () => {
                     country: response.data.country,
                     phoneNumber: response.data.phoneNumber,
                     email: response.data.email,
-                    establishedDate: response.data.establishedDate,
+                    establishedDate: formatDate(response.data.establishedDate),
                     status: response.data.status,
                     image: response.data.image
                 });
@@ -118,6 +124,9 @@ const BranchForm = () => {
                 });
             }
             clearForm();
+            if (id) {
+                navigate(`/company-detail/${id}`)
+            }
         }).catch(e => {
             console.error('Error saving customer:', e);
         });
@@ -180,14 +189,7 @@ const BranchForm = () => {
                                 value={branch.branchName}
                                 error={errors.branchName}
                             />
-                            <CustomCommoBox
-                                fontSize={14}
-                                items={employee}
-                                label='Manager'
-                                searchKey={['firstName', 'lastName']}
-                                labelKeys={['firstName', 'lastName']}
-                                onItemSelected={(value) => setBranch(prevData => ({ ...prevData, ['managerId']: value.id }))}
-                            />
+
 
                             <InputValidation
                                 label='Branch Code'
@@ -210,7 +212,6 @@ const BranchForm = () => {
                                 value={branch.addressLine1}
                                 error={errors.addressLine1}
                             />
-
                             <InputValidation
                                 label='Address Line 2'
                                 id='addressLine2'
@@ -219,7 +220,29 @@ const BranchForm = () => {
                                 fontSize={14}
                                 onChange={handleInputChange}
                                 value={branch.addressLine2}
+                                error={errors.addressLine2}
                             />
+                            <InputValidation
+                                label='Email'
+                                id='email'
+                                type='email'
+                                name='email'
+                                fontSize={14}
+                                onChange={handleInputChange}
+                                value={branch.email}
+                                error={errors.email}
+                            />
+
+                            <InputValidation
+                                label='Established Date'
+                                id='establishedDate'
+                                type='date'
+                                name='establishedDate'
+                                fontSize={14}
+                                onChange={handleInputChange}
+                                value={branch.establishedDate}
+                            />
+
                         </div>
 
                         <div className="col-md-6 col-12">
@@ -275,30 +298,14 @@ const BranchForm = () => {
                                 value={branch.phoneNumber}
                                 error={errors.phoneNumber}
                             />
-                        </div>
-
-                        <div className="col-md-6 col-12">
-                            <InputValidation
-                                label='Email'
-                                id='email'
-                                type='email'
-                                name='email'
+                            <CustomCommoBox
                                 fontSize={14}
-                                onChange={handleInputChange}
-                                value={branch.email}
-                                error={errors.email}
+                                items={employee.filter(e => e.managerID == null)}
+                                label='Manager'
+                                searchKey={'firstName'}
+                                labelKeys={['firstName', 'lastName']}
+                                onItemSelected={(value) => setBranch(prevData => ({ ...prevData, ['managerId']: value.id }))}
                             />
-
-                            <InputValidation
-                                label='Established Date'
-                                id='establishedDate'
-                                type='date'
-                                name='establishedDate'
-                                fontSize={14}
-                                onChange={handleInputChange}
-                                value={branch.establishedDate}
-                            />
-
                         </div>
 
                     </div>

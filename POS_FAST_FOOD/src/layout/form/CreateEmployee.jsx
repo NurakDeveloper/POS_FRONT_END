@@ -54,6 +54,10 @@ const CreateEmployee = () => {
     }, [])
     const manager = employee.filter(e => e.managerID == null);
     const { id } = useParams();
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // Converts to 'YYYY-MM-DD'
+    };
     useEffect(() => {
         if (id) {
             getEmployee(id).then((reponse) => {
@@ -76,7 +80,7 @@ const CreateEmployee = () => {
                     ["address"]: reponse.data.address,
                     ["bankAccount"]: reponse.data.bankAccount,
                     ["contact"]: reponse.data.contact,
-                    ["startWorkingDate"]: reponse.data.startWorkingDate,
+                    ["startWorkingDate"]: formatDate(reponse.data.startWorkingDate),
                     ["createdDate"]: reponse.data.createdDate,
                     ["updatedDate"]: new Date(),
                     ["image"]: reponse.data.image,
@@ -262,7 +266,6 @@ const CreateEmployee = () => {
         // update employee
         if (id) {
             updateEmployee(id, employeeData).then((response) => {
-                alert(JSON.stringify(response.data, null, 2));
                 setEmployeeData(
                     {
                         lastName: '',
@@ -288,6 +291,7 @@ const CreateEmployee = () => {
                         image: ''
                     }
                 )
+                navigate(`/employee-detail/${id}`)
             }).catch(e => {
                 return
             })
@@ -322,24 +326,18 @@ const CreateEmployee = () => {
 
         alert(jsonString)
     }
-    function formHeader() {
-        return (
-            <div className='form-header-content'>
-                <button type="button" class="button cancel box-shadow " onClick={() => navigate('/employees')}><IoIosArrowRoundBack /><span className='px-2'>Cancel</span> </button>
-                <div className='d-flex'>
-                    <button type="button" class="button preview box-shadow " onClick={preview}><i class="fa-solid fa-circle-info px-2"></i>Preview </button>
-                    <div className='px-3 pe-0'>
-                        <button type="button" class="button add box-shadow px-4" onClick={saveEmployee}><IoSaveSharp /><span className='px-2'>Save</span> </button>
-                    </div>
-                </div>
 
-
-            </div>
-        );
-    }
     const handleInputChange = (field, value) => {
         setEmployeeData((prev) => ({ ...prev, [field]: value }));
     };
+    const managerIndex = manager.findIndex(m => {
+        const managerEmployee = employee.find(emp => emp.id === employeeData.managerID);
+        return managerEmployee && m.firstName === managerEmployee.firstName;
+    });
+
+    console.log(managerIndex);
+
+
     const steps = [
         {
             label: "Personal Information",
@@ -429,16 +427,19 @@ const CreateEmployee = () => {
                         fontSize={15}
                         label="Manager"
                         items={manager} // Assuming you have a list of managers
-                        searchKey='firstName'
-                        labelKeys={['firstName', 'lastName']}
-                        onItemSelected={(value) => handleInputChange("managerID", value.id)}
+                        searchKey="firstName"
+                        defaultValueIndex={managerIndex}
+                        labelKeys={["firstName", "lastName"]}
+                        onItemSelected={(value) => handleInputChange("managerID", value?.id)}
                         error={errors.managerID}
                     />
+
                     <CustomCommoBox
                         fontSize={14}
                         label='Select Branch'
                         items={branch}
                         searchKey='branchName'
+                        defaultValueIndex={branch.findIndex(b => b.id == employeeData.companyID)}
                         labelKeys={['branchName']}
                         onItemSelected={(value) => handleInputChange("companyID", value.id)}
                         error={errors.companyID}
@@ -471,21 +472,21 @@ const CreateEmployee = () => {
                         value={employeeData.startWorkingDate}
                         error={errors.startWorkingDate}
                     />
+                    {/* <InputValidation
+                        fontSize={15}
+                        label="Manager ID"
+                        id="managerID"
+                        type="number"
+                        onChange={(e) => handleInputChange("managerID", e.target.value)}
+                        value={employeeData.managerID}
+                        error={errors.managerID}
+                    /> */}
                 </>
             ),
             validate: () => {
                 const errors = {};
                 if (!employeeData.companyID) {
                     errors.companyID = "Branch is required.";
-                }
-                // if (!employeeData.positionID) {
-                //     errors.positionID = "Position is required.";
-                // }
-                if (!employeeData.salary) {
-                    errors.salary = "Salary is required.";
-                }
-                if (!employeeData.startWorkingDate) {
-                    errors.startWorkingDate = "Start Working Date is required.";
                 }
                 return errors;
             },
@@ -548,7 +549,7 @@ const CreateEmployee = () => {
                             style={{ height: "200px", width: "300px", overflow: "hidden" }}
                         >
                             <img
-                                src={selectedImage || "default_image_path"}
+                                src={selectedImage || `http://${domainName}:8085/api/images/${employeeData.image}`}
                                 alt="Profile"
                                 className="h-100"
                             />
@@ -575,12 +576,6 @@ const CreateEmployee = () => {
             ),
             validate: () => {
                 const errors = {};
-                if (!employeeData.image) {
-                    errors.image = "Profile Image is required.";
-                }
-                if (!employeeData.resume) {
-                    errors.resume = "Resume is required.";
-                }
                 return errors;
             },
         },

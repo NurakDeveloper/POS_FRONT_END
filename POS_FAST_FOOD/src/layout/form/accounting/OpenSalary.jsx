@@ -13,6 +13,7 @@ import Cookies from "js-cookie";
 import CustomCommoBox from "../../../components/select/CustomCommoBox";
 import { getAllVendor, getVendor } from "../../../api/Vendor";
 import { getAllEmployee } from "../../../api/EmployeeApi";
+import { userObject } from "../../../api/AppConfig";
 
 const OpenSalary = () => {
     const [rows, setRows] = useState([]);
@@ -23,7 +24,7 @@ const OpenSalary = () => {
     const [vendor, setVendor] = useState([]);
     const [journalData, setJournalData] = useState({
         "journal": 'PAYROLL',
-        "branchId": '',
+        "branchId": userObject().branch,
         "partnerId": '',
         "date": '',
         "total": 0,
@@ -144,7 +145,7 @@ const OpenSalary = () => {
             }
             setJournalData({
                 "journal": '',
-                "branchId": '',
+                "branchId": userObject().branch,
                 "partnerId": '',
                 "date": '',
                 "total": 0,
@@ -197,7 +198,7 @@ const OpenSalary = () => {
                                         <CustomCommoBox
                                             fontSize={14}
                                             label='Select Employee'
-                                            searchKey={['firstName', 'lastName', 'email']}
+                                            searchKey='firstName'
                                             items={employee}
                                             labelKeys={['firstName', 'lastName']}
                                             error={errors.partnerId}

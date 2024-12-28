@@ -13,6 +13,7 @@ import { exportToExcelFiles, perPage, searchData } from '../../../../api/AppConf
 import { motion } from 'framer-motion';
 import { X } from '@mui/icons-material';
 import ActionHeader from '../../../../components/listheader/ActionHeader';
+import ED from '../../../../components/editRemoveAction/ED';
 const Employee = () => {
     const [employee, setEmployee] = useState([]);
     const [branch, setBranch] = useState([]);
@@ -186,10 +187,10 @@ const Employee = () => {
                                             <div className='f-16'>{o.firstName} {o.lastName}</div>
                                             <div className='text-secondary f-14'>{findBranchName(o.companyID)}.</div>
 
-                                            <p className='text-secondary f-10'>
+                                            <p className='text-secondary f-14'>
                                                 <i class="fa-solid fa-phone px-1 ps-0"></i>{o.mobile}
                                             </p>
-                                            <div className='py-2 f-10'><span className='text-badges-warning p-1'><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email} </span></div>
+                                            <div className='py-2 f-14'><span className='text-badges-warning p-1'><i class="fa-solid fa-envelope px-1 ps-0"></i>{o.email} </span></div>
 
 
                                         </div>
@@ -331,19 +332,14 @@ const Employee = () => {
                                             <td onClick={() => goto(`/employee-detail/${f.id}`)} > <span className='text-badges-warning'>{findBranchName(f.companyID)}</span></td>
                                             <td onClick={() => goto(`/employee-detail/${f.id}`)} >{f.startWorkingDate}</td>
                                             <td>
-                                                <div className="between">
-                                                    <span className='text-badges-danger' onClick={() => {
+                                                <ED
+                                                    deleteClick={() => {
                                                         setIsRemoveOpen(true)
                                                         setEmployeeId(f.id)
-                                                    }}>
-                                                        <i class="fa-solid fa-trash-can"></i>
-                                                    </span>
-                                                    <span className='text-badges-green' onClick={() => goto(`/update-employee/${f.id}`)}>
-                                                        <FaUserEdit />
-                                                    </span>
+                                                    }}
+                                                    updateClick={() => goto(`/update-employee/${f.id}`)}
+                                                />
 
-
-                                                </div>
                                             </td>
 
 

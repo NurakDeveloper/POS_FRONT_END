@@ -1,7 +1,7 @@
 
 import './App.css'
 import Menu from './layout/menu/Menu'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import Dashboard from './layout/page/dashboard/Dashboard'
 import Desk from './layout/page/desk/Desk'
 import Account from './layout/page/accountant/Account'
@@ -62,6 +62,10 @@ import Company from './layout/page/company/Company'
 import BranchForm from './layout/form/BranchForm'
 import { findCompanyName } from './api/FindData'
 import { getAllBranch } from './api/Branch'
+import CompanyDetail from './layout/page/company/companyDetail/CompanyDetail'
+import { Paper } from '@mui/material'
+import VendorDetail from './layout/page/people/vendor/VendorDetail'
+import { id } from 'date-fns/locale'
 function App() {
   const domainName = hostName();
   const profilePath = `http://${domainName}:8085/api/images/`
@@ -161,66 +165,58 @@ function App() {
     if (userType == 2) setPageViewer(() => posApplication());
     if (userType == 3) setPageViewer(() => userLoging());
   }
-  const [branch, setBranch] = useState([]);
-  function findBranchName(id) {
-    const b = branch.find(b => b.id == id);
-    if (b) return b.branchName;
-    return 'No Company'
-  }
-  useEffect(() => {
-    getAllBranch().then((response) => {
-      setBranch(response.data);
-    })
-  }, [])
+  const navigate = useNavigate();
   const header = () => {
     return (
       <>
-        <div className='d-flex justify-content-between align-items-center w-100 py-2 bg-white d-none d-md-none d-lg-flex  px-2 ps-0 rounded box-shadow'>
-          <div className="start">
-            <span className='f-16 text-secondary ps-3'>CAMBODIA</span>
-            <div className="f-16  text-start ps-3 border-start border-3 ms-2">
-              {findBranchName(userObject().branch)}
+        <Paper>
 
+          <div className='d-flex justify-content-between align-items-center w-100 py-2 bg-white d-none d-md-none d-lg-flex  px-2 ps-0 rounded'>
+            <div className="start">
+              <span className='f-16 text-secondary ps-3'>CAMBODIA</span>
+              <div className="f-16  text-start ps-3 border-start border-3 ms-2">
+                <p className='pointer hover-line' onClick={() => navigate(`/company-detail/${userObject().branch}`)}>{userObject().branchName ? userObject().branchName : ''}</p>
+              </div>
             </div>
-          </div>
-          <div className=' end '>
-            <div className='fs-4 d-flex'>
-              <div className='pointer' onClick={() => {
-                Cookies.set('admin_viewer', 2)
-                window.location.href = '/';
-              }}>
-                <HiOutlineComputerDesktop />
-              </div>
-              <div className="position-relative fs-4 mx-3">
-                <IoChatbubbleEllipsesOutline />
-                <span className="position-absolute top-0 start-100 translate-middle f-14 text-danger">
-                  99+
-                  <span className="visually-hidden">unread messages</span>
-                </span>
-              </div>
-              <div className="">
-                <IoTimerOutline />
-              </div>
+            <div className=' end '>
+              <div className='fs-4 d-flex'>
+                <div className='pointer' onClick={() => {
+                  Cookies.set('admin_viewer', 2)
+                  window.location.href = '/';
+                }}>
+                  <HiOutlineComputerDesktop />
+                </div>
+                <div className="position-relative fs-4 mx-3">
+                  <IoChatbubbleEllipsesOutline />
+                  <span className="position-absolute top-0 start-100 translate-middle f-14 text-danger">
+                    99+
+                    <span className="visually-hidden">unread messages</span>
+                  </span>
+                </div>
+                <div className="">
+                  <IoTimerOutline />
+                </div>
 
-            </div>
-            <div className="app-defualt-user d-flex start px-4 py-1 ">
-              <img src={`${profilePath}${profile}`} alt="" className="user-img mx-2 rounded-circle p-1 border border-success" />
-              <div className="center">
-                <div>
-                  <div className='start' style={{ fontSize: 15 }}> <span className='pe-2'>{userName}</span> {role == 'ADMIN' ? <RiVerifiedBadgeFill className='f-20 text-primary' /> : ''}</div>
-                  <div className='text-secondary' style={{ fontSize: 10 }}>ROLE|{role}</div>
+              </div>
+              <div className="app-defualt-user d-flex start px-4 py-1 ">
+                <img src={`${profilePath}${profile}`} alt="" className="user-img mx-2 rounded-circle p-1 border border-success" />
+                <div className="center">
+                  <div>
+                    <div className='start' style={{ fontSize: 15 }}> <span className='pe-2'>{userName}</span> {role == 'ADMIN' ? <RiVerifiedBadgeFill className='f-20 text-primary' /> : ''}</div>
+                    <div className='text-secondary' style={{ fontSize: 10 }}>ROLE|{role}</div>
+                  </div>
                 </div>
               </div>
+              <div className='fs-4 p-2 pointer text-danger' onClick={() => {
+                Cookies.remove('user-data')
+                location.reload();
+              }}>
+                <IoExitOutline />
+              </div>
             </div>
-            <div className='fs-4 p-2 pointer text-danger' onClick={() => {
-              Cookies.remove('user-data')
-              location.reload();
-            }}>
-              <IoExitOutline />
-            </div>
-          </div>
 
-        </div>
+          </div>
+        </Paper>
         <div className='between w-100 box-shadow py-2 rounded mt-2 bg-white d-md-flex d-lg-none d-sm-flex'>
           <div className="menu-btn fs-5 pointer w-100 ms-3">
             <i class="fa-solid fa-bars pointer" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"></i>
@@ -263,8 +259,10 @@ function App() {
                   <Route path='/create-vendor' element={<VendorForm />} />
                   <Route path='/update-vendor/:id' element={<VendorForm />} />
                   <Route path='/list-vendor' element={<ViewVendor />} />
+                  <Route path='/vendor-detail/:id' element={<VendorDetail />} />
 
                   <Route path='/list-branch' element={<Company />} />
+                  <Route path='/company-detail/:id' element={<CompanyDetail />} />
                   <Route path='/create-branch' element={<BranchForm />} />
                   <Route path='/update-branch/:id' element={<BranchForm />} />
 
@@ -277,7 +275,7 @@ function App() {
                   <Route path='/pos-order' element={<ViewOrder />} />
                   <Route path='/order-detail/:id' element={<OrderDetail />} />
                   <Route path='/list-customer' element={<Customer />} />
-                  <Route path='/customer-detail' element={<CustomerDetail />} />
+                  <Route path='/customer-detail/:id' element={<CustomerDetail />} />
                   <Route path='/chart-of-account' element={<Account />} />
                   <Route path='/employees' element={<Employee />} />
                   <Route path='/employee-detail/:id' element={<EmployeeDetail />} />

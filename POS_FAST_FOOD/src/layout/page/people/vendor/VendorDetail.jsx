@@ -1,78 +1,59 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getEmployee } from "../../../../api/EmployeeApi";
-import { getAllBranch } from "../../../../api/Branch";
-import { getAllEmployee } from "../../../../api/EmployeeApi";
-import { el } from "date-fns/locale";
-import { IoIosArrowRoundBack, IoIosPersonAdd } from "react-icons/io";
 import { hostName } from "../../../../api/host";
 import Text from "../../../../components/text/Text";
-import { createUser, getUserByEmployeeId } from "../../../../api/UserApi";
-import InputValidation from "../../../../components/input/InputValidation";
-import CustomCommoBox from "../../../../components/select/CustomCommoBox";
-import { userObject } from "../../../../api/AppConfig";
-import { Accordion, AccordionDetails, AccordionSummary, Paper, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Paper } from "@mui/material";
 import List from "../../../../components/list/List";
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 import DetailED from "../../../../components/editRemoveAction/DetailED";
 import { getCustomer } from "../../../../api/Customer";
 import { getAllCustomer } from "../../../../api/Customer";
+import { getAllVendor } from "../../../../api/Vendor";
+import { getVendor } from "../../../../api/Vendor";
 
-
-
-const CustomerDetail = () => {
+const VendorDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const domainName = hostName();
     const profilePath = `http://${domainName}:8085/api/images/`
-    const [customer, setCustomer] = useState([]);
-    const [customerData, setCustomerData] = useState({
-        "firstName": "",
-        "lastName": "",
-        "email": "",
-        "phoneNumber": "",
-        "addressLine1": "",
-        "addressLine2": "",
-        "city": "",
-        "state": "",
-        "postalCode": "",
-        "country": "",
-        "joinDate": "",
-        "membershipStatus": "SL",
-        "status": "ACTIVE",
-        "image": ""
-    });
-    function getCustomerData() {
-        getAllCustomer().then((response) => {
-            setCustomer(response.data);
+    const [vendor, setVendor] = useState([]);
+    const [vendorData, setVendorData] = useState(
+        {
+            "displayName": "",
+            "companyName": "",
+            "email": "",
+            "phone": "",
+            "address": "",
+            "image": "",
+            "active": true
+        }
+    );
+    function getVendorData() {
+        getAllVendor().then((response) => {
+            setVendor(response.data);
         })
     }
     useEffect(() => {
-        getCustomerData();
+        getVendorData();
     }, [id])
 
     useEffect(() => {
         if (id) {
-            getCustomer(id).then((response) => {
+            getVendor(id).then((response) => {
                 const data = response.data;
-                setCustomerData((prevData) => ({
+
+                setVendorData((prevData) => ({
                     ...prevData,
-                    firstName: data.firstName || prevData.firstName,
-                    lastName: data.lastName || prevData.lastName,
+                    displayName: data.displayName || prevData.displayName,
+                    companyName: data.companyName || prevData.companyName,
                     email: data.email || prevData.email,
-                    phoneNumber: data.phoneNumber || prevData.phoneNumber,
-                    addressLine1: data.addressLine1 || prevData.addressLine1,
-                    addressLine2: data.addressLine2 || prevData.addressLine2,
-                    city: data.city || prevData.city,
-                    state: data.state || prevData.state,
-                    postalCode: data.postalCode || prevData.postalCode,
-                    country: data.country || prevData.country,
-                    joinDate: data.joinDate || prevData.joinDate,
-                    membershipStatus: data.membershipStatus || prevData.membershipStatus,
-                    status: data.status || prevData.status,
+                    phone: data.phone || prevData.phone,
+                    address: data.address || prevData.address,
                     image: data.image || prevData.image,
+                    active: data.active !== undefined ? data.active : prevData.active,
                 }));
             });
+
         }
     }, [id]);
 
@@ -109,17 +90,17 @@ const CustomerDetail = () => {
                                 <div className='d-flex justify-content-between align-items-center py-3 border-bottom border-2'>
                                     <div>
                                         <Paper elevation={0} className=''>
-                                            <div className="display-4 display-name py-4">{customerData.firstName} {customerData.lastName}</div>
-                                            <div className="f-14 text-secondary">{customerData.addressLine1} , {customerData.phoneNumber}</div>
-                                            <div className="f-14 text-secondary text-success">Email : {customerData.email}</div>
+                                            <div className="display-4 display-name py-4">{vendorData.displayName}</div>
+                                            <div className="f-14 text-secondary">{vendorData.address} , {vendorData.phone}</div>
+                                            <div className="f-14 text-secondary text-success">Email : {vendorData.email}</div>
                                         </Paper>
                                     </div>
                                     <div>
-                                        <Paper elevation={5} className='center rounded box-shadow' sx={{ height: '200px', width: '150px', overflow: 'hidden' }}>
-                                            <img src={`${profilePath}${customerData.image}`} alt="" className="h-100 rounded" />
+                                        <Paper elevation={5} className='center rounded box-shadow' sx={{ height: '200px', width: '300px', overflow: 'hidden' }}>
+                                            <img src={`${profilePath}${vendorData.image}`} alt="" className="h-100 rounded" />
                                         </Paper>
                                         <div className="pt-3">
-                                            <DetailED updateClick={() => navigate(`/update-employee/${id}`)} />
+                                            <DetailED updateClick={() => navigate(`/update-vendor/${id}`)} />
                                         </div>
 
                                     </div>
@@ -144,11 +125,11 @@ const CustomerDetail = () => {
                                         aria-controls="panel1-content"
                                         id="panel1-header"
                                     >
-                                        <p className="f-20 py-2 display-name">Membership</p>
+                                        <p className="f-20 py-2 display-name">Vendor Location</p>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <p className="f-16">
-                                            {customerData.resume}
+                                            {vendorData.address}
                                         </p>
                                     </AccordionDetails>
                                 </Accordion>
@@ -174,16 +155,9 @@ const CustomerDetail = () => {
                                     <AccordionDetails>
                                         <div className="row">
                                             <div className="col-md-6 col-12">
-                                                <Text title='City' value={customerData.city} fontSize={14} />
-                                                <Text title='Country' value={customerData.country} fontSize={14} />
-                                                <Text classValue={'pointer'} title='Postalcode ' value={customerData.postalCode} fontSize={14} click={() => navigate(`/employee-detail/${employeeData.managerID}`)} />
-
-                                            </div>
-                                            <div className="col-md-6 col-12">
-                                                <Text title='State / Province' value={customerData.state} fontSize={14} />
-                                                <Text title='Register date' value={formatDate(customerData.joinDate)} fontSize={14} />
-                                                <Text title='Email' value={customerData.email} fontSize={14} />
-
+                                                <Text title='Address' value={vendorData.address} fontSize={14} />
+                                                <Text title='Company' value={vendorData.companyName} fontSize={14} />
+                                                <Text title='Status' value={vendorData.active} fontSize={14} />
                                             </div>
                                         </div>
                                     </AccordionDetails>
@@ -201,12 +175,12 @@ const CustomerDetail = () => {
                                 position: 'sticky',
                                 top: 0
                             }}>
-                            <h1 className="fs-5 text-center py-3">More Customer</h1>
+                            <h1 className="fs-5 text-center py-3">More Vendor</h1>
                             {
 
-                                customer.map(e =>
-                                    <div className="d-block px-2" style={{ background: e.id == id ? `rgb(241, 241, 241)` : 'white' }} key={e.id} onClick={() => navigate(`/customer-detail/${e.id}`)}>
-                                        <List title={e.firstName + ' ' + e.lastName} subTitle={e.email} imgUrl={e.image} />
+                                vendor.map(e =>
+                                    <div className="d-block px-2" style={{ background: e.id == id ? `rgb(241, 241, 241)` : 'white' }} key={e.id} onClick={() => navigate(`/vendor-detail/${e.id}`)}>
+                                        <List title={e.displayName} subTitle={e.email} imgUrl={e.image} />
                                     </div>
                                 )
                             }
@@ -226,4 +200,4 @@ const CustomerDetail = () => {
 
 
 
-export default CustomerDetail
+export default VendorDetail

@@ -87,7 +87,8 @@ export const userObject = () => {
                     "image": userData.data.image,
                     "role": userData.role,
                     "branch": userData.data.companyID,
-                };
+                    "branchName": userData.branchName
+                }
                 return obj;
 
 
@@ -97,7 +98,7 @@ export const userObject = () => {
                     "image": '',
                     "role": userData.role,
                     "branch": 0,
-                };
+                }
             }
         }
     } catch (e) {

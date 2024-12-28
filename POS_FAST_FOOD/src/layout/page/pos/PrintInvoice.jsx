@@ -59,6 +59,7 @@ const Invoice = ({ data }) => {
 
                 <div className='f-10 text-secondary'>Date: <span>{formatDate(new Date())}</span></div>
                 <div className=""><hr /></div>
+                <div className='f-10 text-secondary'>Custoemr Service {data.customerName}</div>
                 <div className='f-10 text-secondary'>Served By {data.stuff}</div>
                 <div className="py-2" style={{ fontSize: '30px', fontWeight: 200 }}>
                     {data.tableNumber}
@@ -86,7 +87,9 @@ const Invoice = ({ data }) => {
             </table>
 
             <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-                <div><strong>Total:</strong> ${data.totalAmount}</div>
+                <div><strong>Total:</strong> ${data.totalAmount + data.totalDiscount}</div>
+                <div><strong>Discount:</strong> ${data.totalDiscount}</div>
+                <div><strong>Paid:</strong> ${data.totalAmount}</div>
                 <div><strong>Cash:</strong> ${data.received}</div>
                 <div><strong>Exchange:</strong> ${data.change}</div>
             </div>

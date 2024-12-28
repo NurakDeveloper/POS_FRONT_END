@@ -13,12 +13,15 @@ import InputValidation from '../../../components/input/InputValidation'
 import { IoPrintOutline } from 'react-icons/io5'
 import { motion } from 'framer-motion';
 import ActionHeader from '../../../components/listheader/ActionHeader'
+import { getAllEmployee } from '../../../api/EmployeeApi'
+import { Avatar, AvatarGroup } from '@mui/material'
 const Company = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingRemove, setIsLoadingRemove] = useState(false);
     const [product, setProduct] = useState([]);
     const [branch, setBranch] = useState([]);
     const domainName = hostName();
+    const [employee, setEmployee] = useState([]);
     const [productId, setProductId] = useState();
     useEffect(() => {
         getData();
@@ -39,6 +42,11 @@ const Company = () => {
         getAllBranch().then((respnse) => {
             setBranch(respnse.data);
             console.log(respnse.data);
+        }).catch(error => {
+            console.error(error);
+        })
+        getAllEmployee().then((response) => {
+            setEmployee(response.data);
         }).catch(error => {
             console.error(error);
         })
@@ -105,7 +113,7 @@ const Company = () => {
                         animate="visible"
                     >
                         <div
-                            onClick={() => navigate(`/update-branch/${o.id}`)}  // Navigate to branch detail
+                            onClick={() => navigate(`/company-detail/${o.id}`)}  // Navigate to branch detail
                             className="bg-white p-0 pointer border transform-hover"
                             style={{
                                 height: '250px',  // Adjusted height for branch cards
@@ -129,16 +137,41 @@ const Company = () => {
                                         <div className="f-16 text-title">{o.branchName}</div>
                                         <div className="text-secondary f-14">{o.city}, {o.state}</div>
                                         <div className="py-2">
-                                            <span className="f-14 text-badges-red">Manager: {o.managerId}</span>
+                                            <span className="f-14 text-badges-red">Branch Manager: {employee ? employee.find(e => e.id == o.managerId).firstName + ' ' + employee.find(e => e.id == o.managerId).lastName : ''}</span>
                                         </div>
                                         <div className="py-2">
                                             <span className="f-14 text-badges-warning">Established: {new Date(o.establishedDate).toLocaleDateString()}</span>
                                         </div>
-                                        <textarea
+                                        {/* <textarea
                                             className="border-0 text-secondary w-100 py-2 h-100 f-10"
                                             value={o.addressLine1 + ' ' + o.addressLine2}
                                             readOnly
-                                        ></textarea>
+                                        ></textarea> */}
+                                        <AvatarGroup
+                                            spacing="medium"
+                                            max={3}
+                                            sx={{
+                                                justifyContent: "start", // Align avatars to the start
+                                                "& .MuiAvatar-root": {
+                                                    marginLeft: "-8px", // Adjust the overlap or spacing between avatars
+                                                },
+                                            }}
+                                        >
+                                            {employee.map((p) => {
+
+                                                if (p.companyID == o.id) {
+                                                    return (
+                                                        <>
+                                                            <Avatar
+                                                                key={p.id} // Add a unique key for each Avatar
+                                                                alt={p.name || "Product Avatar"} // Add a descriptive alt text
+                                                                src={`http://${domainName}:8085/api/images/${p.image}`}
+                                                            />
+                                                        </>
+                                                    )
+                                                }
+                                            })}
+                                        </AvatarGroup>
                                     </div>
                                 </div>
                             </div>

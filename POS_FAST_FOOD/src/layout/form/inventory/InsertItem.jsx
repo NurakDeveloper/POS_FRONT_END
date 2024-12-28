@@ -252,6 +252,7 @@ const InsertItem = () => {
                         items={categories} // Assuming you have a list of categories
                         searchKey={['name']}
                         labelKeys={['name']}
+                        defaultValueIndex={categories.findIndex(c => c.id == productData.categoryId)}
                         onItemSelected={(value) => handleInputChange("categoryId", value.id)}
                         error={errors.categoryId}
                     />
@@ -261,6 +262,7 @@ const InsertItem = () => {
                         items={branch} // Assuming you have a list of categories
                         searchKey={['branchName']}
                         labelKeys={['branchName', 'addressLine1']}
+                        defaultValueIndex={branch.findIndex(b => b.id == productData.branchId)}
                         onItemSelected={(value) => handleInputChange("branchId", value.id)}
                         error={errors.branchId}
                     />

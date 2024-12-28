@@ -13,11 +13,17 @@ import DataList from '../../../components/datalist/DataList'
 import { motion } from 'framer-motion'
 import ActionHeader from '../../../components/listheader/ActionHeader'
 import { exportToExcelFiles, perPage, searchData } from '../../../api/AppConfig'
+import { getAllProduct } from '../../../api/Product'
+import { Avatar, AvatarGroup, Paper } from '@mui/material'
+import ED from '../../../components/editRemoveAction/ED'
 
 const Category = () => {
 
+    const [employee, setEmployee] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [product, setProduct] = useState([]);
     const domainName = hostName();
+    const IMG_BEST_URL = `http://${domainName}:8085/api/images/`;
     const categoryPathImage = `http://${domainName}:8085/api/images/`;
     useEffect(() => {
         getCategory();
@@ -37,6 +43,9 @@ const Category = () => {
             setCategories(response.data);
         }).catch(e => {
             console.error(e);
+        })
+        getAllProduct().then((reponse) => {
+            setProduct(reponse.data);
         })
     }
     const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
@@ -155,7 +164,7 @@ const Category = () => {
                             <Th
                                 onSort={() => handleSort("id")}
                                 sortDirection={sortConfig.key === "id" ? sortConfig.direction : ""}
-                                columnWidth={20}
+                                columnWidth={50}
                             >
                                 No
                             </Th>
@@ -165,6 +174,7 @@ const Category = () => {
                                     sortConfig.key === "name" ? sortConfig.direction : ""
                                 }
                                 resizable
+                                columnWidth={100}
                             >
                                 Category
                             </Th>
@@ -175,7 +185,7 @@ const Category = () => {
                                 }
                                 resizable
                             >
-                                Description
+                                Product
                             </Th>
                             <Th columnWidth={30}>
                                 Action
@@ -206,24 +216,45 @@ const Category = () => {
                                                 <img src={`${categoryPathImage}${f.image}`} alt="" className="h-100" />
                                             </div>
                                             <div className='ps-3'>
-                                                {f.name}
+                                                <span>{f.name}</span> <br />
+                                                <span className='f-10'>{f.description}</span>
                                             </div>
                                         </div>
                                     </Td>
-                                    <Td>{f.description}</Td>
+                                    <Td>
+                                        <AvatarGroup
+                                            spacing="medium"
+                                            max={5}
+                                            sx={{
+                                                justifyContent: "start", // Align avatars to the start
+                                                "& .MuiAvatar-root": {
+                                                    marginLeft: "-8px", // Adjust the overlap or spacing between avatars
+                                                },
+                                            }}
+                                        >
+                                            {product.map((p) => {
+                                                if (p.categoryId == f.id) {
+                                                    return (
+                                                        <Avatar
+                                                            key={p.id} // Add a unique key for each Avatar
+                                                            alt={p.name || "Product Avatar"} // Add a descriptive alt text
+                                                            src={`${IMG_BEST_URL}${p.image}`}
+                                                        />
+                                                    );
+                                                }
+                                            })}
+                                        </AvatarGroup>
+
+
+                                    </Td>
                                     <td>
-                                        <div className="between">
-                                            <span className='pointer text-badges-danger' onClick={() => {
+                                        <ED
+                                            deleteClick={() => {
                                                 setCategoryId(f.id);
                                                 setIsRemoveCategories(true);
-                                            }}>
-                                                <i class="fa-solid fa-trash-can " ></i>
-                                            </span>
-                                            <span className='pointer text-badges-green' onClick={() => navigate(`/update-category/${f.id}`)}>
-                                                <RiEditFill />
-                                            </span>
-
-                                        </div>
+                                            }}
+                                            updateClick={() => navigate(`/update-category/${f.id}`)}
+                                        />
                                     </td>
                                 </motion.tr>
                             ))}
